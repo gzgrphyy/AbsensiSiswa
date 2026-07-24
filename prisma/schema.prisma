@@ -1,13 +1,107 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  GURU
+}
+
+enum Semester {
+  GANJIL
+  GENAP
+}
+
+enum StatusAbsensi {
+  HADIR
+  SAKIT
+  IZIN
+  ALPHA
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  nama         String   @db.VarChar(100)
+  email        String   @unique @db.VarChar(150)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  role         Role
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  kelasWali    Kelas[]   @relation("WaliKelas")
+  absensiInput Absensi[] @relation("DicatatOleh")
+
+  @@map("users")
+}
+
+model TahunAjaran {
+  id        Int       @id @default(autoincrement())
+  nama      String    @db.VarChar(20)
+  semester  Semester
+  isActive  Boolean   @default(false) @map("is_active")
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  kelas     Kelas[]
+
+  @@unique([nama, semester])
+  @@map("tahun_ajaran")
+}
+
+model Kelas {
+  id            Int      @id @default(autoincrement())
+  nama          String   @db.VarChar(50)
+  waliKelasId   Int?     @map("wali_kelas_id")
+  tahunAjaranId Int      @map("tahun_ajaran_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  waliKelas     User?       @relation("WaliKelas", fields: [waliKelasId], references: [id])
+  tahunAjaran   TahunAjaran @relation(fields: [tahunAjaranId], references: [id])
+  siswa         Siswa[]
+  absensi       Absensi[]
+
+  @@unique([nama, tahunAjaranId])
+  @@map("kelas")
+}
+
+model Siswa {
+  id         Int      @id @default(autoincrement())
+  nisn       String   @unique @db.VarChar(20)
+  nama       String   @db.VarChar(100)
+  kelasId    Int      @map("kelas_id")
+  namaWali   String?  @map("nama_wali") @db.VarChar(100)
+  kontakWali String?  @map("kontak_wali") @db.VarChar(20)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  kelas      Kelas     @relation(fields: [kelasId], references: [id])
+  absensi    Absensi[]
+
+  @@map("siswa")
+}
+
+model Absensi {
+  id          Int           @id @default(autoincrement())
+  siswaId     Int           @map("siswa_id")
+  kelasId     Int           @map("kelas_id")
+  tanggal     DateTime      @db.Date
+  status      StatusAbsensi
+  keterangan  String?       @db.VarChar(255)
+  dicatatOleh Int           @map("dicatat_oleh")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  siswa       Siswa @relation(fields: [siswaId], references: [id])
+  kelas       Kelas @relation(fields: [kelasId], references: [id])
+  pencatat    User  @relation("DicatatOleh", fields: [dicatatOleh], references: [id])
+
+  @@unique([siswaId, tanggal])
+  @@map("absensi")
 }
