@@ -184,7 +184,7 @@ const hariIni = todayName
             </div>
             <div class="flex gap-2">
               <NuxtLink :to="`/absensi/sesi/${sesi.id}`"
-                class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
+                class="flex-1 text-center px-3 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors">
                 Konfirmasi Kehadiran
               </NuxtLink>
               <button @click="confirmClose = sesi"
@@ -239,13 +239,13 @@ const hariIni = todayName
                 <button v-if="!j.todaySesi || (j.todaySesi.status === 'SELESAI')"
                   @click="bukaSesi(j.id)"
                   :disabled="openingSesi === j.id"
-                  class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-1.5">
+                  class="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-1.5">
                   <svg v-if="openingSesi === j.id" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                   {{ openingSesi === j.id ? 'Membuka...' : 'Buka Sesi' }}
                 </button>
                 <NuxtLink v-else-if="j.activeSesi"
                   :to="`/absensi/sesi/${j.activeSesi.id}`"
-                  class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 inline-flex items-center gap-1.5">
+                  class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-primary-100 inline-flex items-center gap-1.5">
                   Lihat
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                 </NuxtLink>

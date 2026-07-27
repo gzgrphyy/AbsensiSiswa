@@ -218,7 +218,7 @@ onMounted(() => {
                   :checked="entries.get(s.id)?.checked || false"
                   @change="toggleSiswa(s.id)"
                   :disabled="sesi.status === 'SELESAI'"
-                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed" />
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-primary-500 cursor-pointer disabled:cursor-not-allowed" />
               </td>
               <td class="px-3 py-3">
                 <div class="flex items-center gap-2">
@@ -233,7 +233,7 @@ onMounted(() => {
                 <select v-if="sesi.status === 'AKTIF'"
                   :value="entries.get(s.id)?.status || 'ALPHA'"
                   @change="(e) => setStatus(s.id, (e.target as HTMLSelectElement).value)"
-                  class="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer">
+                  class="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-primary-500 bg-white cursor-pointer">
                   <option value="HADIR">Hadir</option>
                   <option value="SAKIT">Sakit</option>
                   <option value="IZIN">Izin</option>
@@ -247,7 +247,7 @@ onMounted(() => {
                 <input v-if="sesi.status === 'AKTIF'"
                   v-model="entries.get(s.id)!.keterangan"
                   type="text" placeholder="-" maxlength="255"
-                  class="w-full max-w-[120px] text-xs border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-blue-500 placeholder:text-gray-300" />
+                  class="w-full max-w-[120px] text-xs border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-primary-500 placeholder:text-gray-300" />
                 <span v-else class="text-xs text-gray-400">{{ s.request?.keterangan || '-' }}</span>
               </td>
               <td class="px-3 py-3 text-center hidden md:table-cell">
@@ -268,7 +268,7 @@ onMounted(() => {
           <strong class="text-green-600">{{ statusCount.HADIR }}</strong> hadir
         </p>
         <button @click="submitKonfirmasi" :disabled="submitting"
-          class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
+          class="px-5 py-2.5 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
           <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           {{ submitting ? 'Menyimpan...' : 'Konfirmasi Kehadiran' }}
         </button>

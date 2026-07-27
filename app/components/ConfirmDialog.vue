@@ -5,7 +5,7 @@ withDefaults(defineProps<{
   message: string
   confirmLabel?: string
   cancelLabel?: string
-  variant?: 'danger' | 'warning' | 'success'
+  variant?: 'danger' | 'warning' | 'success' | 'primary'
   loading?: boolean
 }>(), {
   confirmLabel: 'Ya',
@@ -21,14 +21,16 @@ const emit = defineEmits<{
 
 const btnVariants = {
   danger: 'bg-red-600 hover:bg-red-700 text-white',
-  warning: 'bg-amber-500 hover:bg-amber-600 text-white',
+  warning: 'bg-accent-500 hover:bg-accent-600 text-primary-900',
   success: 'bg-green-600 hover:bg-green-700 text-white',
+  primary: 'bg-primary-500 hover:bg-primary-600 text-white',
 }
 
 const iconVariants = {
-  danger: 'bg-red-100 text-red-600',
-  warning: 'bg-amber-100 text-amber-600',
-  success: 'bg-green-100 text-green-600',
+  danger: 'bg-red-50 text-red-600',
+  warning: 'bg-accent-50 text-primary-700',
+  success: 'bg-green-50 text-green-600',
+  primary: 'bg-primary-50 text-primary-600',
 }
 </script>
 
@@ -36,10 +38,10 @@ const iconVariants = {
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="show" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/30" @click="emit('cancel')" />
-        <div class="relative bg-white rounded-xl shadow-xl w-full max-w-sm mx-auto p-6 border border-gray-200">
-          <div class="flex items-center gap-3 mb-4">
-            <div :class="['p-2 rounded-full', iconVariants[variant]]">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" @click="emit('cancel')" />
+        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-6 border border-gray-100">
+          <div class="flex items-start gap-3 mb-4">
+            <div :class="['p-2 rounded-full flex-shrink-0', iconVariants[variant]]">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
@@ -51,7 +53,7 @@ const iconVariants = {
                 />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  v-if="variant === 'success'"
+                  v-if="variant === 'success' || variant === 'primary'"
                 />
               </svg>
             </div>
@@ -64,14 +66,14 @@ const iconVariants = {
           <div class="flex justify-end gap-3">
             <button
               @click="emit('cancel')"
-              class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-150"
             >
               {{ cancelLabel }}
             </button>
             <button
               @click="emit('confirm')"
               :disabled="loading"
-              :class="['px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 inline-flex items-center gap-1.5 disabled:opacity-50', btnVariants[variant]]"
+              :class="['px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 inline-flex items-center gap-1.5 shadow-sm disabled:opacity-50', btnVariants[variant]]"
             >
               <svg v-if="loading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

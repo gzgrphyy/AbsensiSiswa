@@ -5,7 +5,7 @@ const isAdmin = computed(() => user.value?.role === 'ADMIN')
 </script>
 
 <template>
-  <div class="flex min-h-screen">
+  <div class="flex min-h-screen bg-[#FEFEFE]">
     <!-- Sidebar -->
     <Sidebar />
 
@@ -15,7 +15,7 @@ const isAdmin = computed(() => user.value?.role === 'ADMIN')
       <Header />
 
       <!-- Content -->
-      <main class="flex-1 bg-gray-50 overflow-y-auto">
+      <main class="flex-1 overflow-y-auto">
         <div class="page-container">
           <slot />
         </div>

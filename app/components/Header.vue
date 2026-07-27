@@ -22,30 +22,30 @@ async function handleLogout() {
 
 <template>
   <header class="bg-white border-b border-gray-200 flex-shrink-0">
-    <!-- Garis merah di paling atas -->
-    <div class="h-0.5 bg-red-600" />
+    <!-- Garis primary di paling atas -->
+    <div class="h-0.5 bg-primary-500" />
 
-    <div class="px-6 py-3 flex items-center justify-between">
-      <!-- Left: App Info -->
-      <div class="flex items-center gap-4">
+    <div class="px-6 py-2.5 flex items-center justify-between">
+      <!-- Left: Breadcrumb-style info -->
+      <div class="flex items-center gap-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white text-sm font-bold">
+          <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">
             S
           </div>
-          <div>
-            <h1 class="text-sm font-semibold text-gray-900 leading-tight">SISTEM ABSENSI SEKOLAH</h1>
-            <p class="text-[10px] text-gray-400 leading-tight">YAYASAN PENDIDIKAN INDONESIA</p>
+          <div class="hidden sm:block">
+            <h1 class="text-sm font-semibold text-gray-900 leading-tight">Sistem Absensi</h1>
+            <p class="text-[10px] text-gray-400 leading-tight">SMKN 4 Bandung</p>
           </div>
         </div>
       </div>
 
       <!-- Right: User Info -->
       <div class="flex items-center gap-3">
-        <span class="text-xs text-gray-400 hidden sm:block">{{ today }}</span>
-        <div class="h-5 w-px bg-gray-200 hidden sm:block" />
+        <span class="text-[11px] text-gray-400 hidden md:block">{{ today }}</span>
+        <div class="h-4 w-px bg-gray-200 hidden md:block" />
 
-        <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-primary-50 flex items-center justify-center text-xs font-semibold text-primary-600 border border-primary-100">
             {{ user?.nama?.charAt(0)?.toUpperCase() || 'U' }}
           </div>
           <div class="hidden md:block">
@@ -56,7 +56,7 @@ async function handleLogout() {
 
         <button
           @click="handleLogout"
-          class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150"
+          class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-150"
           title="Logout"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

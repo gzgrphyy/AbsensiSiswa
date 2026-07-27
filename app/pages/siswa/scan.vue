@@ -281,7 +281,7 @@ const statusLabels: Record<string, string> = {
             <p class="text-sm text-gray-700 mb-1">{{ cameraError }}</p>
             <div class="mt-3 flex flex-col gap-2 items-center">
               <button @click="startCamera"
-                class="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors inline-flex items-center gap-1.5">
+                class="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-primary-100 transition-colors inline-flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
@@ -356,12 +356,12 @@ const statusLabels: Record<string, string> = {
                 v-model="manualCode"
                 type="text"
                 placeholder="Contoh: R-001"
-                class="flex-1 px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-shadow"
+                class="flex-1 px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 transition-shadow"
               />
               <button
                 type="submit"
                 :disabled="submitting || !manualCode.trim()"
-                class="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-1.5"
+                class="px-4 py-2.5 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 active:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-1.5"
               >
                 <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -432,7 +432,7 @@ const statusLabels: Record<string, string> = {
               </NuxtLink>
               <button @click="resetScan"
                 :disabled="submitting"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:opacity-50"
+                class="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 active:bg-primary-700 transition-colors disabled:opacity-50"
               >
                 {{ result.success ? 'Scan Lagi' : 'Coba Lagi' }}
               </button>

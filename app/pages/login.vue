@@ -41,8 +41,8 @@ async function handleLogin() {
           <div class="w-14 h-14 rounded-xl bg-red-600 flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
             S
           </div>
-          <h1 class="text-lg font-bold text-gray-900">SISTEM ABSENSI SEKOLAH</h1>
-          <p class="text-xs text-gray-400 mt-1">YAYASAN PENDIDIKAN INDONESIA</p>
+          <h1 class="text-lg font-bold text-gray-900">Sistem Absensi sekolah</h1>
+          <p class="text-xs text-gray-400 mt-1">SMKN 4 Bandung</p>
         </div>
 
         <!-- Error -->
@@ -65,7 +65,7 @@ async function handleLogin() {
               type="email"
               required
               placeholder="email@sekolah.sch.id"
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400"
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow placeholder:text-gray-400"
             />
           </div>
 
@@ -78,7 +78,7 @@ async function handleLogin() {
               type="password"
               required
               placeholder="Masukkan password"
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400"
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow placeholder:text-gray-400"
             />
           </div>
 
@@ -98,7 +98,7 @@ async function handleLogin() {
 
         <!-- Footer -->
         <p class="text-center text-xs text-gray-400 mt-6">
-          &copy; {{ new Date().getFullYear() }} Yayasan Pendidikan Indonesia
+          &copy; {{ new Date().getFullYear() }} Smkn 4 Bandung
         </p>
       </div>
     </div>

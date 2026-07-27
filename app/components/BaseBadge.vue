@@ -1,6 +1,6 @@
 <script setup lang="ts">
 withDefaults(defineProps<{
-  variant?: 'green' | 'red' | 'blue' | 'amber' | 'gray' | 'purple' | 'cyan'
+  variant?: 'green' | 'red' | 'blue' | 'amber' | 'gray' | 'purple' | 'cyan' | 'primary'
   size?: 'sm' | 'md'
   dot?: boolean
   pulse?: boolean
@@ -12,23 +12,25 @@ withDefaults(defineProps<{
 })
 
 const variants = {
-  green: 'bg-green-100 text-green-800 ring-1 ring-green-200',
-  red: 'bg-red-100 text-red-800 ring-1 ring-red-200',
-  blue: 'bg-blue-100 text-blue-800 ring-1 ring-blue-200',
-  amber: 'bg-amber-100 text-amber-800 ring-1 ring-amber-200',
-  gray: 'bg-gray-100 text-gray-600 ring-1 ring-gray-200',
-  purple: 'bg-purple-100 text-purple-800 ring-1 ring-purple-200',
-  cyan: 'bg-cyan-100 text-cyan-800 ring-1 ring-cyan-200',
+  green: 'bg-green-50 text-green-700 ring-1 ring-green-200',
+  red: 'bg-red-50 text-red-700 ring-1 ring-red-200',
+  blue: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
+  amber: 'bg-accent-50 text-primary-800 ring-1 ring-accent-200 font-semibold',
+  gray: 'bg-gray-50 text-gray-500 ring-1 ring-gray-200',
+  purple: 'bg-purple-50 text-purple-700 ring-1 ring-purple-200',
+  cyan: 'bg-cyan-50 text-cyan-700 ring-1 ring-cyan-200',
+  primary: 'bg-primary-50 text-primary-700 ring-1 ring-primary-200 font-semibold',
 }
 
 const dotColors = {
   green: 'bg-green-500',
   red: 'bg-red-500',
   blue: 'bg-blue-500',
-  amber: 'bg-amber-500',
+  amber: 'bg-accent-500',
   gray: 'bg-gray-400',
   purple: 'bg-purple-500',
   cyan: 'bg-cyan-500',
+  primary: 'bg-primary-500',
 }
 
 const sizes = {

@@ -16,18 +16,18 @@ withDefaults(defineProps<{
 const emit = defineEmits<{ click: [] }>()
 
 const variants = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-sm',
+  primary: 'bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 shadow-sm',
   danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm',
   success: 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-sm',
-  warning: 'bg-amber-500 text-white hover:bg-amber-600 active:bg-amber-700 shadow-sm',
-  ghost: 'text-gray-600 hover:text-gray-800 hover:bg-gray-100',
-  outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400',
+  warning: 'bg-accent-500 text-primary-900 hover:bg-accent-600 active:bg-accent-700 shadow-sm font-semibold',
+  ghost: 'text-gray-500 hover:text-primary-600 hover:bg-primary-50',
+  outline: 'border border-gray-200 text-gray-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50',
 }
 
 const sizes = {
-  sm: iconOnly => iconOnly ? 'p-1.5 text-xs' : 'px-2.5 py-1.5 text-xs',
-  md: iconOnly => iconOnly ? 'p-2 text-sm' : 'px-3.5 py-2 text-sm',
-  lg: iconOnly => iconOnly ? 'p-2.5 text-sm' : 'px-4 py-2.5 text-sm',
+  sm: (iconOnly: boolean) => iconOnly ? 'p-1.5 text-xs' : 'px-2.5 py-1.5 text-xs',
+  md: (iconOnly: boolean) => iconOnly ? 'p-2 text-sm' : 'px-3.5 py-2 text-sm',
+  lg: (iconOnly: boolean) => iconOnly ? 'p-2.5 text-sm' : 'px-4 py-2.5 text-sm',
 }
 </script>
 
@@ -36,7 +36,7 @@ const sizes = {
     @click="emit('click')"
     :disabled="disabled || loading"
     :class="[
-      'inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed',
+      'inline-flex items-center justify-center gap-1.5 font-medium rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-300 disabled:opacity-50 disabled:cursor-not-allowed',
       variants[variant],
       sizes[size](iconOnly),
     ]"

@@ -50,7 +50,7 @@ const rataPersentase = computed(() =>
     <div class="flex items-center gap-3 mb-5">
       <label class="text-sm font-medium text-gray-700">Periode:</label>
       <select v-model="selectedBulan"
-        class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500">
+        class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary-500">
         <option v-for="o in bulanOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
       </select>
     </div>

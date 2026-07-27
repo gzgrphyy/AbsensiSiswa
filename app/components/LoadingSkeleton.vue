@@ -11,18 +11,18 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <div v-if="type === 'table'" class="bg-white rounded-lg border border-gray-200 shadow-card p-5 space-y-4">
+  <div v-if="type === 'table'" class="bg-white rounded-xl border border-gray-100 shadow-card p-5 space-y-4">
     <div v-for="i in rows" :key="i" class="flex items-center gap-4 animate-pulse">
-      <div v-for="j in columns" :key="j" class="h-4 bg-gray-200 rounded" :style="{ width: (50 + Math.random() * 40) + '%' }"></div>
+      <div v-for="j in columns" :key="j" class="h-3 bg-gray-100 rounded" :style="{ width: (50 + Math.random() * 40) + '%' }"></div>
     </div>
   </div>
   <div v-else-if="type === 'card'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div v-for="i in rows" :key="i" class="bg-white rounded-lg border border-gray-200 shadow-card p-5 animate-pulse">
-      <div class="h-3 bg-gray-200 rounded w-20 mb-2"></div>
-      <div class="h-6 bg-gray-200 rounded w-12"></div>
+    <div v-for="i in rows" :key="i" class="bg-white rounded-xl border border-gray-100 shadow-card p-5 animate-pulse">
+      <div class="h-3 bg-gray-100 rounded w-20 mb-2"></div>
+      <div class="h-6 bg-gray-100 rounded w-12"></div>
     </div>
   </div>
   <div v-else class="space-y-2 animate-pulse">
-    <div v-for="i in rows" :key="i" class="h-4 bg-gray-200 rounded" :style="{ width: (60 + Math.random() * 30) + '%' }"></div>
+    <div v-for="i in rows" :key="i" class="h-3 bg-gray-100 rounded" :style="{ width: (60 + Math.random() * 30) + '%' }"></div>
   </div>
 </template>

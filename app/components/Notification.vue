@@ -13,8 +13,8 @@ const emit = defineEmits<{ dismiss: [] }>()
 const styles = {
   success: 'bg-green-50 border-green-200 text-green-800',
   error: 'bg-red-50 border-red-200 text-red-800',
-  warning: 'bg-amber-50 border-amber-200 text-amber-800',
-  info: 'bg-blue-50 border-blue-200 text-blue-800',
+  warning: 'bg-accent-50 border-accent-200 text-primary-900',
+  info: 'bg-primary-50 border-primary-200 text-primary-800',
 }
 
 const icons = {
@@ -27,7 +27,7 @@ const icons = {
 
 <template>
   <Transition name="slide">
-    <div v-if="show" :class="['mb-4 px-4 py-3 rounded-lg border text-sm flex items-center gap-2 shadow-card', styles[type]]">
+    <div v-if="show" :class="['mb-4 px-4 py-3 rounded-xl border text-sm flex items-center gap-2.5 shadow-card', styles[type]]">
       <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons[type]" />
       </svg>

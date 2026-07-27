@@ -72,7 +72,7 @@ async function handleSave() {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <BaseFormField label="Nama Lengkap" required>
             <input v-model="form.nama" type="text"
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
           </BaseFormField>
           <BaseFormField label="NISN">
             <input :value="profile?.nisn || '-'" type="text" disabled
@@ -95,18 +95,18 @@ async function handleSave() {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField label="Nama Wali">
               <input v-model="form.namaWali" type="text" placeholder="Nama orang tua / wali"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
             </BaseFormField>
             <BaseFormField label="Kontak Wali">
               <input v-model="form.kontakWali" type="text" placeholder="Nomor HP wali"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
             </BaseFormField>
           </div>
         </div>
 
         <div class="flex justify-end pt-4 border-t border-gray-200">
           <button type="submit" :disabled="saving"
-            class="px-6 py-2.5 bg-blue-600 text-sm font-medium text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
+            class="px-6 py-2.5 bg-primary-500 text-sm font-medium text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             Simpan Perubahan
           </button>

@@ -18,12 +18,12 @@ function goBack() {
 </script>
 
 <template>
-  <div class="flex items-center justify-between mb-5">
+  <div class="flex items-center justify-between mb-6">
     <div class="flex items-center gap-3">
       <button
         v-if="showBack"
         @click="goBack"
-        class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+        class="p-1.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-150"
         title="Kembali"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,8 +31,8 @@ function goBack() {
         </svg>
       </button>
       <div>
-        <h1 class="text-lg font-semibold text-gray-900">{{ title }}</h1>
-        <p v-if="description" class="text-sm text-gray-500">{{ description }}</p>
+        <h1 class="text-xl font-bold text-gray-900 tracking-tight">{{ title }}</h1>
+        <p v-if="description" class="text-sm text-gray-400 mt-0.5">{{ description }}</p>
       </div>
     </div>
     <div class="flex items-center gap-2">

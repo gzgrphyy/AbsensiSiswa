@@ -119,7 +119,7 @@ async function handleDelete() {
     <PageHeader title="Jadwal Pelajaran" description="Kelola jadwal pelajaran">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium shadow-sm">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium shadow-sm">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -159,7 +159,7 @@ async function handleDelete() {
               <td class="px-4 py-3 text-gray-500 text-xs hidden lg:table-cell">{{ item.guru.nama }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
-                  <button @click="openEdit(item)" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit">
+                  <button @click="openEdit(item)" class="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg" title="Edit">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
@@ -191,20 +191,20 @@ async function handleDelete() {
         <BaseFormField label="Mata Pelajaran" required>
           <input v-model="form.mapel" type="text" @input="onFormChange" required
             placeholder="contoh: Matematika"
-            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
         </BaseFormField>
 
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField label="Hari" required>
             <select v-model="form.hari" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
               <option v-for="h in hariList" :key="h" :value="h">{{ hariLabel[h] }}</option>
             </select>
           </BaseFormField>
 
           <BaseFormField label="Kelas" required>
             <select v-model="form.kelasId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
               <option :value="0" disabled>Pilih kelas</option>
               <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
             </select>
@@ -214,19 +214,19 @@ async function handleDelete() {
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField label="Jam Mulai" required>
             <input v-model="form.jamMulai" type="time" @input="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
           </BaseFormField>
 
           <BaseFormField label="Jam Selesai" required>
             <input v-model="form.jamSelesai" type="time" @input="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
           </BaseFormField>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField label="Ruangan" required>
             <select v-model="form.ruanganId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
               <option :value="0" disabled>Pilih ruangan</option>
               <option v-for="r in ruanganList" :key="r.id" :value="r.id">{{ r.nama }}</option>
             </select>
@@ -234,7 +234,7 @@ async function handleDelete() {
 
           <BaseFormField label="Guru" required>
             <select v-model="form.guruId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
               <option :value="0" disabled>Pilih guru</option>
               <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
             </select>
@@ -244,7 +244,7 @@ async function handleDelete() {
       <template #footer>
         <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">Batal</button>
         <button type="submit" @click="handleSave" :disabled="saving"
-          class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
+          class="px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2">
           <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           {{ saving ? 'Menyimpan...' : 'Simpan' }}
         </button>

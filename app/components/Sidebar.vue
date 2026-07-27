@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const { user } = useUserSession()
 const collapsed = ref(false)
-const openGroups = ref<Record<string, boolean>>({
-  'master-data': true
-})
+const openGroups = ref<Record<string, boolean>>({})
 
 interface MenuItem {
   label: string
@@ -53,16 +51,12 @@ const siswaMenus: MenuItem[] = [
 
 const isActive = (to?: string) => {
   if (!to) return false
-  return route.path === to || route.path.startsWith(to + '/')
+  return route.path === to
 }
 
 const isChildActive = (children?: { to: string }[]) => {
   if (!children) return false
   return children.some(c => route.path === c.to || route.path.startsWith(c.to + '/'))
-}
-
-function toggleGroup(key: string) {
-  openGroups.value[key] = !openGroups.value[key]
 }
 
 const currentMenus = computed(() => {
@@ -72,6 +66,24 @@ const currentMenus = computed(() => {
   if (role === 'SISWA') return siswaMenus
   return []
 })
+
+function toggleGroup(key: string) {
+  openGroups.value[key] = !openGroups.value[key]
+}
+
+// Auto buka/tutup grup menu berdasarkan route
+watch(
+  [() => route.path, currentMenus],
+  () => {
+    for (const menu of currentMenus.value) {
+      if (menu.children) {
+        const isInGroup = menu.children.some(c => route.path === c.to || route.path.startsWith(c.to + '/'))
+        openGroups.value[menu.icon] = isInGroup
+      }
+    }
+  },
+  { immediate: true }
+)
 
 function renderIcon(icon: string) {
   const icons: Record<string, string> = {
@@ -93,59 +105,62 @@ function renderIcon(icon: string) {
 <template>
   <aside
     :class="[
-      'bg-white border-r border-gray-200 flex flex-col transition-all duration-200 h-screen sticky top-0',
+      'bg-white border-r border-gray-200 flex flex-col transition-all duration-200 h-screen sticky top-0 z-40',
       collapsed ? 'w-14' : 'w-60'
     ]"
   >
+    <!-- Garis aksen atas (sama dengan Header) -->
+    <div class="h-0.5 bg-primary-500" />
+
     <!-- Logo Area -->
-    <div class="flex-shrink-0 px-4 py-4 border-b border-gray-200">
-      <NuxtLink to="/" class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+    <div class="flex-shrink-0 border-b border-gray-200">
+      <NuxtLink to="/" class="flex items-center gap-2.5 px-4 py-2.5">
+        <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-sm">
           S
         </div>
         <div v-if="!collapsed" class="min-w-0">
-          <p class="text-sm font-semibold text-gray-900 truncate">Sekolah</p>
-          <p class="text-[10px] text-gray-400 truncate">Absensi Siswa</p>
+          <p class="text-sm font-semibold text-gray-900 truncate leading-tight">SMKN 4 Bandung</p>
+          <p class="text-[10px] text-gray-400 truncate leading-tight">Sistem Absensi</p>
         </div>
       </NuxtLink>
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto scrollbar-thin px-2 py-3 space-y-1">
+    <nav class="flex-1 overflow-y-auto scrollbar-thin px-2.5 py-3 space-y-0.5">
       <template v-for="item in currentMenus" :key="item.label">
         <!-- Menu dengan children -->
         <div v-if="item.children">
           <button
             @click="toggleGroup(item.icon)"
             :class="[
-              'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150',
+              'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
               isChildActive(item.children)
-                ? 'bg-gray-100 text-gray-900'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                ? 'bg-primary-50 text-primary-700'
+                :              'text-gray-500 hover:bg-primary-50 hover:text-primary-600'
             ]"
           >
-            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 flex-shrink-0" :class="isChildActive(item.children) ? 'text-primary-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="renderIcon(item.icon)" />
             </svg>
-            <span v-if="!collapsed" class="flex-1 text-left">{{ item.label }}</span>
-            <svg v-if="!collapsed" class="w-4 h-4 transition-transform duration-150" :class="{ 'rotate-90': openGroups[item.icon] }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span v-if="!collapsed" class="flex-1 text-left truncate">{{ item.label }}</span>
+            <svg v-if="!collapsed" class="w-3.5 h-3.5 text-gray-400 transition-transform duration-150" :class="{ 'rotate-90 text-primary-500': openGroups[item.icon] }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
-          <div v-show="!collapsed && openGroups[item.icon]" class="ml-2 mt-1 space-y-1">
+          <div v-show="!collapsed && openGroups[item.icon]" class="ml-3 mt-0.5 space-y-0.5 border-l-2 border-primary-100 pl-2">
             <NuxtLink
               v-for="child in item.children"
               :key="child.to"
               :to="child.to"
               :class="[
-                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors duration-150',
+                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all duration-150',
                 route.path === child.to
-                  ? 'bg-gray-100 text-gray-900 font-medium'
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                  ? 'bg-primary-50 text-primary-700 font-medium'
+                  : 'text-gray-500 hover:bg-primary-50 hover:text-primary-600'
               ]"
             >
-              <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :class="route.path === child.to ? 'bg-red-500' : 'bg-gray-300'"></span>
-              <span>{{ child.label }}</span>
+              <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :class="route.path === child.to ? 'bg-primary-500' : 'bg-gray-300'"></span>
+              <span class="truncate">{{ child.label }}</span>
             </NuxtLink>
           </div>
         </div>
@@ -155,25 +170,25 @@ function renderIcon(icon: string) {
           v-else
           :to="item.to"
           :class="[
-            'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-150',
+            'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
             isActive(item.to)
-              ? 'bg-gray-100 text-gray-900'
-              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              ? 'bg-primary-50 text-primary-700'
+              :              'text-gray-500 hover:bg-primary-50 hover:text-primary-600'
           ]"
         >
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 flex-shrink-0" :class="isActive(item.to) ? 'text-primary-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="renderIcon(item.icon)" />
           </svg>
-          <span v-if="!collapsed">{{ item.label }}</span>
+          <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
         </NuxtLink>
       </template>
     </nav>
 
     <!-- Collapse toggle -->
-    <div class="flex-shrink-0 px-2 py-3 border-t border-gray-200">
+    <div class="flex-shrink-0 border-t border-gray-200 px-2 py-2">
       <button
         @click="collapsed = !collapsed"
-        class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors duration-150"
+        class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all duration-150"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />

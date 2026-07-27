@@ -85,30 +85,30 @@ async function handleSave() {
         <div v-show="activeTab === 'umum'" class="space-y-4">
           <BaseFormField label="Nama Sekolah" required>
             <input v-model="formUmum.namaSekolah" type="text"
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
           </BaseFormField>
           <BaseFormField label="Alamat">
             <textarea v-model="formUmum.alamat" rows="2"
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"></textarea>
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500"></textarea>
           </BaseFormField>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField label="Telepon">
               <input v-model="formUmum.telp" type="text"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
             <BaseFormField label="Email">
               <input v-model="formUmum.email" type="email"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField label="Tahun Ajaran">
               <input v-model="formUmum.tahunAjaran" type="text"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
             <BaseFormField label="Semester">
               <select v-model="formUmum.semester"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
                 <option value="Ganjil">Ganjil</option>
                 <option value="Genap">Genap</option>
               </select>
@@ -117,11 +117,11 @@ async function handleSave() {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField label="Kepala Sekolah">
               <input v-model="formUmum.kepalaSekolah" type="text"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
             <BaseFormField label="NIP Kepala Sekolah">
               <input v-model="formUmum.nipKepsek" type="text"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
           </div>
         </div>
@@ -131,34 +131,34 @@ async function handleSave() {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField label="Batas Scan (menit sebelum jam mulai)">
               <input v-model.number="formAbsensi.batasScan" type="number" min="1"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
             <BaseFormField label="Batas Telat (menit)">
               <input v-model.number="formAbsensi.batasTelat" type="number" min="1"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField label="Toleransi Alpha (kali)">
               <input v-model.number="formAbsensi.toleransiAlpha" type="number" min="1"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
           </div>
           <div class="space-y-3">
             <BaseFormField label="Opsi Lainnya">
               <div class="flex items-center gap-3">
                 <input v-model="formAbsensi.autoTutupSesi" type="checkbox" id="autoTutup"
-                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-primary-500" />
                 <label for="autoTutup" class="text-sm text-gray-700">Tutup sesi otomatis setelah jam selesai</label>
               </div>
               <div class="flex items-center gap-3">
                 <input v-model="formAbsensi.notifikasi" type="checkbox" id="notif"
-                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-primary-500" />
                 <label for="notif" class="text-sm text-gray-700">Kirim notifikasi ke wali murid</label>
               </div>
               <div class="flex items-center gap-3">
                 <input v-model="formAbsensi.izinTeksBebas" type="checkbox" id="izinBebas"
-                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-primary-500" />
                 <label for="izinBebas" class="text-sm text-gray-700">Izinkan teks bebas pada keterangan (selain sakit/izin)</label>
               </div>
             </BaseFormField>
@@ -170,29 +170,29 @@ async function handleSave() {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField label="Minimal Panjang Password">
               <input v-model.number="formKeamanan.minimalPassword" type="number" min="6"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
             <BaseFormField label="Sesi Timeout (menit)">
               <input v-model.number="formKeamanan.sesiTimeout" type="number" min="5"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField label="Max Login Gagal">
               <input v-model.number="formKeamanan.maxLogin" type="number" min="1"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
             </BaseFormField>
           </div>
           <div class="space-y-3">
             <BaseFormField label="Opsi Keamanan">
               <div class="flex items-center gap-3">
                 <input v-model="formKeamanan.twoFactorAuth" type="checkbox" id="2fa"
-                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-primary-500" />
                 <label for="2fa" class="text-sm text-gray-700">Aktifkan Two-Factor Authentication</label>
               </div>
               <div class="flex items-center gap-3">
                 <input v-model="formKeamanan.logAktivitas" type="checkbox" id="log"
-                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-primary-500" />
                 <label for="log" class="text-sm text-gray-700">Catat log aktivitas pengguna</label>
               </div>
             </BaseFormField>
@@ -201,7 +201,7 @@ async function handleSave() {
 
         <div class="flex justify-end mt-6 pt-4 border-t border-gray-200">
           <button type="submit" :disabled="saving"
-            class="px-6 py-2.5 bg-blue-600 text-sm font-medium text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
+            class="px-6 py-2.5 bg-primary-500 text-sm font-medium text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             Simpan Pengaturan
           </button>
