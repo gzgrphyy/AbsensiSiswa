@@ -9,9 +9,7 @@ interface RiwayatItem {
   scannedAt: string
 }
 
-const { data: statusData, pending } = useFetch<any>('/api/siswa/status', { immediate: true })
-
-const riwayat = computed<RiwayatItem[]>(() => statusData.value?.recentHistory || [])
+const { data: riwayat, pending } = useFetch<RiwayatItem[]>('/api/siswa/riwayat', { immediate: true })
 
 const statusLabels: Record<string, string> = {
   PENDING: 'Menunggu',

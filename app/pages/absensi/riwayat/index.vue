@@ -13,12 +13,8 @@ interface HistoryItem {
   alpha: number
 }
 
-const { data: history, pending } = useFetch<HistoryItem[]>('/api/absensi/sesi/aktif', {
-  immediate: true,
-  transform: (data: any) => {
-    // Mock transform - will work after proper API endpoint
-    return data || []
-  }
+const { data: history, pending } = useFetch<HistoryItem[]>('/api/absensi/riwayat', {
+  immediate: true
 })
 
 // Fallback to mock data if API not ready
@@ -29,7 +25,7 @@ const mockHistory: HistoryItem[] = [
   { id: 4, tanggal: '2026-07-26', mapel: 'Bahasa Indonesia', kelas: 'X-C', ruangan: 'Kelas X-C', status: 'SELESAI', totalSiswa: 30, hadir: 28, sakit: 1, izin: 0, alpha: 1 },
 ]
 
-const displayData = computed(() => (history.value?.length ? history.value : mockHistory))
+const displayData = computed(() => history.value || [])
 </script>
 
 <template>

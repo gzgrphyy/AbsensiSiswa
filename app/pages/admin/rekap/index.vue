@@ -9,31 +9,29 @@ interface RekapItem {
   persentase: number
 }
 
-const { data, pending } = useFetch<RekapItem[]>('/api/admin/rekap', {
+const selectedBulan = ref(new Date().toISOString().slice(0, 7))
+
+const { data, pending, refresh } = useFetch<RekapItem[]>('/api/admin/rekap', {
+  query: { bulan: selectedBulan },
   immediate: true,
-  transform: (res: any) => {
-    return res || []
-  }
+  transform: (res: any) => Array.isArray(res) ? res : []
 })
 
-const mockData: RekapItem[] = [
-  { kelas: 'X-A', totalSiswa: 30, hadir: 28, sakit: 1, izin: 1, alpha: 0, persentase: 93.3 },
-  { kelas: 'X-B', totalSiswa: 30, hadir: 26, sakit: 2, izin: 0, alpha: 2, persentase: 86.7 },
-  { kelas: 'XI-A', totalSiswa: 28, hadir: 27, sakit: 0, izin: 1, alpha: 0, persentase: 96.4 },
-  { kelas: 'XI-B', totalSiswa: 30, hadir: 29, sakit: 1, izin: 0, alpha: 0, persentase: 96.7 },
-  { kelas: 'XII-A', totalSiswa: 32, hadir: 30, sakit: 1, izin: 1, alpha: 0, persentase: 93.8 },
-  { kelas: 'XII-B', totalSiswa: 28, hadir: 25, sakit: 1, izin: 0, alpha: 2, persentase: 89.3 },
-]
+watch(selectedBulan, () => refresh())
 
-const displayData = computed(() => (data.value?.length ? data.value : mockData))
+const displayData = computed(() => (Array.isArray(data.value) ? data.value : []))
 
-const bulanOptions = [
-  { value: '07', label: 'Juli 2026' },
-  { value: '06', label: 'Juni 2026' },
-  { value: '05', label: 'Mei 2026' },
-]
-
-const selectedBulan = ref('07')
+const bulanOptions = computed(() => {
+  const options = []
+  const now = new Date()
+  for (let i = 0; i < 6; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    const label = d.toLocaleDateString('id-ID', { year: 'numeric', month: 'long' })
+    options.push({ value, label })
+  }
+  return options
+})
 
 const totalHadir = computed(() => displayData.value.reduce((a, b) => a + b.hadir, 0))
 const totalSiswa = computed(() => displayData.value.reduce((a, b) => a + b.totalSiswa, 0))

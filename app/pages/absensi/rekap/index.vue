@@ -15,14 +15,7 @@ const { data, pending } = useFetch<RekapItem[]>('/api/absensi/rekap', {
   transform: (res: any) => res || []
 })
 
-const mockData: RekapItem[] = [
-  { mapel: 'Matematika', kelas: 'XII-A', totalSiswa: 32, hadir: 30, sakit: 1, izin: 1, alpha: 0, persentase: 93.8 },
-  { mapel: 'Fisika', kelas: 'X-A', totalSiswa: 28, hadir: 27, sakit: 0, izin: 0, alpha: 1, persentase: 96.4 },
-  { mapel: 'Bahasa Inggris', kelas: 'XI-B', totalSiswa: 30, hadir: 29, sakit: 0, izin: 1, alpha: 0, persentase: 96.7 },
-  { mapel: 'Bahasa Indonesia', kelas: 'X-C', totalSiswa: 30, hadir: 28, sakit: 1, izin: 0, alpha: 1, persentase: 93.3 },
-]
-
-const displayData = computed(() => (data.value?.length ? data.value : mockData))
+const displayData = computed(() => data.value || [])
 
 const totalHadir = computed(() => displayData.value.reduce((a, b) => a + b.hadir, 0))
 const totalSiswa = computed(() => displayData.value.reduce((a, b) => a + b.totalSiswa, 0))
@@ -65,6 +58,11 @@ const rataPersentase = computed(() =>
                 <td class="px-4 py-3 text-center text-green-600 font-medium">{{ item.hadir }}</td>
                 <td class="px-4 py-3 text-center text-gray-500 text-xs hidden md:table-cell">{{ item.sakit }}/{{ item.izin }}/{{ item.alpha }}</td>
                 <td class="px-4 py-3 text-center font-semibold" :class="item.persentase >= 90 ? 'text-green-600' : item.persentase >= 75 ? 'text-amber-600' : 'text-red-600'">{{ item.persentase }}%</td>
+              </tr>
+              <tr v-if="displayData.length === 0">
+                <td colspan="6" class="px-4 py-16 text-center">
+                  <p class="text-gray-500 font-medium">Belum ada data rekap</p>
+                </td>
               </tr>
             </tbody>
           </table>

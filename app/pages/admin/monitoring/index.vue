@@ -8,28 +8,34 @@ interface MonitoringItem {
   status: string
 }
 
-const { data, pending } = useFetch<MonitoringItem[]>('/api/admin/monitoring', {
+const { data, pending, refresh } = useFetch<MonitoringItem[]>('/api/admin/monitoring', {
   immediate: true,
-  transform: (res: any) => res || []
+  transform: (res: any) => Array.isArray(res) ? res : []
 })
 
-const mockData: MonitoringItem[] = [
-  { ruangan: 'Kelas X-A', sesiAktif: 1, totalSiswa: 30, sudahAbsen: 28, belumAbsen: 2, status: 'AKTIF' },
-  { ruangan: 'Kelas XI-B', sesiAktif: 2, totalSiswa: 30, sudahAbsen: 25, belumAbsen: 5, status: 'AKTIF' },
-  { ruangan: 'Lab Komputer', sesiAktif: 1, totalSiswa: 28, sudahAbsen: 27, belumAbsen: 1, status: 'AKTIF' },
-  { ruangan: 'Kelas XII-A', sesiAktif: 0, totalSiswa: 32, sudahAbsen: 0, belumAbsen: 0, status: 'TIDAK AKTIF' },
-]
-
-const displayData = computed(() => (data.value?.length ? data.value : mockData))
+const displayData = computed(() => data.value || [])
 
 const totalAktif = computed(() => displayData.value.filter(i => i.status === 'AKTIF').reduce((a, b) => a + b.sesiAktif, 0))
 const totalSudahAbsen = computed(() => displayData.value.reduce((a, b) => a + b.sudahAbsen, 0))
 const totalBelumAbsen = computed(() => displayData.value.reduce((a, b) => a + b.belumAbsen, 0))
+
+// Auto-refresh every 15 seconds for real-time monitoring
+onMounted(() => {
+  const interval = setInterval(() => refresh(), 15000)
+  onUnmounted(() => clearInterval(interval))
+})
 </script>
 
 <template>
   <AppLayout>
-    <PageHeader title="Monitoring Absensi" description="Pantau sesi absensi secara real-time" />
+    <PageHeader title="Monitoring Absensi" description="Pantau sesi absensi secara real-time">
+      <template #actions>
+        <div class="flex items-center gap-2 text-xs text-gray-500">
+          <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          Live
+        </div>
+      </template>
+    </PageHeader>
 
     <LoadingSkeleton v-if="pending" type="table" :rows="4" :columns="6" />
 
@@ -61,9 +67,14 @@ const totalBelumAbsen = computed(() => displayData.value.reduce((a, b) => a + b.
                 <td class="px-4 py-3 text-center text-green-600 font-medium">{{ item.sudahAbsen }}</td>
                 <td class="px-4 py-3 text-center text-amber-600 font-medium">{{ item.belumAbsen }}</td>
                 <td class="px-4 py-3 text-center">
-                  <BaseBadge :variant="item.status === 'AKTIF' ? 'green' : 'gray'">
+                  <BaseBadge :variant="item.status === 'AKTIF' ? 'green' : 'gray'" :dot="item.status === 'AKTIF'" :pulse="item.status === 'AKTIF'">
                     {{ item.status }}
                   </BaseBadge>
+                </td>
+              </tr>
+              <tr v-if="displayData.length === 0">
+                <td colspan="6" class="px-4 py-16 text-center">
+                  <p class="text-gray-500 font-medium">Belum ada data monitoring</p>
                 </td>
               </tr>
             </tbody>
