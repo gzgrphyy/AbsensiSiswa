@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import * as argon2 from 'argon2'
 
 const bodySchema = z.object({
   email: z.string().email('Email tidak valid'),
@@ -22,8 +21,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Email atau password salah' })
   }
 
-  const passwordValid = await argon2.verify(user.passwordHash, password)
-  if (!passwordValid) {
+  if (!user.isActive) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Akun ini telah dinonaktifkan. Hubungi admin.'
+    })
+  }
+
+  if (!verifyPassword(password, user.passwordHash)) {
     throw createError({ statusCode: 401, statusMessage: 'Email atau password salah' })
   }
 

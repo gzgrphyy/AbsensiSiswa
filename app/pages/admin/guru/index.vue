@@ -1,50 +1,62 @@
 <script setup lang="ts">
 
-interface TahunAjaran {
+interface Guru {
   id: number
   nama: string
-  semester: 'GANJIL' | 'GENAP'
+  email: string
+  nip: string | null
   isActive: boolean
-  deletedAt: string | null
   createdAt: string
   updatedAt: string
-  _count: { kelas: number }
+  _count: { kelasWali: number }
 }
 
-const { data, pending, refresh } = useFetch<TahunAjaran[]>('/api/admin/tahun-ajaran', {
-  immediate: true
+const showInactive = ref(false)
+
+const { data, pending, refresh } = useFetch<Guru[]>('/api/admin/guru', {
+  immediate: true,
+  query: { showInactive },
+  watch: [showInactive]
 })
 
 const showModal = ref(false)
-const editing = ref<TahunAjaran | null>(null)
-const form = ref({ nama: '', semester: 'GANJIL' as 'GANJIL' | 'GENAP', setActive: false })
+const showPasswordModal = ref(false)
+const editing = ref<Guru | null>(null)
+const form = ref({ nama: '', email: '', nip: '' })
 const saving = ref(false)
+const generatedPassword = ref('')
+const resetPasswordFor = ref<Guru | null>(null)
 const confirmToggle = ref<{ id: number; nama: string; active: boolean } | null>(null)
-const confirmDelete = ref<{ id: number; nama: string; kelasCount: number } | null>(null)
-const confirmClose = ref<boolean>(false)
+const confirmClose = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
 const dirtyForm = ref(false)
 
-const semesterLabel = (s: 'GANJIL' | 'GENAP') => s === 'GANJIL' ? 'Ganjil' : 'Genap'
-const fullLabel = (item: { nama: string; semester: 'GANJIL' | 'GENAP' }) =>
-  `${item.nama} ${semesterLabel(item.semester)}`
+function showError(msg: string) {
+  errorMsg.value = msg
+  setTimeout(() => { errorMsg.value = '' }, 5000)
+}
+
+function showSuccess(msg: string) {
+  successMsg.value = msg
+  setTimeout(() => { successMsg.value = '' }, 3000)
+}
 
 function openCreate() {
   editing.value = null
-  form.value = { nama: '', semester: 'GANJIL', setActive: false }
+  form.value = { nama: '', email: '', nip: '' }
   errorMsg.value = ''
   successMsg.value = ''
   dirtyForm.value = false
   showModal.value = true
 }
 
-function openEdit(item: TahunAjaran) {
+function openEdit(item: Guru) {
   editing.value = item
   form.value = {
     nama: item.nama,
-    semester: item.semester,
-    setActive: false
+    email: item.email,
+    nip: item.nip || ''
   }
   errorMsg.value = ''
   successMsg.value = ''
@@ -64,16 +76,6 @@ function handleCloseClick() {
   }
 }
 
-function showError(msg: string) {
-  errorMsg.value = msg
-  setTimeout(() => { errorMsg.value = '' }, 5000)
-}
-
-function showSuccess(msg: string) {
-  successMsg.value = msg
-  setTimeout(() => { successMsg.value = '' }, 3000)
-}
-
 async function handleSave() {
   saving.value = true
   errorMsg.value = ''
@@ -82,19 +84,16 @@ async function handleSave() {
   try {
     if (editing.value) {
       const body: Record<string, unknown> = {}
-      const hasKelas = editing.value._count.kelas > 0
-      if (!hasKelas) {
-        body.nama = form.value.nama
-        body.semester = form.value.semester
-      }
-      if (form.value.setActive) {
-        body.isActive = true
-      }
+      if (form.value.nama !== editing.value.nama) body.nama = form.value.nama
+      if (form.value.email !== editing.value.email) body.email = form.value.email
+      if ((form.value.nip || null) !== editing.value.nip) body.nip = form.value.nip || null
+
       if (Object.keys(body).length === 0) {
         showModal.value = false
         return
       }
-      const { error } = await useFetch(`/api/admin/tahun-ajaran/${editing.value.id}`, {
+
+      const { error } = await useFetch(`/api/admin/guru/${editing.value.id}`, {
         method: 'PATCH',
         body
       })
@@ -102,65 +101,84 @@ async function handleSave() {
         showError(error.value.statusMessage || 'Gagal menyimpan')
         return
       }
-      showSuccess('Tahun ajaran berhasil diperbarui')
-      confirmClose.value = false
+      showSuccess('Data guru berhasil diperbarui')
     } else {
-      const { error } = await useFetch('/api/admin/tahun-ajaran', {
+      const { data: result, error } = await useFetch('/api/admin/guru', {
         method: 'POST',
-        body: form.value
+        body: {
+          nama: form.value.nama,
+          email: form.value.email,
+          nip: form.value.nip || undefined
+        }
       })
       if (error.value) {
         showError(error.value.statusMessage || 'Gagal menyimpan')
         return
       }
-      showSuccess('Tahun ajaran berhasil ditambahkan')
+      if (result.value?.generatedPassword) {
+        generatedPassword.value = result.value.generatedPassword
+        showPasswordModal.value = true
+      }
+      showSuccess('Akun guru berhasil ditambahkan')
     }
     showModal.value = false
+    confirmClose.value = false
     await refresh()
   } finally {
     saving.value = false
   }
 }
 
-async function handleToggle() {
+async function handleResetPassword() {
+  if (!resetPasswordFor.value) return
+  saving.value = true
+  errorMsg.value = ''
+
+  try {
+    const data = await $fetch(`/api/admin/guru/${resetPasswordFor.value.id}/reset-password`, {
+      method: 'POST'
+    })
+    generatedPassword.value = data.generatedPassword
+    showPasswordModal.value = true
+    resetPasswordFor.value = null
+    showSuccess('Password berhasil di-reset')
+  } catch (err: any) {
+    showError(err?.data?.statusMessage || 'Gagal reset password')
+  } finally {
+    saving.value = false
+  }
+}
+
+async function handleToggleActive() {
   if (!confirmToggle.value) return
-  const { id } = confirmToggle.value
+  const { id, active } = confirmToggle.value
   confirmToggle.value = null
+  saving.value = true
 
-  const { error } = await useFetch(`/api/admin/tahun-ajaran/${id}`, {
-    method: 'PATCH',
-    body: { isActive: true }
-  })
-  if (error.value) {
-    showError(error.value.statusMessage || 'Gagal mengubah status')
-    return
+  try {
+    await $fetch(`/api/admin/guru/${id}/toggle-active`, {
+      method: 'PATCH'
+    })
+    showSuccess(active ? 'Akun guru dinonaktifkan' : 'Akun guru diaktifkan')
+    await refresh()
+  } catch (err: any) {
+    showError(err?.data?.statusMessage || 'Gagal mengubah status')
+  } finally {
+    saving.value = false
   }
-  showSuccess('Status aktif berhasil dipindahkan')
-  await refresh()
 }
 
-async function handleDelete() {
-  if (!confirmDelete.value) return
-  const { id } = confirmDelete.value
-  confirmDelete.value = null
-
-  const { error } = await useFetch(`/api/admin/tahun-ajaran/${id}`, {
-    method: 'DELETE'
-  })
-  if (error.value) {
-    showError(error.value.statusMessage || 'Gagal menghapus')
-    return
-  }
-  showSuccess('Tahun ajaran berhasil dihapus')
-  await refresh()
+function promptToggle(item: Guru) {
+  confirmToggle.value = { id: item.id, nama: item.nama, active: item.isActive }
 }
 
-function promptToggle(item: TahunAjaran) {
-  confirmToggle.value = { id: item.id, nama: fullLabel(item), active: item.isActive }
+function promptResetPassword(item: Guru) {
+  resetPasswordFor.value = item
 }
 
-function promptDelete(item: TahunAjaran) {
-  confirmDelete.value = { id: item.id, nama: fullLabel(item), kelasCount: item._count.kelas }
+function copyPassword() {
+  navigator.clipboard.writeText(generatedPassword.value)
+  showSuccess('Password berhasil disalin!')
 }
 </script>
 
@@ -176,8 +194,8 @@ function promptDelete(item: TahunAjaran) {
             </svg>
           </NuxtLink>
           <div>
-            <h1 class="text-xl font-semibold text-gray-900">Tahun Ajaran</h1>
-            <p class="text-sm text-gray-500 hidden sm:block">Kelola tahun ajaran dan semester aktif</p>
+            <h1 class="text-xl font-semibold text-gray-900">Data Guru</h1>
+            <p class="text-sm text-gray-500 hidden sm:block">Kelola akun guru dan hak akses</p>
           </div>
         </div>
         <button @click="openCreate"
@@ -185,7 +203,7 @@ function promptDelete(item: TahunAjaran) {
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="hidden sm:inline">Tambah</span>
+          <span class="hidden sm:inline">Tambah Guru</span>
         </button>
       </div>
     </header>
@@ -222,15 +240,37 @@ function promptDelete(item: TahunAjaran) {
         </div>
       </Transition>
 
+      <!-- Filter toggle -->
+      <div class="flex items-center justify-end mb-4">
+        <label class="inline-flex items-center gap-2 cursor-pointer select-none group">
+          <span class="text-sm text-gray-500 group-hover:text-gray-700 transition-colors">Tampilkan nonaktif</span>
+          <button
+            role="switch"
+            :aria-checked="showInactive"
+            @click="showInactive = !showInactive"
+            :class="showInactive
+              ? 'bg-blue-600 ring-1 ring-blue-300'
+              : 'bg-gray-200 ring-1 ring-gray-300'
+            "
+            class="relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
+          >
+            <span
+              :class="showInactive ? 'translate-x-[18px]' : 'translate-x-[2px]'"
+              class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-all duration-200"
+            />
+          </button>
+        </label>
+      </div>
+
       <!-- Loading skeleton -->
       <div v-if="pending" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="p-6 space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-center gap-4 animate-pulse">
-            <div class="h-4 bg-gray-200 rounded w-32"></div>
-            <div class="h-4 bg-gray-200 rounded w-20"></div>
-            <div class="h-4 bg-gray-200 rounded w-12 ml-auto"></div>
+            <div class="h-4 bg-gray-200 rounded w-40"></div>
+            <div class="h-4 bg-gray-200 rounded w-52"></div>
+            <div class="h-4 bg-gray-200 rounded w-24"></div>
             <div class="h-6 bg-gray-200 rounded-full w-20"></div>
-            <div class="h-4 bg-gray-200 rounded w-24 ml-auto"></div>
+            <div class="h-4 bg-gray-200 rounded w-20 ml-auto"></div>
           </div>
         </div>
       </div>
@@ -241,9 +281,9 @@ function promptDelete(item: TahunAjaran) {
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 border-b border-gray-200">
-                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Tahun Ajaran</th>
-                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden sm:table-cell">Semester</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Kelas</th>
+                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Nama</th>
+                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden sm:table-cell">Email</th>
+                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden md:table-cell">NIP</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Status</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Aksi</th>
               </tr>
@@ -252,31 +292,30 @@ function promptDelete(item: TahunAjaran) {
               <tr v-for="item in data" :key="item.id"
                 class="transition-all duration-150"
                 :class="item.isActive
-                  ? 'bg-green-50/60 hover:bg-green-100/60 border-l-4 border-l-green-500'
-                  : 'hover:bg-gray-50 border-l-4 border-l-transparent'">
+                  ? 'hover:bg-gray-50 border-l-4 border-l-transparent'
+                  : 'bg-gray-50/50 hover:bg-gray-100/50 border-l-4 border-l-gray-300'">
                 <td class="px-4 sm:px-6 py-4">
                   <div class="flex items-center gap-2">
-                    <span class="font-medium text-gray-900">{{ item.nama }}</span>
-                    <span class="sm:hidden text-xs font-medium"
-                      :class="item.semester === 'GANJIL' ? 'text-purple-600' : 'text-cyan-600'">
-                      {{ semesterLabel(item.semester) }}
-                    </span>
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+                      {{ item.nama.charAt(0).toUpperCase() }}
+                    </div>
+                    <div>
+                      <span class="font-medium text-gray-900" :class="{ 'text-gray-500': !item.isActive }">
+                        {{ item.nama }}
+                      </span>
+                      <div class="text-xs text-gray-400 sm:hidden">{{ item.email }}</div>
+                    </div>
                   </div>
                 </td>
                 <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                    :class="item.semester === 'GANJIL'
-                      ? 'bg-purple-100 text-purple-700 ring-1 ring-purple-200'
-                      : 'bg-cyan-100 text-cyan-700 ring-1 ring-cyan-200'">
-                    <span
-                      class="w-1.5 h-1.5 rounded-full inline-block mr-1.5"
-                      :style="{ backgroundColor: item.semester === 'GANJIL' ? '#8b5cf6' : '#06b6d4' }">
-                    </span>
-                    {{ semesterLabel(item.semester) }}
+                  <span class="text-gray-600" :class="{ 'text-gray-400': !item.isActive }">
+                    {{ item.email }}
                   </span>
                 </td>
-                <td class="px-4 sm:px-6 py-4 text-center">
-                  <span class="text-gray-600 font-medium">{{ item._count.kelas }}</span>
+                <td class="px-4 sm:px-6 py-4 text-center hidden md:table-cell">
+                  <span class="text-gray-500" :class="{ 'text-gray-300': !item.isActive }">
+                    {{ item.nip || '-' }}
+                  </span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
                   <div class="flex items-center justify-center">
@@ -286,8 +325,8 @@ function promptDelete(item: TahunAjaran) {
                       Aktif
                     </span>
                     <span v-else
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 ring-1 ring-gray-200">
-                      Tidak Aktif
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-500 ring-1 ring-gray-200">
+                      Nonaktif
                     </span>
                   </div>
                 </td>
@@ -296,34 +335,32 @@ function promptDelete(item: TahunAjaran) {
                     <!-- Edit -->
                     <button @click="openEdit(item)"
                       class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-150"
-                      :title="`Edit ${fullLabel(item)}`">
+                      :title="`Edit ${item.nama}`">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </button>
 
-                    <!-- Activate (only if not active) -->
-                    <button v-if="!item.isActive" @click="promptToggle(item)"
-                      class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-150"
-                      :title="`Aktifkan ${fullLabel(item)}`">
+                    <!-- Reset Password -->
+                    <button @click="promptResetPassword(item)"
+                      class="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all duration-150"
+                      :title="`Reset password ${item.nama}`">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                       </svg>
                     </button>
 
-                    <!-- Active indicator icon -->
-                    <span v-else class="p-2 text-green-500 cursor-default" title="Sedang aktif">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <!-- Toggle Active -->
+                    <button @click="promptToggle(item)"
+                      :class="item.isActive
+                        ? 'p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-150'
+                        : 'p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-150'"
+                      :title="item.isActive ? 'Nonaktifkan akun' : 'Aktifkan akun'">
+                      <svg v-if="item.isActive" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                       </svg>
-                    </span>
-
-                    <!-- Delete (only if not active) -->
-                    <button v-if="!item.isActive" @click="promptDelete(item)"
-                      class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-150"
-                      :title="`Hapus ${fullLabel(item)}`">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </button>
                   </div>
@@ -335,9 +372,9 @@ function promptDelete(item: TahunAjaran) {
                 <td colspan="5" class="px-4 sm:px-6 py-16 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <p class="text-gray-500 font-medium">Belum ada data tahun ajaran</p>
+                    <p class="text-gray-500 font-medium">Belum ada data guru</p>
                     <button @click="openCreate"
                       class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,14 +395,12 @@ function promptDelete(item: TahunAjaran) {
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="handleCloseClick">
-          <!-- Backdrop -->
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="handleCloseClick"></div>
 
           <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto overflow-hidden border border-gray-100">
-            <!-- Modal header -->
             <div class="flex items-center justify-between px-6 pt-6 pb-2">
               <h2 class="text-lg font-semibold text-gray-900">
-                {{ editing ? 'Edit Tahun Ajaran' : 'Tambah Tahun Ajaran' }}
+                {{ editing ? 'Edit Data Guru' : 'Tambah Guru Baru' }}
               </h2>
               <button @click="handleCloseClick"
                 class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
@@ -376,55 +411,41 @@ function promptDelete(item: TahunAjaran) {
             </div>
 
             <form @submit.prevent="handleSave" class="p-6 space-y-5">
-              <!-- Nama -->
+              <!-- Nama Lengkap -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Tahun Ajaran</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Nama Lengkap <span class="text-red-500">*</span>
+                </label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
-                  placeholder="contoh: 2026/2027"
-                  :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400" />
-                <Transition name="fade">
-                  <p v-if="editing && editing._count.kelas > 0" class="flex items-center gap-1 text-xs text-amber-600 mt-1.5">
-                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
-                    Nama tidak bisa diubah karena sudah memiliki {{ editing._count.kelas }} kelas terkait
-                  </p>
-                </Transition>
+                  placeholder="Nama lengkap guru"
+                  class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400" />
               </div>
 
-              <!-- Semester -->
+              <!-- Email -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Semester</label>
-                <select v-model="form.semester" @change="onFormChange"
-                  :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-shadow appearance-none bg-white">
-                  <option value="GANJIL">Ganjil</option>
-                  <option value="GENAP">Genap</option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                  Email <span class="text-red-500">*</span>
+                </label>
+                <input v-model="form.email" type="email" @input="onFormChange"
+                  placeholder="email@sekolah.sch.id"
+                  class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400" />
               </div>
 
-              <!-- Set Active -->
-              <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                <input id="setActive" v-model="form.setActive" type="checkbox" @change="onFormChange"
-                  class="mt-0.5 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-shadow" />
-                <div class="flex flex-col">
-                  <label for="setActive" class="text-sm font-medium text-gray-700 cursor-pointer">
-                    {{ editing ? 'Set sebagai tahun ajaran aktif' : 'Jadikan aktif sekarang' }}
-                  </label>
-                  <p class="text-xs text-gray-500 mt-0.5">
-                    Tahun ajaran lain yang aktif akan otomatis dinonaktifkan
-                  </p>
-                </div>
+              <!-- NIP -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">NIP (opsional)</label>
+                <input v-model="form.nip" type="text" @input="onFormChange"
+                  placeholder="Nomor Induk Pegawai"
+                  class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400" />
               </div>
 
-              <!-- Edit mode info -->
+              <!-- Info create -->
               <Transition name="fade">
-                <div v-if="editing && editing.isActive" class="flex items-center gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-700">
+                <div v-if="!editing" class="flex items-center gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-700">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span>Tahun ajaran ini sedang aktif. Untuk menonaktifkan, aktifkan tahun ajaran lain.</span>
+                  <span>Password akan digenerate otomatis dan ditampilkan setelah simpan</span>
                 </div>
               </Transition>
 
@@ -479,10 +500,96 @@ function promptDelete(item: TahunAjaran) {
         </div>
       </Transition>
 
-      <!-- Modal Confirm Toggle -->
+      <!-- Modal Show Password -->
+      <Transition name="modal">
+        <div v-if="showPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="showPasswordModal = false"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="p-2 bg-amber-100 rounded-full">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+              </div>
+              <h2 class="text-lg font-semibold text-gray-900">Password Generated</h2>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-3">
+              Password untuk akun ini. Salin dan sampaikan ke guru yang bersangkutan.
+            </p>
+
+            <div class="flex items-center gap-2 p-4 bg-gray-50 border border-gray-200 rounded-lg mb-4">
+              <code class="flex-1 text-lg font-mono font-bold text-center text-gray-900 tracking-wider select-all">
+                {{ generatedPassword }}
+              </code>
+            </div>
+
+            <div class="flex justify-end gap-3">
+              <button @click="showPasswordModal = false"
+                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                Tutup
+              </button>
+              <button @click="copyPassword"
+                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 shadow-sm transition-all duration-150 inline-flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Salin Password
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+
+      <!-- Modal Confirm Toggle Active -->
       <Transition name="modal">
         <div v-if="confirmToggle" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmToggle = null"></div>
+          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100">
+            <div class="flex items-center gap-3 mb-4">
+              <div :class="confirmToggle.active ? 'p-2 bg-red-100 rounded-full' : 'p-2 bg-green-100 rounded-full'">
+                <svg v-if="confirmToggle.active" class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+                <svg v-else class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold text-gray-900">
+                  {{ confirmToggle.active ? 'Nonaktifkan Akun' : 'Aktifkan Akun' }}
+                </h2>
+                <p class="text-sm text-gray-500">{{ confirmToggle.nama }}</p>
+              </div>
+            </div>
+
+            <p v-if="confirmToggle.active" class="text-sm text-gray-600 mb-4">
+              Guru ini tidak akan bisa login sampai diaktifkan kembali. Data kelas dan absensi tetap aman.
+            </p>
+            <p v-else class="text-sm text-gray-600 mb-4">
+              Guru ini akan bisa login kembali setelah diaktifkan.
+            </p>
+
+            <div class="flex justify-end gap-3">
+              <button @click="confirmToggle = null"
+                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                Batal
+              </button>
+              <button @click="handleToggleActive"
+                :class="confirmToggle.active
+                  ? 'px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-150'
+                  : 'px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-all duration-150'">
+                {{ confirmToggle.active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+
+      <!-- Modal Confirm Reset Password -->
+      <Transition name="modal">
+        <div v-if="resetPasswordFor" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="resetPasswordFor = null"></div>
           <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100">
             <div class="flex items-center gap-3 mb-4">
               <div class="p-2 bg-amber-100 rounded-full">
@@ -490,67 +597,24 @@ function promptDelete(item: TahunAjaran) {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h2 class="text-lg font-semibold text-gray-900">Aktifkan Tahun Ajaran</h2>
-            </div>
-            <p class="text-sm text-gray-600 mb-1">
-              Tahun ajaran <strong class="text-gray-900">{{ confirmToggle.nama }}</strong> akan diaktifkan.
-            </p>
-            <p class="text-sm text-amber-700 bg-amber-50 border border-amber-100 rounded-lg p-3 mb-4">
-              Tahun ajaran lain yang aktif akan otomatis dinonaktifkan.
-            </p>
-            <div class="flex justify-end gap-3">
-              <button @click="confirmToggle = null"
-                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                Batal
-              </button>
-              <button @click="handleToggle"
-                class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 active:bg-green-800 shadow-sm transition-all duration-150">
-                Ya, Aktifkan
-              </button>
-            </div>
-          </div>
-        </div>
-      </Transition>
-
-      <!-- Modal Confirm Delete -->
-      <Transition name="modal">
-        <div v-if="confirmDelete" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmDelete = null"></div>
-          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="p-2 bg-red-100 rounded-full">
-                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </div>
               <div>
-                <h2 class="text-lg font-semibold text-gray-900">Hapus Tahun Ajaran</h2>
-                <p class="text-sm text-gray-500">Tindakan ini tidak bisa dibatalkan</p>
+                <h2 class="text-lg font-semibold text-gray-900">Reset Password</h2>
+                <p class="text-sm text-gray-500">{{ resetPasswordFor.nama }}</p>
               </div>
             </div>
-            <p class="text-sm text-gray-600 mb-1">
-              Yakin ingin menghapus <strong class="text-gray-900">{{ confirmDelete.nama }}</strong>?
+
+            <p class="text-sm text-gray-600 mb-5">
+              Password baru akan digenerate otomatis. Password lama tidak bisa digunakan lagi. Lanjutkan?
             </p>
-            <div v-if="confirmDelete.kelasCount > 0"
-              class="mt-3 p-3 bg-amber-50 border border-amber-100 rounded-lg text-sm text-amber-700 flex items-start gap-2">
-              <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-              <span>
-                Tahun ajaran ini masih memiliki <strong>{{ confirmDelete.kelasCount }} kelas</strong> terkait. Data siswa/absensi tidak akan hilang, tetapi tahun ajaran tidak akan muncul di pilihan baru.
-              </span>
-            </div>
-            <p v-else class="mt-3 text-sm text-gray-500">
-              Data akan dihapus secara permanen dari tampilan.
-            </p>
-            <div class="flex justify-end gap-3 mt-5 pt-4 border-t border-gray-100">
-              <button @click="confirmDelete = null"
+
+            <div class="flex justify-end gap-3">
+              <button @click="resetPasswordFor = null"
                 class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
                 Batal
               </button>
-              <button @click="handleDelete"
-                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 shadow-sm transition-all duration-150">
-                Ya, Hapus
+              <button @click="handleResetPassword"
+                class="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 active:bg-amber-800 shadow-sm transition-all duration-150">
+                Ya, Reset
               </button>
             </div>
           </div>
@@ -561,7 +625,6 @@ function promptDelete(item: TahunAjaran) {
 </template>
 
 <style scoped>
-/* Modal transitions */
 .modal-enter-active {
   transition: all 0.2s ease-out;
 }
@@ -580,8 +643,6 @@ function promptDelete(item: TahunAjaran) {
 .modal-leave-to > div:first-child {
   opacity: 0;
 }
-
-/* Slide transitions for notifications */
 .slide-enter-active {
   transition: all 0.3s ease-out;
 }
@@ -596,8 +657,6 @@ function promptDelete(item: TahunAjaran) {
   transform: translateY(-10px);
   opacity: 0;
 }
-
-/* Fade transition */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;

@@ -1,0 +1,65 @@
+import { createSiswaSchema } from './schema'
+
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+  const result = createSiswaSchema.safeParse(body)
+  if (!result.success) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: result.error.issues[0].message
+    })
+  }
+
+  const { nisn, nama, email, kelasId, namaWali, kontakWali } = result.data
+
+  const existingNisn = await prisma.siswa.findUnique({ where: { nisn } })
+  if (existingNisn) {
+    throw createError({
+      statusCode: 409,
+      statusMessage: `NISN "${nisn}" sudah digunakan`
+    })
+  }
+
+  const existingEmail = await prisma.user.findUnique({ where: { email } })
+  if (existingEmail) {
+    throw createError({
+      statusCode: 409,
+      statusMessage: `Email "${email}" sudah digunakan`
+    })
+  }
+
+  const kelas = await prisma.kelas.findUnique({ where: { id: kelasId } })
+  if (!kelas) {
+    throw createError({ statusCode: 404, statusMessage: 'Kelas tidak ditemukan' })
+  }
+
+  const rawPassword = generatePassword(10)
+  const passwordHash = hashPassword(rawPassword)
+
+  const siswa = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({
+      data: { nama, email, passwordHash, role: 'SISWA', isActive: true }
+    })
+
+    return await tx.siswa.create({
+      data: {
+        userId: user.id,
+        nisn,
+        nama,
+        kelasId,
+        namaWali: namaWali || null,
+        kontakWali: kontakWali || null
+      },
+      include: {
+        user: { select: { id: true, nama: true, email: true, isActive: true } },
+        kelas: { select: { id: true, nama: true } }
+      }
+    })
+  })
+
+  return {
+    ...siswa,
+    generatedPassword: rawPassword,
+    message: 'Akun siswa berhasil dibuat. Salin password dan sampaikan ke siswa bersangkutan.'
+  }
+})

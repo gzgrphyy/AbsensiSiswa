@@ -10,6 +10,7 @@ datasource db {
 enum Role {
   ADMIN
   GURU
+  SISWA
 }
 
 enum Semester {
@@ -18,23 +19,45 @@ enum Semester {
 }
 
 enum StatusAbsensi {
+  PENDING
   HADIR
   SAKIT
   IZIN
   ALPHA
 }
 
+enum StatusSesi {
+  AKTIF
+  SELESAI
+}
+
+enum Hari {
+  SENIN
+  SELASA
+  RABU
+  KAMIS
+  JUMAT
+  SABTU
+  MINGGU
+}
+
 model User {
   id           Int      @id @default(autoincrement())
   nama         String   @db.VarChar(100)
+  nip          String?  @unique @db.VarChar(30)
   email        String   @unique @db.VarChar(150)
   passwordHash String   @map("password_hash") @db.VarChar(255)
   role         Role
+  isActive     Boolean  @default(true) @map("is_active")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  kelasWali    Kelas[]   @relation("WaliKelas")
-  absensiInput Absensi[] @relation("DicatatOleh")
+  // Relations
+  kelasWali       Kelas[]           @relation("WaliKelas")
+  jadwalPelajaran JadwalPelajaran[] @relation("GuruPengampu")
+  sesiDibuka      SesiAbsensi[]     @relation("SesiDibukaOleh")
+  approvedRequests AbsensiRequest[] @relation("ApprovedOleh")
+  siswa           Siswa?
 
   @@map("users")
 }
@@ -48,7 +71,7 @@ model TahunAjaran {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
 
-  kelas     Kelas[]
+  kelas Kelas[]
 
   @@unique([nama, semester])
   @@map("tahun_ajaran")
@@ -62,10 +85,10 @@ model Kelas {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  waliKelas     User?       @relation("WaliKelas", fields: [waliKelasId], references: [id])
-  tahunAjaran   TahunAjaran @relation(fields: [tahunAjaranId], references: [id])
-  siswa         Siswa[]
-  absensi       Absensi[]
+  waliKelas       User?              @relation("WaliKelas", fields: [waliKelasId], references: [id])
+  tahunAjaran     TahunAjaran        @relation(fields: [tahunAjaranId], references: [id])
+  siswa           Siswa[]
+  jadwalPelajaran JadwalPelajaran[]
 
   @@unique([nama, tahunAjaranId])
   @@map("kelas")
@@ -73,6 +96,7 @@ model Kelas {
 
 model Siswa {
   id         Int      @id @default(autoincrement())
+  userId     Int?     @unique @map("user_id")
   nisn       String   @unique @db.VarChar(20)
   nama       String   @db.VarChar(100)
   kelasId    Int      @map("kelas_id")
@@ -81,27 +105,78 @@ model Siswa {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  kelas      Kelas     @relation(fields: [kelasId], references: [id])
-  absensi    Absensi[]
+  user           User?             @relation(fields: [userId], references: [id])
+  kelas          Kelas             @relation(fields: [kelasId], references: [id])
+  absensiRequests AbsensiRequest[]
 
   @@map("siswa")
 }
 
-model Absensi {
+model Ruangan {
+  id        Int      @id @default(autoincrement())
+  nama      String   @db.VarChar(100)
+  qrCode    String   @unique @map("qr_code") @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  jadwalPelajaran JadwalPelajaran[]
+
+  @@map("ruangan")
+}
+
+model JadwalPelajaran {
+  id         Int      @id @default(autoincrement())
+  kelasId    Int      @map("kelas_id")
+  ruanganId  Int      @map("ruangan_id")
+  mapel      String   @db.VarChar(100)
+  guruId     Int      @map("guru_id")
+  hari       Hari
+  jamMulai   String   @map("jam_mulai") @db.VarChar(5)
+  jamSelesai String   @map("jam_selesai") @db.VarChar(5)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  kelas   Kelas       @relation(fields: [kelasId], references: [id])
+  ruangan Ruangan     @relation(fields: [ruanganId], references: [id])
+  guru    User        @relation("GuruPengampu", fields: [guruId], references: [id])
+  sesi    SesiAbsensi[]
+
+  @@map("jadwal_pelajaran")
+}
+
+model SesiAbsensi {
+  id         Int        @id @default(autoincrement())
+  jadwalId   Int        @map("jadwal_id")
+  tanggal    DateTime   @db.Date
+  status     StatusSesi
+  dibukaOleh Int        @map("dibuka_oleh")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  jadwal   JadwalPelajaran @relation(fields: [jadwalId], references: [id])
+  pembuka  User            @relation("SesiDibukaOleh", fields: [dibukaOleh], references: [id])
+  requests AbsensiRequest[]
+
+  @@unique([jadwalId, tanggal])
+  @@map("sesi_absensi")
+}
+
+model AbsensiRequest {
   id          Int           @id @default(autoincrement())
+  sesiId      Int           @map("sesi_id")
   siswaId     Int           @map("siswa_id")
-  kelasId     Int           @map("kelas_id")
-  tanggal     DateTime      @db.Date
-  status      StatusAbsensi
+  scannedAt   DateTime      @map("scanned_at")
+  status      StatusAbsensi @default(PENDING)
   keterangan  String?       @db.VarChar(255)
-  dicatatOleh Int           @map("dicatat_oleh")
+  approvedBy  Int?          @map("approved_by")
+  approvedAt  DateTime?     @map("approved_at")
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 
-  siswa       Siswa @relation(fields: [siswaId], references: [id])
-  kelas       Kelas @relation(fields: [kelasId], references: [id])
-  pencatat    User  @relation("DicatatOleh", fields: [dicatatOleh], references: [id])
+  sesi     SesiAbsensi @relation(fields: [sesiId], references: [id])
+  siswa    Siswa       @relation(fields: [siswaId], references: [id])
+  approver User?       @relation("ApprovedOleh", fields: [approvedBy], references: [id])
 
-  @@unique([siswaId, tanggal])
-  @@map("absensi")
+  @@unique([sesiId, siswaId])
+  @@map("absensi_request")
 }

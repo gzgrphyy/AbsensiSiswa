@@ -21,4 +21,8 @@ export default defineEventHandler(async (event) => {
   if (path.startsWith('/api/absensi/') && session.user.role !== 'GURU') {
     throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
   }
+
+  if (path.startsWith('/api/siswa/') && session.user.role !== 'SISWA') {
+    throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
+  }
 })

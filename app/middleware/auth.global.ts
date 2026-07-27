@@ -11,20 +11,31 @@ export default defineNuxtRouteMiddleware(async (to, _from) => {
       const role = user.value?.role
       if (role === 'ADMIN') return navigateTo('/admin')
       if (role === 'GURU') return navigateTo('/absensi')
+      if (role === 'SISWA') return navigateTo('/siswa')
     }
     return
   }
 
-  if (to.path.startsWith('/admin') || to.path.startsWith('/absensi')) {
+  if (to.path.startsWith('/admin') || to.path.startsWith('/absensi') || to.path.startsWith('/siswa')) {
     if (!loggedIn.value) {
       return navigateTo('/login')
     }
 
     if (to.path.startsWith('/admin') && user.value?.role !== 'ADMIN') {
-      return navigateTo('/absensi')
+      // Redirect non-admin ke halaman masing-masing
+      if (user.value?.role === 'GURU') return navigateTo('/absensi')
+      if (user.value?.role === 'SISWA') return navigateTo('/siswa')
+      return navigateTo('/login')
     }
     if (to.path.startsWith('/absensi') && user.value?.role !== 'GURU') {
-      return navigateTo('/admin')
+      if (user.value?.role === 'ADMIN') return navigateTo('/admin')
+      if (user.value?.role === 'SISWA') return navigateTo('/siswa')
+      return navigateTo('/login')
+    }
+    if (to.path.startsWith('/siswa') && user.value?.role !== 'SISWA') {
+      if (user.value?.role === 'ADMIN') return navigateTo('/admin')
+      if (user.value?.role === 'GURU') return navigateTo('/absensi')
+      return navigateTo('/login')
     }
   }
 })

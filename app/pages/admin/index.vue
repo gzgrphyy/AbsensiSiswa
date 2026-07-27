@@ -39,10 +39,11 @@ async function handleLogout() {
           <p class="text-sm text-gray-400 mt-1">(Coming soon)</p>
         </div>
 
-        <div class="block p-6 bg-white rounded-xl shadow-sm border opacity-50">
-          <h2 class="font-semibold text-gray-400">Guru</h2>
-          <p class="text-sm text-gray-400 mt-1">(Coming soon)</p>
-        </div>
+        <NuxtLink to="/admin/guru"
+          class="block p-6 bg-white rounded-xl shadow-sm border hover:shadow-md hover:border-blue-300 transition-all">
+          <h2 class="font-semibold text-gray-900">Guru</h2>
+          <p class="text-sm text-gray-500 mt-1">Kelola akun guru dan hak akses</p>
+        </NuxtLink>
       </div>
     </main>
   </div>
