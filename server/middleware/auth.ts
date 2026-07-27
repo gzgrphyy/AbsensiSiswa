@@ -14,6 +14,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
 
+  // /api/user/ accessible by any authenticated user (for profile)
+  if (path.startsWith('/api/user/')) {
+    return
+  }
+
   if (path.startsWith('/api/admin/') && session.user.role !== 'ADMIN') {
     throw createError({ statusCode: 403, statusMessage: 'Forbidden' })
   }

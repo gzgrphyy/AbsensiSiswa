@@ -21,6 +21,31 @@ const errorMsg = ref('')
 const successMsg = ref('')
 const confirmClose = ref(false)
 const dirtyForm = ref(false)
+const copiedType = ref<'code' | 'url' | null>(null)
+
+const scanUrl = computed(() => {
+  if (!showQR.value) return ''
+  if (!import.meta.client) return `${showQR.value.qrCode}`
+  return `${window.location.origin}/siswa/scan?code=${showQR.value.qrCode}`
+})
+
+async function copyToClipboard(text: string, type: 'code' | 'url') {
+  try {
+    await navigator.clipboard.writeText(text)
+    copiedType.value = type
+    setTimeout(() => { copiedType.value = null }, 2000)
+  } catch {
+    // fallback
+    const ta = document.createElement('textarea')
+    ta.value = text
+    document.body.appendChild(ta)
+    ta.select()
+    document.execCommand('copy')
+    document.body.removeChild(ta)
+    copiedType.value = type
+    setTimeout(() => { copiedType.value = null }, 2000)
+  }
+}
 
 function showError(msg: string) {
   errorMsg.value = msg
@@ -267,6 +292,45 @@ function ruanganUrl(item: Ruangan) {
               <svg class="w-8 h-8 animate-spin text-blue-600" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             </div>
             <div v-else-if="qrSvg" class="flex justify-center mb-4" v-html="qrSvg"></div>
+
+            <!-- Kode QR Text -->
+            <div v-if="!loadingQR && showQR" class="mb-4 text-left">
+              <div class="bg-gray-50 rounded-lg border border-gray-200 p-3 space-y-2">
+                <div>
+                  <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Kode QR</label>
+                  <div class="flex items-center gap-2 mt-1">
+                    <code class="flex-1 text-sm font-mono text-blue-700 bg-white border border-gray-200 rounded px-2 py-1.5 truncate">{{ showQR.qrCode }}</code>
+                    <button @click="copyToClipboard(showQR.qrCode, 'code')"
+                      class="flex-shrink-0 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      :title="copiedType === 'code' ? 'Tersalin!' : 'Salin Kode'">
+                      <svg v-if="copiedType !== 'code'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <svg v-else class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">URL Scan</label>
+                  <div class="flex items-center gap-2 mt-1">
+                    <code class="flex-1 text-xs font-mono text-gray-600 bg-white border border-gray-200 rounded px-2 py-1.5 truncate">{{ scanUrl }}</code>
+                    <button @click="copyToClipboard(scanUrl, 'url')"
+                      class="flex-shrink-0 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      :title="copiedType === 'url' ? 'Tersalin!' : 'Salin URL'">
+                      <svg v-if="copiedType !== 'url'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <svg v-else class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                  </div>
+                  <p class="text-xs text-gray-400 mt-1">Ketik kode QR atau URL ini di halaman scan siswa</p>
+                </div>
+              </div>
+            </div>
 
             <div class="flex gap-2 justify-center">
               <button @click="printQR" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 inline-flex items-center gap-1.5">
