@@ -165,62 +165,21 @@ function promptDelete(item: TahunAjaran) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-    <!-- Header -->
-    <header class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/60 sticky top-0 z-30">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <NuxtLink to="/admin" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="Kembali ke Dashboard">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-          </NuxtLink>
-          <div>
-            <h1 class="text-xl font-semibold text-gray-900">Tahun Ajaran</h1>
-            <p class="text-sm text-gray-500 hidden sm:block">Kelola tahun ajaran dan semester aktif</p>
-          </div>
-        </div>
+  <AppLayout>
+    <PageHeader title="Tahun Ajaran" description="Kelola tahun ajaran dan semester aktif">
+      <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-sm font-medium shadow-sm hover:shadow transition-all duration-150">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-sm font-medium shadow-sm transition-all duration-150">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
           <span class="hidden sm:inline">Tambah</span>
         </button>
-      </div>
-    </header>
+      </template>
+    </PageHeader>
 
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <!-- Notifications -->
-      <Transition name="slide">
-        <div v-if="errorMsg"
-          class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-center gap-2 shadow-sm">
-          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span class="flex-1">{{ errorMsg }}</span>
-          <button @click="errorMsg = ''" class="p-0.5 hover:bg-red-100 rounded transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </Transition>
-
-      <Transition name="slide">
-        <div v-if="successMsg"
-          class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm flex items-center gap-2 shadow-sm">
-          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span class="flex-1">{{ successMsg }}</span>
-          <button @click="successMsg = ''" class="p-0.5 hover:bg-green-100 rounded transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </Transition>
+    <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
+    <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
 
       <!-- Loading skeleton -->
       <div v-if="pending" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -352,7 +311,6 @@ function promptDelete(item: TahunAjaran) {
           </table>
         </div>
       </div>
-    </main>
 
     <!-- Modal Create/Edit -->
     <Teleport to="body">
@@ -557,7 +515,7 @@ function promptDelete(item: TahunAjaran) {
         </div>
       </Transition>
     </Teleport>
-  </div>
+  </AppLayout>
 </template>
 
 <style scoped>

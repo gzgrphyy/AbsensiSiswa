@@ -1,0 +1,263 @@
+<script setup lang="ts">
+interface Jadwal {
+  id: number
+  mapel: string
+  hari: string
+  jamMulai: string
+  jamSelesai: string
+  kelas: { id: number; nama: string }
+  ruangan: { id: number; nama: string }
+  guru: { id: number; nama: string }
+}
+
+const { data: jadwalList, pending, refresh } = useFetch<Jadwal[]>('/api/admin/jadwal-pelajaran', { immediate: true })
+const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin/kelas', { immediate: true })
+const { data: guruList } = useFetch<{ id: number; nama: string }[]>('/api/admin/guru', { immediate: true })
+const { data: ruanganList } = useFetch<{ id: number; nama: string }[]>('/api/admin/ruangan', { immediate: true })
+
+const hariList = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU']
+const hariLabel: Record<string, string> = { SENIN: 'Senin', SELASA: 'Selasa', RABU: 'Rabu', KAMIS: 'Kamis', JUMAT: 'Jumat', SABTU: 'Sabtu', MINGGU: 'Minggu' }
+
+const showModal = ref(false)
+const editing = ref<Jadwal | null>(null)
+const form = ref({ mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0 })
+const saving = ref(false)
+const errorMsg = ref('')
+const successMsg = ref('')
+const confirmDelete = ref<{ id: number; mapel: string } | null>(null)
+const confirmClose = ref(false)
+const dirtyForm = ref(false)
+
+function showError(msg: string) {
+  errorMsg.value = msg
+  setTimeout(() => { errorMsg.value = '' }, 5000)
+}
+
+function showSuccess(msg: string) {
+  successMsg.value = msg
+  setTimeout(() => { successMsg.value = '' }, 3000)
+}
+
+function openCreate() {
+  editing.value = null
+  form.value = { mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0 }
+  errorMsg.value = ''
+  dirtyForm.value = false
+  showModal.value = true
+}
+
+function openEdit(item: Jadwal) {
+  editing.value = item
+  form.value = {
+    mapel: item.mapel,
+    hari: item.hari,
+    jamMulai: item.jamMulai,
+    jamSelesai: item.jamSelesai,
+    kelasId: item.kelas.id,
+    ruanganId: item.ruangan.id,
+    guruId: item.guru.id
+  }
+  errorMsg.value = ''
+  dirtyForm.value = false
+  showModal.value = true
+}
+
+function onFormChange() { dirtyForm.value = true }
+
+function handleCloseClick() {
+  if (dirtyForm.value) confirmClose.value = true
+  else showModal.value = false
+}
+
+async function handleSave() {
+  saving.value = true
+  errorMsg.value = ''
+
+  try {
+    const body = {
+      mapel: form.value.mapel,
+      hari: form.value.hari,
+      jamMulai: form.value.jamMulai,
+      jamSelesai: form.value.jamSelesai,
+      kelasId: form.value.kelasId,
+      ruanganId: form.value.ruanganId,
+      guruId: form.value.guruId
+    }
+
+    if (editing.value) {
+      const { error } = await useFetch(`/api/admin/jadwal-pelajaran/${editing.value.id}`, { method: 'PATCH', body })
+      if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
+      showSuccess('Jadwal berhasil diperbarui')
+    } else {
+      const { error } = await useFetch('/api/admin/jadwal-pelajaran', { method: 'POST', body })
+      if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
+      showSuccess('Jadwal berhasil ditambahkan')
+    }
+    showModal.value = false
+    confirmClose.value = false
+    await refresh()
+  } finally { saving.value = false }
+}
+
+function promptDelete(item: Jadwal) {
+  confirmDelete.value = { id: item.id, mapel: item.mapel }
+}
+
+async function handleDelete() {
+  if (!confirmDelete.value) return
+  const { id } = confirmDelete.value
+  confirmDelete.value = null
+  const { error } = await useFetch(`/api/admin/jadwal-pelajaran/${id}`, { method: 'DELETE' })
+  if (error.value) { showError(error.value.statusMessage || 'Gagal menghapus'); return }
+  showSuccess('Jadwal berhasil dihapus')
+  await refresh()
+}
+</script>
+
+<template>
+  <AppLayout>
+    <PageHeader title="Jadwal Pelajaran" description="Kelola jadwal pelajaran">
+      <template #actions>
+        <button @click="openCreate"
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="hidden sm:inline">Tambah Jadwal</span>
+        </button>
+      </template>
+    </PageHeader>
+
+    <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
+    <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
+
+    <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="7" />
+
+    <div v-else class="bg-white rounded-lg border border-gray-200 shadow-card overflow-hidden">
+      <div class="overflow-x-auto scrollbar-thin">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-gray-50 border-b border-gray-200">
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">Mata Pelajaran</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">Hari</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">Jam</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden sm:table-cell">Kelas</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden md:table-cell">Ruangan</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden lg:table-cell">Guru</th>
+              <th class="text-center px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr v-for="item in jadwalList" :key="item.id" class="hover:bg-gray-50 transition-colors">
+              <td class="px-4 py-3 font-medium text-gray-900">{{ item.mapel }}</td>
+              <td class="px-4 py-3">
+                <BaseBadge variant="blue" size="sm">{{ hariLabel[item.hari] || item.hari }}</BaseBadge>
+              </td>
+              <td class="px-4 py-3 text-gray-600 text-xs">{{ item.jamMulai }} - {{ item.jamSelesai }}</td>
+              <td class="px-4 py-3 text-gray-600 hidden sm:table-cell">{{ item.kelas.nama }}</td>
+              <td class="px-4 py-3 text-gray-500 hidden md:table-cell">{{ item.ruangan.nama }}</td>
+              <td class="px-4 py-3 text-gray-500 text-xs hidden lg:table-cell">{{ item.guru.nama }}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-center gap-1">
+                  <button @click="openEdit(item)" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button @click="promptDelete(item)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="Hapus">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr v-if="!jadwalList || jadwalList.length === 0">
+              <td colspan="7" class="px-4 py-16 text-center">
+                <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p class="text-gray-500 font-medium">Belum ada jadwal pelajaran</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <BaseModal :show="showModal" :title="editing ? 'Edit Jadwal' : 'Tambah Jadwal Baru'" @close="handleCloseClick" max-w="max-w-lg">
+      <form @submit.prevent="handleSave" class="space-y-4">
+        <BaseFormField label="Mata Pelajaran" required>
+          <input v-model="form.mapel" type="text" @input="onFormChange" required
+            placeholder="contoh: Matematika"
+            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+        </BaseFormField>
+
+        <div class="grid grid-cols-2 gap-4">
+          <BaseFormField label="Hari" required>
+            <select v-model="form.hari" @change="onFormChange" required
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+              <option v-for="h in hariList" :key="h" :value="h">{{ hariLabel[h] }}</option>
+            </select>
+          </BaseFormField>
+
+          <BaseFormField label="Kelas" required>
+            <select v-model="form.kelasId" @change="onFormChange" required
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+              <option :value="0" disabled>Pilih kelas</option>
+              <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
+            </select>
+          </BaseFormField>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <BaseFormField label="Jam Mulai" required>
+            <input v-model="form.jamMulai" type="time" @input="onFormChange" required
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+          </BaseFormField>
+
+          <BaseFormField label="Jam Selesai" required>
+            <input v-model="form.jamSelesai" type="time" @input="onFormChange" required
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" />
+          </BaseFormField>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <BaseFormField label="Ruangan" required>
+            <select v-model="form.ruanganId" @change="onFormChange" required
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+              <option :value="0" disabled>Pilih ruangan</option>
+              <option v-for="r in ruanganList" :key="r.id" :value="r.id">{{ r.nama }}</option>
+            </select>
+          </BaseFormField>
+
+          <BaseFormField label="Guru" required>
+            <select v-model="form.guruId" @change="onFormChange" required
+              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-white">
+              <option :value="0" disabled>Pilih guru</option>
+              <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
+            </select>
+          </BaseFormField>
+        </div>
+      </form>
+      <template #footer>
+        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">Batal</button>
+        <button type="submit" @click="handleSave" :disabled="saving"
+          class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
+          <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+          {{ saving ? 'Menyimpan...' : 'Simpan' }}
+        </button>
+      </template>
+    </BaseModal>
+
+    <ConfirmDialog
+      :show="!!confirmDelete"
+      title="Hapus Jadwal"
+      :message="`Yakin ingin menghapus jadwal ${confirmDelete?.mapel}?`"
+      variant="danger"
+      @confirm="handleDelete"
+      @cancel="confirmDelete = null"
+    />
+  </AppLayout>
+</template>

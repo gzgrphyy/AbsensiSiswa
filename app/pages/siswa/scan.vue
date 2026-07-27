@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const route = useRoute()
-const { user } = useUserSession()
 
 const hasCamera = ref(false)
 const scanning = ref(false)
@@ -88,7 +87,6 @@ async function handleScan(code: string) {
   errorMsg.value = ''
   result.value = null
 
-  // Extract code from URL if full URL was scanned
   let qrCode = code
   try {
     const url = new URL(code)
@@ -118,7 +116,6 @@ async function submitManual() {
 }
 
 onMounted(() => {
-  // Check if code param is in URL (direct scan via camera app)
   const codeParam = route.query.code as string
   if (codeParam) {
     manualCode.value = codeParam
@@ -132,6 +129,14 @@ onUnmounted(() => {
   stopCamera()
 })
 
+const statusBadgeVariant: Record<string, string> = {
+  PENDING: 'amber',
+  HADIR: 'green',
+  SAKIT: 'red',
+  IZIN: 'blue',
+  ALPHA: 'gray'
+}
+
 const statusLabels: Record<string, string> = {
   PENDING: 'Menunggu Konfirmasi',
   HADIR: 'Hadir',
@@ -139,44 +144,16 @@ const statusLabels: Record<string, string> = {
   IZIN: 'Izin',
   ALPHA: 'Alpha'
 }
-
-const statusColors: Record<string, string> = {
-  PENDING: 'bg-amber-100 text-amber-700 border-amber-200',
-  HADIR: 'bg-green-100 text-green-700 border-green-200',
-  SAKIT: 'bg-red-100 text-red-700 border-red-200',
-  IZIN: 'bg-blue-100 text-blue-700 border-blue-200',
-  ALPHA: 'bg-gray-100 text-gray-600 border-gray-200'
-}
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-    <header class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/60 sticky top-0 z-30">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <NuxtLink to="/siswa" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-          </NuxtLink>
-          <div>
-            <h1 class="text-lg font-semibold text-gray-900">Scan QR Absensi</h1>
-            <p class="text-sm text-gray-500">Arahkan kamera ke QR Code ruangan</p>
-          </div>
-        </div>
-      </div>
-    </header>
+  <AppLayout>
+    <PageHeader title="Scan QR Absensi" description="Arahkan kamera ke QR Code ruangan" />
 
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8">
-        <!-- Error -->
-        <Transition name="fade">
-          <div v-if="errorMsg" class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm flex items-center gap-2">
-            <span class="flex-1">{{ errorMsg }}</span>
-            <button @click="errorMsg = ''" class="p-0.5 hover:bg-red-100 rounded"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
-          </div>
-        </Transition>
+    <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
 
+    <div class="max-w-lg mx-auto">
+      <BaseCard>
         <!-- Scanner -->
         <div v-if="!result">
           <div v-if="!hasCamera && scanning === false && !errorMsg" class="text-center py-8">
@@ -184,10 +161,10 @@ const statusColors: Record<string, string> = {
           </div>
 
           <div v-if="hasCamera" class="relative mb-4">
-            <video ref="videoRef" class="w-full rounded-xl border border-gray-200 bg-black" playsinline></video>
+            <video ref="videoRef" class="w-full rounded-lg border border-gray-200 bg-black" playsinline></video>
             <canvas ref="canvasRef" class="hidden"></canvas>
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div class="w-48 h-48 border-2 border-white/70 rounded-xl"></div>
+              <div class="w-48 h-48 border-2 border-white/60 rounded-lg"></div>
             </div>
             <div class="absolute bottom-3 left-0 right-0 text-center">
               <span class="text-xs text-white/70 bg-black/40 px-3 py-1 rounded-full">Mendeteksi QR Code...</span>
@@ -208,7 +185,7 @@ const statusColors: Record<string, string> = {
             <p class="text-xs text-gray-400 mb-2">Atau masukkan kode QR secara manual:</p>
             <form @submit.prevent="submitManual" class="flex gap-2">
               <input v-model="manualCode" type="text" placeholder="Masukkan kode QR"
-                class="flex-1 px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+                class="flex-1 px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400" />
               <button type="submit" :disabled="submitting || !manualCode.trim()"
                 class="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-1.5">
                 <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
@@ -231,12 +208,12 @@ const statusColors: Record<string, string> = {
               </svg>
             </div>
 
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">
+            <h2 class="text-lg font-semibold text-gray-900 mb-2">
               {{ result.success ? 'Absensi Berhasil!' : 'Absensi Ditolak' }}
             </h2>
-            <p class="text-gray-600 mb-4">{{ result.message }}</p>
+            <p class="text-sm text-gray-600 mb-4">{{ result.message }}</p>
 
-            <div v-if="result.ruangan || result.sesi" class="bg-gray-50 rounded-xl border border-gray-200 p-4 mb-4 text-left space-y-2 text-sm">
+            <div v-if="result.ruangan || result.sesi" class="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-4 text-left space-y-2 text-sm">
               <div v-if="result.ruangan" class="flex justify-between">
                 <span class="text-gray-500">Ruangan</span>
                 <span class="font-medium text-gray-900">{{ result.ruangan.nama }}</span>
@@ -255,41 +232,25 @@ const statusColors: Record<string, string> = {
               </div>
               <div v-if="result.status" class="flex justify-between">
                 <span class="text-gray-500">Status</span>
-                <span :class="statusColors[result.status] || 'bg-gray-100 text-gray-600'"
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                <BaseBadge :variant="statusBadgeVariant[result.status] || 'gray'">
                   {{ statusLabels[result.status] || result.status }}
-                </span>
+                </BaseBadge>
               </div>
             </div>
 
-            <div v-if="result.success" class="flex gap-2 justify-center">
+            <div class="flex gap-2 justify-center">
               <NuxtLink to="/siswa"
                 class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                Kembali ke Dashboard
+                Kembali
               </NuxtLink>
               <button @click="result = null; errorMsg = ''; startCamera()"
                 class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-                Scan Lagi
-              </button>
-            </div>
-            <div v-else>
-              <button @click="result = null; errorMsg = ''; startCamera()"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-                Coba Lagi
+                {{ result.success ? 'Scan Lagi' : 'Coba Lagi' }}
               </button>
             </div>
           </div>
         </Transition>
-      </div>
-    </main>
-  </div>
+      </BaseCard>
+    </div>
+  </AppLayout>
 </template>
-
-<style scoped>
-.slide-enter-active { transition: all 0.3s ease-out; }
-.slide-leave-active { transition: all 0.2s ease-in; }
-.slide-enter-from { transform: translateY(-10px); opacity: 0; }
-.slide-leave-to { transform: translateY(-10px); opacity: 0; }
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-</style>
