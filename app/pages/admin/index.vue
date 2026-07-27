@@ -29,6 +29,18 @@ async function handleLogout() {
           <p class="text-sm text-gray-500 mt-1">Kelola tahun ajaran dan semester</p>
         </NuxtLink>
 
+        <NuxtLink to="/admin/ruangan"
+          class="block p-6 bg-white rounded-xl shadow-sm border hover:shadow-md hover:border-blue-300 transition-all">
+          <h2 class="font-semibold text-gray-900">Ruangan</h2>
+          <p class="text-sm text-gray-500 mt-1">Kelola ruangan dan QR Code</p>
+        </NuxtLink>
+
+        <NuxtLink to="/admin/guru"
+          class="block p-6 bg-white rounded-xl shadow-sm border hover:shadow-md hover:border-blue-300 transition-all">
+          <h2 class="font-semibold text-gray-900">Guru</h2>
+          <p class="text-sm text-gray-500 mt-1">Kelola akun guru dan hak akses</p>
+        </NuxtLink>
+
         <div class="block p-6 bg-white rounded-xl shadow-sm border opacity-50">
           <h2 class="font-semibold text-gray-400">Kelas</h2>
           <p class="text-sm text-gray-400 mt-1">(Coming soon)</p>
@@ -39,11 +51,10 @@ async function handleLogout() {
           <p class="text-sm text-gray-400 mt-1">(Coming soon)</p>
         </div>
 
-        <NuxtLink to="/admin/guru"
-          class="block p-6 bg-white rounded-xl shadow-sm border hover:shadow-md hover:border-blue-300 transition-all">
-          <h2 class="font-semibold text-gray-900">Guru</h2>
-          <p class="text-sm text-gray-500 mt-1">Kelola akun guru dan hak akses</p>
-        </NuxtLink>
+        <div class="block p-6 bg-white rounded-xl shadow-sm border opacity-50">
+          <h2 class="font-semibold text-gray-400">Jadwal Pelajaran</h2>
+          <p class="text-sm text-gray-400 mt-1">(Coming soon)</p>
+        </div>
       </div>
     </main>
   </div>
