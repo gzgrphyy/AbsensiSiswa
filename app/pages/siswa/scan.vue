@@ -20,6 +20,10 @@ const result = ref<{
 const errorMsg = ref('')
 const submitting = ref(false)
 const torchOn = ref(false)
+const availableCameras = ref<MediaDeviceInfo[]>([])
+const selectedCameraIndex = ref(0)
+const cameraSwitching = ref(false)
+const cameraReady = ref(false)
 
 const videoRef = ref<HTMLVideoElement | null>(null)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
@@ -27,26 +31,49 @@ const streamRef = ref<MediaStream | null>(null)
 const animFrameId = ref(0)
 const lastDetectTime = ref(0)
 
+/**
+ * Daftar kamera yang tersedia — dipanggil SETELAH stream jalan,
+ * karena enumerateDevices() butuh izin yang sudah diberikan.
+ */
+async function refreshCameraList() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices()
+    availableCameras.value = devices.filter(d => d.kind === 'videoinput')
+  } catch {
+    // abaikan
+  }
+}
+
+/**
+ * Mulai kamera dengan index tertentu (default 0 = kamera pertama).
+ * Tidak bikin temp stream — langsung getUserMedia.
+ */
 async function startCamera() {
   if (!import.meta.client) return
+
   cameraError.value = ''
   hasCamera.value = false
   scanning.value = false
+  cameraReady.value = false
 
-  // Hentikan stream lama kalo ada
+  // Hentikan stream lama
   stopCamera()
 
-  // Urutan fallback kamera: environment -> user -> tanpa facingMode
-  const attempts = [
-    { facingMode: 'environment' as const, width: { ideal: 640 }, height: { ideal: 480 } },
-    { facingMode: 'user' as const, width: { ideal: 640 }, height: { ideal: 480 } },
+  // videoRef sudah pasti ada karena pakai v-show (element selalu di DOM)
+  // Langsung coba akses kamera
+
+  // Prioritas: user -> environment -> tanpa facingMode
+  // Di laptop: user = webcam internal.
+  const constraintsList: MediaTrackConstraints[] = [
+    { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+    { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
     { width: { ideal: 640 }, height: { ideal: 480 } }
   ]
 
-  let stream = null
+  let stream: MediaStream | null = null
   let lastError: any = null
 
-  for (const video of attempts) {
+  for (const video of constraintsList) {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video, audio: false })
       if (stream) break
@@ -56,55 +83,117 @@ async function startCamera() {
   }
 
   if (!stream) {
-    hasCamera.value = false
-    scanning.value = false
-
-    if (lastError?.name === 'NotAllowedError' || lastError?.name === 'PermissionDeniedError') {
-      cameraError.value = 'Izin kamera ditolak. Izinkan akses kamera di pengaturan browser, lalu coba lagi.'
-    } else if (lastError?.name === 'NotFoundError') {
-      cameraError.value = 'Kamera tidak ditemukan di perangkat ini.'
-    } else if (lastError?.name === 'NotReadableError') {
-      cameraError.value = 'Kamera sedang digunakan aplikasi lain. Tutup aplikasi kamera lain, lalu coba lagi.'
-    } else if (lastError?.name === 'SecurityError') {
-      cameraError.value = 'Akses kamera butuh koneksi HTTPS. Gunakan ngrok untuk akses dari HP, atau masukkan kode manual.'
-    } else {
-      cameraError.value = 'Kamera tidak tersedia. Silakan masukkan kode QR secara manual.'
-    }
+    handleCameraError(lastError)
     return
   }
 
-  // Stream berhasil didapat
+  // Simpan stream
   streamRef.value = stream
 
-  if (videoRef.value) {
-    videoRef.value.srcObject = stream
-    videoRef.value.setAttribute('playsinline', '')
-    try {
-      await videoRef.value.play()
-    } catch {
-      // Kadang play gagal kalo user belum interaksi
+  // Pasang ke video element
+  videoRef.value.srcObject = stream
+  videoRef.value.setAttribute('playsinline', '')
+
+  try {
+    await videoRef.value.play()
+  } catch (err: any) {
+    // Kalau play gagal (misal user belum interaksi), coba lagi setelah interaksi
+    if (err?.name === 'NotAllowedError') {
+      cameraError.value = 'Browser membutuhkan interaksi. Klik tombol "Coba Lagi" di bawah.'
+      stopCamera()
+      return
     }
   }
 
-  // Tunggu video bener-bener jalan (max 3 detik)
-  if (videoRef.value) {
-    await Promise.race([
-      new Promise<void>((resolve) => {
-        const interval = setInterval(() => {
-          if (videoRef.value?.readyState && videoRef.value.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-            clearInterval(interval)
-            resolve()
-          }
-        }, 100)
-      }),
-      new Promise((resolve) => setTimeout(resolve, 3000))
-    ])
-  }
-
+  // Tandai camera siap dan mulai scan
+  cameraReady.value = true
   hasCamera.value = true
   scanning.value = true
   scanComplete.value = false
+
+  // Mulai loop scan
   scanLoop()
+
+  // Setelah stream jalan, enumerate camera untuk tombol switch
+  await refreshCameraList()
+}
+
+function stopCamera() {
+  scanning.value = false
+  cameraReady.value = false
+  if (animFrameId.value) {
+    cancelAnimationFrame(animFrameId.value)
+    animFrameId.value = 0
+  }
+  if (streamRef.value) {
+    streamRef.value.getTracks().forEach(t => {
+      t.stop()
+      t.enabled = false
+    })
+    streamRef.value = null
+  }
+}
+
+async function switchCamera() {
+  if (availableCameras.value.length < 2 || cameraSwitching.value) return
+  cameraSwitching.value = true
+
+  const nextIndex = (selectedCameraIndex.value + 1) % availableCameras.value.length
+  const camera = availableCameras.value[nextIndex]
+
+  stopCamera()
+  await nextTick()
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        deviceId: { exact: camera.deviceId },
+        width: { ideal: 640 },
+        height: { ideal: 480 }
+      },
+      audio: false
+    })
+
+    streamRef.value = stream
+    if (videoRef.value) {
+      videoRef.value.srcObject = stream
+      videoRef.value.setAttribute('playsinline', '')
+      await videoRef.value.play()
+    }
+
+    // Update index hanya setelah stream benar-benar berhasil
+    selectedCameraIndex.value = nextIndex
+    cameraReady.value = true
+    hasCamera.value = true
+    scanning.value = true
+    scanComplete.value = false
+    scanLoop()
+  } catch {
+    // Fallback: start ulang dengan facingMode
+    await startCamera()
+  } finally {
+    cameraSwitching.value = false
+  }
+}
+
+function handleCameraError(err: any) {
+  hasCamera.value = false
+  scanning.value = false
+
+  const name = err?.name || ''
+  if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+    cameraError.value = 'Izin kamera ditolak. Izinkan akses kamera di pengaturan browser, lalu coba lagi.'
+  } else if (name === 'NotFoundError') {
+    cameraError.value = 'Kamera tidak ditemukan di perangkat ini.'
+  } else if (name === 'NotReadableError') {
+    cameraError.value = 'Kamera sedang digunakan aplikasi lain. Tutup aplikasi kamera lain, lalu coba lagi.'
+  } else if (name === 'SecurityError') {
+    cameraError.value = 'Akses kamera butuh koneksi HTTPS. Akses via localhost atau gunakan ngrok, atau masukkan kode manual.'
+  } else if (name === 'OverconstrainedError') {
+    cameraError.value = 'Kamera tidak kompatibel. Silakan masukkan kode QR secara manual.'
+  } else {
+    cameraError.value = 'Kamera tidak tersedia. Silakan masukkan kode QR secara manual.'
+  }
 }
 
 function scanLoop() {
@@ -144,21 +233,6 @@ function scanLoop() {
   }
 
   animFrameId.value = requestAnimationFrame(scanLoop)
-}
-
-function stopCamera() {
-  scanning.value = false
-  if (animFrameId.value) {
-    cancelAnimationFrame(animFrameId.value)
-    animFrameId.value = 0
-  }
-  if (streamRef.value) {
-    streamRef.value.getTracks().forEach(t => {
-      t.stop()
-      t.enabled = false
-    })
-    streamRef.value = null
-  }
 }
 
 async function handleScan(code: string) {
@@ -299,7 +373,7 @@ const statusLabels: Record<string, string> = {
             <p class="text-sm text-gray-500">Mengakses kamera...</p>
           </div>
 
-          <div v-if="hasCamera" class="relative">
+          <div v-show="hasCamera" class="relative">
             <div class="relative bg-black rounded-lg overflow-hidden">
               <video
                 ref="videoRef"
@@ -321,26 +395,46 @@ const statusLabels: Record<string, string> = {
                 </div>
               </div>
 
-              <div class="absolute top-3 left-3">
+              <div class="absolute top-3 left-3 flex items-center gap-2">
                 <span class="text-xs text-white/80 bg-black/50 px-2.5 py-1 rounded-full inline-flex items-center gap-1.5">
                   <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                  {{ submitting ? 'Memproses...' : 'Scan QR...' }}
+                  {{ !cameraReady ? 'Menyiapkan kamera...' : submitting ? 'Memproses...' : 'Scan QR...' }}
                 </span>
               </div>
 
-              <button
-                v-if="hasCamera"
-                @click="toggleTorch"
-                class="absolute top-3 right-3 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:text-white transition-colors"
-                title="Lampu kilat"
-              >
-                <svg v-if="!torchOn" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                <svg v-else class="w-4 h-4 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </button>
+              <div class="absolute top-3 right-3 flex items-center gap-1.5">
+                <!-- Tombol Ganti Kamera -->
+                <button
+                  v-if="availableCameras.length > 1"
+                  @click="switchCamera"
+                  :disabled="cameraSwitching"
+                  class="w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:text-white transition-colors"
+                  title="Ganti kamera"
+                >
+                  <svg v-if="!cameraSwitching" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                </button>
+
+                <!-- Tombol Lampu (Torch) -->
+                <button
+                  v-if="hasCamera"
+                  @click="toggleTorch"
+                  class="w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white/80 hover:text-white transition-colors"
+                  title="Lampu kilat"
+                >
+                  <svg v-if="!torchOn" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <svg v-else class="w-4 h-4 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -449,10 +543,11 @@ const statusLabels: Record<string, string> = {
           <div>
             <p class="text-sm font-medium text-blue-800">Tips Scan QR</p>
             <ul class="mt-1 text-xs text-blue-700 space-y-1">
-              <li>&bull; Pastikan ruangan cukup terang</li>
-              <li>&bull; Arahkan kamera tepat ke QR Code</li>
-              <li>&bull; Di HP: akses via <span class="font-mono bg-white px-1 rounded">https://</span> (pakai ngrok) agar kamera bisa dipakai</li>
-              <li>&bull; Kode QR bisa dimasukkan manual jika kamera error</li>
+              <li>&bull; Pastikan pencahayaan ruangan cukup.</li>
+              <li>&bull; Izinkan akses kamera pada browser.</li>
+              <li>&bull; Buka aplikasi melalui localhost (Laptop/PC) atau HTTPS (Smartphone). <span class="font-mono bg-white px-1 rounded">localhost</span> atau pastikan browser sudah memberi izin kamera</li>
+              <li>&bull; Arahkan kamera ke bagian tengah QR Code. </li>
+              <li>&bull; Tunggu beberapa saat hingga QR Code terbaca otomatis.</li>
             </ul>
           </div>
         </div>

@@ -65,8 +65,7 @@ function openEdit(item: Jadwal) {
 function onFormChange() { dirtyForm.value = true }
 
 function handleCloseClick() {
-  if (dirtyForm.value) confirmClose.value = true
-  else showModal.value = false
+  showModal.value = false
 }
 
 async function handleSave() {
