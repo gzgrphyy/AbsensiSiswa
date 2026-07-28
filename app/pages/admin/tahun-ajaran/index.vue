@@ -182,40 +182,40 @@ function promptDelete(item: TahunAjaran) {
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
 
       <!-- Loading skeleton -->
-      <div v-if="pending" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div v-if="pending" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm dark:shadow-dark-card border border-gray-200 dark:border-slate-700 overflow-hidden">
         <div class="p-6 space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-center gap-4 animate-pulse">
-            <div class="h-4 bg-gray-200 rounded w-32"></div>
-            <div class="h-4 bg-gray-200 rounded w-20"></div>
-            <div class="h-4 bg-gray-200 rounded w-12 ml-auto"></div>
-            <div class="h-6 bg-gray-200 rounded-full w-20"></div>
-            <div class="h-4 bg-gray-200 rounded w-24 ml-auto"></div>
+            <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-32"></div>
+            <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-20"></div>
+            <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-12 ml-auto"></div>
+            <div class="h-6 bg-gray-200 dark:bg-slate-700 rounded-full w-20"></div>
+            <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-24 ml-auto"></div>
           </div>
         </div>
       </div>
 
       <!-- Table -->
-      <div v-else class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200">
+      <div v-else class="bg-white dark:bg-slate-800 rounded-xl shadow-sm dark:shadow-dark-card border border-gray-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-shadow duration-200">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-gray-50 border-b border-gray-200">
-                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Tahun Ajaran</th>
-                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden sm:table-cell">Semester</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Kelas</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Status</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wider">Aksi</th>
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Tahun Ajaran</th>
+                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Semester</th>
+                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Kelas</th>
+                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Status</th>
+                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Aksi</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
               <tr v-for="item in data" :key="item.id"
                 class="transition-all duration-150"
                 :class="item.isActive
-                  ? 'bg-green-50/60 hover:bg-green-100/60 border-l-4 border-l-green-500'
-                  : 'hover:bg-gray-50 border-l-4 border-l-transparent'">
+                  ? 'bg-green-50/60 dark:bg-green-900/20 hover:bg-green-100/60 dark:hover:bg-green-900/30 border-l-4 border-l-green-500'
+                  : 'hover:bg-gray-50 dark:hover:bg-slate-700/30 border-l-4 border-l-transparent'">
                 <td class="px-4 sm:px-6 py-4">
                   <div class="flex items-center gap-2">
-                    <span class="font-medium text-gray-900">{{ item.nama }}</span>
+                    <span class="font-medium text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
                     <span class="sm:hidden text-xs font-medium"
                       :class="item.semester === 'GANJIL' ? 'text-purple-600' : 'text-cyan-600'">
                       {{ semesterLabel(item.semester) }}
@@ -245,7 +245,7 @@ function promptDelete(item: TahunAjaran) {
                       Aktif
                     </span>
                     <span v-else
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500 ring-1 ring-gray-200">
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 ring-1 ring-gray-200 dark:ring-slate-600">
                       Tidak Aktif
                     </span>
                   </div>
@@ -319,14 +319,14 @@ function promptDelete(item: TahunAjaran) {
           <!-- Backdrop -->
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="handleCloseClick"></div>
 
-          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-auto overflow-hidden border border-gray-100">
+          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-md mx-auto overflow-hidden border border-gray-100 dark:border-slate-700">
             <!-- Modal header -->
             <div class="flex items-center justify-between px-6 pt-6 pb-2">
-              <h2 class="text-lg font-semibold text-gray-900">
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {{ editing ? 'Edit Tahun Ajaran' : 'Tambah Tahun Ajaran' }}
               </h2>
               <button @click="handleCloseClick"
-                class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                class="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -336,11 +336,11 @@ function promptDelete(item: TahunAjaran) {
             <form @submit.prevent="handleSave" class="p-6 space-y-5">
               <!-- Nama -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Tahun Ajaran</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nama Tahun Ajaran</label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
                   placeholder="contoh: 2026/2027"
                   :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400" />
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 <Transition name="fade">
                   <p v-if="editing && editing._count.kelas > 0" class="flex items-center gap-1 text-xs text-amber-600 mt-1.5">
                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -353,24 +353,24 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Semester -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Semester</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Semester</label>
                 <select v-model="form.semester" @change="onFormChange"
                   :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-shadow appearance-none bg-white">
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
                   <option value="GANJIL">Ganjil</option>
                   <option value="GENAP">Genap</option>
                 </select>
               </div>
 
               <!-- Set Active -->
-              <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+              <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-100 dark:border-slate-600">
                 <input id="setActive" v-model="form.setActive" type="checkbox" @change="onFormChange"
-                  class="mt-0.5 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-primary-500 transition-shadow" />
+                  class="mt-0.5 w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-primary-500 transition-shadow" />
                 <div class="flex flex-col">
-                  <label for="setActive" class="text-sm font-medium text-gray-700 cursor-pointer">
+                  <label for="setActive" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
                     {{ editing ? 'Set sebagai tahun ajaran aktif' : 'Jadikan aktif sekarang' }}
                   </label>
-                  <p class="text-xs text-gray-500 mt-0.5">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                     Tahun ajaran lain yang aktif akan otomatis dinonaktifkan
                   </p>
                 </div>
@@ -397,9 +397,9 @@ function promptDelete(item: TahunAjaran) {
               </Transition>
 
               <!-- Actions -->
-              <div class="flex justify-end gap-3 pt-2 border-t border-gray-100">
+              <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-slate-700">
                 <button type="button" @click="handleCloseClick"
-                  class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+                  class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                   Batal
                 </button>
                 <button type="submit" :disabled="saving"
@@ -420,12 +420,12 @@ function promptDelete(item: TahunAjaran) {
       <Transition name="modal">
         <div v-if="confirmClose" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmClose = false"></div>
-          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100">
-            <h2 class="text-lg font-semibold text-gray-900 mb-2">Batalkan perubahan?</h2>
-            <p class="text-sm text-gray-600 mb-5">Perubahan yang belum disimpan akan hilang.</p>
+          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Batalkan perubahan?</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Perubahan yang belum disimpan akan hilang.</p>
             <div class="flex justify-end gap-3">
               <button @click="confirmClose = false"
-                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                 Lanjutkan Edit
               </button>
               <button @click="showModal = false; confirmClose = false"
@@ -441,24 +441,24 @@ function promptDelete(item: TahunAjaran) {
       <Transition name="modal">
         <div v-if="confirmToggle" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmToggle = null"></div>
-          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100">
+          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
             <div class="flex items-center gap-3 mb-4">
-              <div class="p-2 bg-amber-100 rounded-full">
-                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-full">
+                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h2 class="text-lg font-semibold text-gray-900">Aktifkan Tahun Ajaran</h2>
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Aktifkan Tahun Ajaran</h2>
             </div>
-            <p class="text-sm text-gray-600 mb-1">
-              Tahun ajaran <strong class="text-gray-900">{{ confirmToggle.nama }}</strong> akan diaktifkan.
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
+              Tahun ajaran <strong class="text-gray-900 dark:text-gray-100">{{ confirmToggle.nama }}</strong> akan diaktifkan.
             </p>
-            <p class="text-sm text-amber-700 bg-amber-50 border border-amber-100 rounded-lg p-3 mb-4">
+            <p class="text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-lg p-3 mb-4">
               Tahun ajaran lain yang aktif akan otomatis dinonaktifkan.
             </p>
             <div class="flex justify-end gap-3">
               <button @click="confirmToggle = null"
-                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                 Batal
               </button>
               <button @click="handleToggle"
@@ -474,23 +474,23 @@ function promptDelete(item: TahunAjaran) {
       <Transition name="modal">
         <div v-if="confirmDelete" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmDelete = null"></div>
-          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100">
+          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
             <div class="flex items-center gap-3 mb-4">
-              <div class="p-2 bg-red-100 rounded-full">
-                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
+                <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-gray-900">Hapus Tahun Ajaran</h2>
-                <p class="text-sm text-gray-500">Tindakan ini tidak bisa dibatalkan</p>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Hapus Tahun Ajaran</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Tindakan ini tidak bisa dibatalkan</p>
               </div>
             </div>
-            <p class="text-sm text-gray-600 mb-1">
-              Yakin ingin menghapus <strong class="text-gray-900">{{ confirmDelete.nama }}</strong>?
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
+              Yakin ingin menghapus <strong class="text-gray-900 dark:text-gray-100">{{ confirmDelete.nama }}</strong>?
             </p>
             <div v-if="confirmDelete.kelasCount > 0"
-              class="mt-3 p-3 bg-amber-50 border border-amber-100 rounded-lg text-sm text-amber-700 flex items-start gap-2">
+              class="mt-3 p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-lg text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
               <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
@@ -498,12 +498,12 @@ function promptDelete(item: TahunAjaran) {
                 Tahun ajaran ini masih memiliki <strong>{{ confirmDelete.kelasCount }} kelas</strong> terkait. Data siswa/absensi tidak akan hilang, tetapi tahun ajaran tidak akan muncul di pilihan baru.
               </span>
             </div>
-            <p v-else class="mt-3 text-sm text-gray-500">
+            <p v-else class="mt-3 text-sm text-gray-500 dark:text-gray-400">
               Data akan dihapus secara permanen dari tampilan.
             </p>
-            <div class="flex justify-end gap-3 mt-5 pt-4 border-t border-gray-100">
+            <div class="flex justify-end gap-3 mt-5 pt-4 border-t border-gray-100 dark:border-slate-700">
               <button @click="confirmDelete = null"
-                class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                 Batal
               </button>
               <button @click="handleDelete"

@@ -155,20 +155,20 @@ onMounted(() => {
 <template>
   <AppLayout>
     <!-- Session Info Bar -->
-    <div v-if="sesi" class="bg-white rounded-lg border border-gray-200 shadow-card p-4 mb-4">
+    <div v-if="sesi" class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card p-4 mb-4">
       <div class="flex flex-wrap items-center gap-4 text-sm">
         <div class="flex-1">
-          <h1 class="text-base font-semibold text-gray-900">{{ sesi.jadwal.mapel }}</h1>
-          <p class="text-sm text-gray-500">{{ sesi.jadwal.kelas.nama }} — {{ sesi.jadwal.ruangan.nama }}</p>
+          <h1 class="text-base font-semibold text-gray-900 dark:text-gray-100">{{ sesi.jadwal.mapel }}</h1>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{{ sesi.jadwal.kelas.nama }} — {{ sesi.jadwal.ruangan.nama }}</p>
         </div>
         <div class="flex items-center gap-3">
-          <span class="inline-flex items-center gap-1.5 text-gray-500">
+          <span class="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             {{ sesi.jadwal.jamMulai }} - {{ sesi.jadwal.jamSelesai }}
           </span>
-          <span class="inline-flex items-center gap-1.5 text-gray-500">
+          <span class="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
@@ -196,44 +196,44 @@ onMounted(() => {
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :columns="5" />
 
     <!-- Siswa Table -->
-    <div v-else-if="sesi" class="bg-white rounded-lg border border-gray-200 shadow-card overflow-hidden">
+    <div v-else-if="sesi" class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
       <div class="overflow-x-auto scrollbar-thin">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-gray-50 border-b border-gray-200">
+            <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
               <th class="w-12 px-3 py-3"></th>
-              <th class="text-left px-3 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">Nama</th>
-              <th class="text-left px-3 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden sm:table-cell">NISN</th>
-              <th class="text-center px-3 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">Status</th>
-              <th class="text-center px-3 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden md:table-cell">Keterangan</th>
-              <th class="text-center px-3 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden md:table-cell">Scan</th>
+              <th class="text-left px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Nama</th>
+              <th class="text-left px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">NISN</th>
+              <th class="text-center px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Status</th>
+              <th class="text-center px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">Keterangan</th>
+              <th class="text-center px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">Scan</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
+          <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
             <tr v-for="s in sesi.allSiswa" :key="s.id"
-              class="hover:bg-gray-50 transition-colors"
-              :class="{ 'bg-green-50/40': entries.get(s.id)?.checked && (!s.request || s.request.status === 'PENDING') }">
+              class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors"
+              :class="{ 'bg-green-50/40 dark:bg-green-900/20': entries.get(s.id)?.checked && (!s.request || s.request.status === 'PENDING') }">
               <td class="px-3 py-3 text-center">
                 <input type="checkbox"
                   :checked="entries.get(s.id)?.checked || false"
                   @change="toggleSiswa(s.id)"
                   :disabled="sesi.status === 'SELESAI'"
-                  class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-primary-500 cursor-pointer disabled:cursor-not-allowed" />
+                  class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-primary-500 cursor-pointer disabled:cursor-not-allowed" />
               </td>
               <td class="px-3 py-3">
                 <div class="flex items-center gap-2">
-                  <div class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xs font-semibold">
+                  <div class="w-7 h-7 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center text-gray-600 dark:text-gray-300 text-xs font-semibold">
                     {{ s.nama.charAt(0).toUpperCase() }}
                   </div>
-                  <span class="font-medium text-gray-900">{{ s.nama }}</span>
+                  <span class="font-medium text-gray-900 dark:text-gray-100">{{ s.nama }}</span>
                 </div>
               </td>
-              <td class="px-3 py-3 text-gray-500 hidden sm:table-cell">{{ s.nisn }}</td>
+              <td class="px-3 py-3 text-gray-500 dark:text-gray-400 hidden sm:table-cell">{{ s.nisn }}</td>
               <td class="px-3 py-3 text-center">
                 <select v-if="sesi.status === 'AKTIF'"
                   :value="entries.get(s.id)?.status || 'ALPHA'"
                   @change="(e) => setStatus(s.id, (e.target as HTMLSelectElement).value)"
-                  class="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-primary-500 bg-white cursor-pointer">
+                  class="text-xs border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1 focus:ring-2 focus:ring-primary-500 bg-white dark:bg-slate-700 dark:text-gray-100 cursor-pointer">
                   <option value="HADIR">Hadir</option>
                   <option value="SAKIT">Sakit</option>
                   <option value="IZIN">Izin</option>
@@ -247,14 +247,14 @@ onMounted(() => {
                 <input v-if="sesi.status === 'AKTIF'"
                   v-model="entries.get(s.id)!.keterangan"
                   type="text" placeholder="-" maxlength="255"
-                  class="w-full max-w-[120px] text-xs border border-gray-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-primary-500 placeholder:text-gray-300" />
-                <span v-else class="text-xs text-gray-400">{{ s.request?.keterangan || '-' }}</span>
+                  class="w-full max-w-[120px] text-xs border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1 focus:ring-2 focus:ring-primary-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-300 dark:placeholder:text-gray-500" />
+                <span v-else class="text-xs text-gray-400 dark:text-gray-500">{{ s.request?.keterangan || '-' }}</span>
               </td>
               <td class="px-3 py-3 text-center hidden md:table-cell">
-                <span v-if="s.request" class="text-xs text-gray-400">
+                <span v-if="s.request" class="text-xs text-gray-400 dark:text-gray-500">
                   {{ new Date(s.request.scannedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }}
                 </span>
-                <span v-else class="text-xs text-gray-300">-</span>
+                <span v-else class="text-xs text-gray-300 dark:text-slate-500">-</span>
               </td>
             </tr>
           </tbody>
@@ -262,10 +262,10 @@ onMounted(() => {
       </div>
 
       <!-- Actions -->
-      <div v-if="sesi.status === 'AKTIF'" class="px-5 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
-        <p class="text-sm text-gray-500">
-          <strong class="text-gray-700">{{ entries.size }}</strong> siswa —
-          <strong class="text-green-600">{{ statusCount.HADIR }}</strong> hadir
+      <div v-if="sesi.status === 'AKTIF'" class="px-5 py-4 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-700 flex items-center justify-between">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          <strong class="text-gray-700 dark:text-gray-300">{{ entries.size }}</strong> siswa —
+          <strong class="text-green-600 dark:text-green-400">{{ statusCount.HADIR }}</strong> hadir
         </p>
         <button @click="submitKonfirmasi" :disabled="submitting"
           class="px-5 py-2.5 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">

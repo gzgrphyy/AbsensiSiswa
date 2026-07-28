@@ -11,7 +11,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-screen overflow-hidden flex flex-col bg-[#FEFEFE]">
+  <div class="h-screen overflow-hidden flex flex-col bg-[#FEFEFE] dark:bg-slate-900">
     <!-- MiniNavbar: only for Admin, sits above everything -->
     <MiniNavbar v-if="isAdmin" class="flex-shrink-0" />
 

@@ -7,7 +7,13 @@ export default defineNuxtConfig({
     port: 3000
   },
 
-  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss'],
+  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
+
+  colorMode: {
+    classSuffix: '',
+    preference: 'system',
+    fallback: 'light',
+  },
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {

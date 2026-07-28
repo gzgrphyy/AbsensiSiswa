@@ -12,14 +12,14 @@ withDefaults(defineProps<{
 })
 
 const variants = {
-  green: 'bg-green-50 text-green-700 ring-1 ring-green-200',
-  red: 'bg-red-50 text-red-700 ring-1 ring-red-200',
-  blue: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
-  amber: 'bg-accent-50 text-primary-800 ring-1 ring-accent-200 font-semibold',
-  gray: 'bg-gray-50 text-gray-500 ring-1 ring-gray-200',
-  purple: 'bg-purple-50 text-purple-700 ring-1 ring-purple-200',
-  cyan: 'bg-cyan-50 text-cyan-700 ring-1 ring-cyan-200',
-  primary: 'bg-primary-50 text-primary-700 ring-1 ring-primary-200 font-semibold',
+  green: 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 ring-1 ring-green-200 dark:ring-green-800',
+  red: 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 ring-1 ring-red-200 dark:ring-red-800',
+  blue: 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 ring-1 ring-blue-200 dark:ring-blue-800',
+  amber: 'bg-accent-50 dark:bg-amber-900/30 text-primary-800 dark:text-amber-200 ring-1 ring-accent-200 dark:ring-amber-800 font-semibold',
+  gray: 'bg-gray-50 dark:bg-slate-700 text-gray-500 dark:text-gray-400 ring-1 ring-gray-200 dark:ring-slate-600',
+  purple: 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 ring-1 ring-purple-200 dark:ring-purple-800',
+  cyan: 'bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-200 dark:ring-cyan-800',
+  primary: 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 ring-1 ring-primary-200 dark:ring-primary-800 font-semibold',
 }
 
 const dotColors = {
@@ -27,7 +27,7 @@ const dotColors = {
   red: 'bg-red-500',
   blue: 'bg-blue-500',
   amber: 'bg-accent-500',
-  gray: 'bg-gray-400',
+  gray: 'bg-gray-400 dark:bg-gray-500',
   purple: 'bg-purple-500',
   cyan: 'bg-cyan-500',
   primary: 'bg-primary-500',

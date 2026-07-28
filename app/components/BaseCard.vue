@@ -18,9 +18,9 @@ const paddings = {
 <template>
   <div
     :class="[
-      'bg-white rounded-xl border border-gray-100 shadow-card',
+      'bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card',
       paddings[padding],
-      { 'hover:shadow-card-hover hover:border-gray-200 transition-all duration-200': hover }
+      { 'hover:shadow-card-hover hover:border-gray-200 dark:hover:border-slate-600 transition-all duration-200': hover }
     ]"
   >
     <slot />

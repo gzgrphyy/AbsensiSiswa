@@ -109,53 +109,53 @@ async function handleChangePassword() {
     <BaseCard>
       <form @submit.prevent="handleSave" class="space-y-5">
         <!-- Info Card -->
-        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
-          <div class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xl font-bold flex-shrink-0">
+        <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-100 dark:border-slate-700">
+          <div class="w-14 h-14 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center text-green-600 dark:text-green-400 text-xl font-bold flex-shrink-0">
             {{ (profile?.namaSiswa || profile?.nama || 'S').charAt(0).toUpperCase() }}
           </div>
           <div>
-            <h2 class="font-semibold text-gray-900">{{ profile?.namaSiswa || profile?.nama || '-' }}</h2>
-            <p class="text-sm text-gray-500">Siswa — {{ profile?.kelas?.nama || '-' }}</p>
-            <p class="text-xs text-gray-400">NISN: {{ profile?.nisn || '-' }}</p>
+            <h2 class="font-semibold text-gray-900 dark:text-gray-100">{{ profile?.namaSiswa || profile?.nama || '-' }}</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Siswa — {{ profile?.kelas?.nama || '-' }}</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500">NISN: {{ profile?.nisn || '-' }}</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <BaseFormField label="Nama Lengkap" required>
             <input v-model="form.nama" type="text"
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
           </BaseFormField>
           <BaseFormField label="NISN">
             <input :value="profile?.nisn || '-'" type="text" disabled
-              class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 cursor-not-allowed" />
+              class="w-full px-3.5 py-2.5 border border-gray-200 dark:border-slate-700 rounded-lg text-sm bg-gray-50 dark:bg-slate-700/50 text-gray-500 dark:text-gray-400 cursor-not-allowed" />
           </BaseFormField>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <BaseFormField label="Email (Akun Login)">
             <input :value="profile?.email || '-'" type="email" disabled
-              class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 cursor-not-allowed" />
+              class="w-full px-3.5 py-2.5 border border-gray-200 dark:border-slate-700 rounded-lg text-sm bg-gray-50 dark:bg-slate-700/50 text-gray-500 dark:text-gray-400 cursor-not-allowed" />
           </BaseFormField>
           <BaseFormField label="Kelas">
             <input :value="profile?.kelas?.nama || '-'" type="text" disabled
-              class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500 cursor-not-allowed" />
+              class="w-full px-3.5 py-2.5 border border-gray-200 dark:border-slate-700 rounded-lg text-sm bg-gray-50 dark:bg-slate-700/50 text-gray-500 dark:text-gray-400 cursor-not-allowed" />
           </BaseFormField>
         </div>
 
-        <div class="border-t border-gray-100 pt-4">
-          <h3 class="text-sm font-semibold text-gray-700 mb-3">Informasi Wali Murid</h3>
+        <div class="border-t border-gray-100 dark:border-slate-700 pt-4">
+          <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Informasi Wali Murid</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField label="Nama Wali">
               <input v-model="form.namaWali" type="text" placeholder="Nama orang tua / wali"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
             </BaseFormField>
             <BaseFormField label="Kontak Wali">
               <input v-model="form.kontakWali" type="text" placeholder="Nomor HP wali"
-                class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
+                class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
             </BaseFormField>
           </div>
         </div>
 
-        <div class="flex justify-end pt-4 border-t border-gray-200">
+        <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-slate-700">
           <button type="submit" :disabled="saving"
             class="px-6 py-2.5 bg-primary-500 text-sm font-medium text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
@@ -168,10 +168,10 @@ async function handleChangePassword() {
     <!-- Ubah Password -->
     <BaseCard class="mt-6">
       <div class="flex items-center gap-2 mb-5">
-        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
-        <h3 class="text-base font-semibold text-gray-900">Ubah Password</h3>
+        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Ubah Password</h3>
       </div>
 
       <Notification type="success" :message="pwSuccessMsg" :show="!!pwSuccessMsg" @dismiss="pwSuccessMsg = ''" />
@@ -180,15 +180,15 @@ async function handleChangePassword() {
       <form @submit.prevent="handleChangePassword" class="space-y-4 max-w-md">
         <BaseFormField label="Password Saat Ini" required>
           <input v-model="pwForm.currentPassword" type="password" placeholder="Masukkan password saat ini"
-            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
         <BaseFormField label="Password Baru" required>
           <input v-model="pwForm.newPassword" type="password" placeholder="Minimal 6 karakter"
-            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
         <BaseFormField label="Konfirmasi Password Baru" required>
           <input v-model="pwForm.confirmPassword" type="password" placeholder="Ketik ulang password baru"
-            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
 
         <div class="flex justify-end pt-2">

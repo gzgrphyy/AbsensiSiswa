@@ -20,8 +20,8 @@ const variants = {
   danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm',
   success: 'bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-sm',
   warning: 'bg-accent-500 text-primary-900 hover:bg-accent-600 active:bg-accent-700 shadow-sm font-semibold',
-  ghost: 'text-gray-500 hover:text-primary-600 hover:bg-primary-50',
-  outline: 'border border-gray-200 text-gray-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50',
+  ghost: 'text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30',
+  outline: 'border border-gray-200 dark:border-slate-600 text-gray-600 dark:text-gray-300 hover:border-primary-300 dark:hover:border-primary-600 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30',
 }
 
 const sizes = {

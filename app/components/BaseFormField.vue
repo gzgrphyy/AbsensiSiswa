@@ -13,12 +13,12 @@ withDefaults(defineProps<{
 
 <template>
   <div>
-    <label v-if="label" class="block text-sm font-medium text-gray-600 mb-1.5">
+    <label v-if="label" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">
       {{ label }}
       <span v-if="required" class="text-red-500">*</span>
     </label>
     <slot />
-    <p v-if="help && !error" class="mt-1 text-xs text-gray-400">{{ help }}</p>
+    <p v-if="help && !error" class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ help }}</p>
     <Transition name="fade">
       <p v-if="error" class="mt-1 text-xs text-red-600 flex items-center gap-1">
         <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

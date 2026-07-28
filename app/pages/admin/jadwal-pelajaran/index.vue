@@ -132,30 +132,30 @@ async function handleDelete() {
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="7" />
 
-    <div v-else class="bg-white rounded-lg border border-gray-200 shadow-card overflow-hidden">
+    <div v-else class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
       <div class="overflow-x-auto scrollbar-thin">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-gray-50 border-b border-gray-200">
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">Mata Pelajaran</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">Hari</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">Jam</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden sm:table-cell">Kelas</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden md:table-cell">Ruangan</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider hidden lg:table-cell">Guru</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 text-xs uppercase tracking-wider">Aksi</th>
+            <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Mata Pelajaran</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Hari</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Jam</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Kelas</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">Ruangan</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden lg:table-cell">Guru</th>
+              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Aksi</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
-            <tr v-for="item in jadwalList" :key="item.id" class="hover:bg-gray-50 transition-colors">
-              <td class="px-4 py-3 font-medium text-gray-900">{{ item.mapel }}</td>
+          <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+            <tr v-for="item in jadwalList" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+              <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
               <td class="px-4 py-3">
                 <BaseBadge variant="blue" size="sm">{{ hariLabel[item.hari] || item.hari }}</BaseBadge>
               </td>
-              <td class="px-4 py-3 text-gray-600 text-xs">{{ item.jamMulai }} - {{ item.jamSelesai }}</td>
-              <td class="px-4 py-3 text-gray-600 hidden sm:table-cell">{{ item.kelas.nama }}</td>
-              <td class="px-4 py-3 text-gray-500 hidden md:table-cell">{{ item.ruangan.nama }}</td>
-              <td class="px-4 py-3 text-gray-500 text-xs hidden lg:table-cell">{{ item.guru.nama }}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-300 text-xs">{{ item.jamMulai }} - {{ item.jamSelesai }}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.kelas.nama }}</td>
+              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.ruangan.nama }}</td>
+              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.guru.nama }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
                   <button @click="openEdit(item)" class="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg" title="Edit">
@@ -173,10 +173,10 @@ async function handleDelete() {
             </tr>
             <tr v-if="!jadwalList || jadwalList.length === 0">
               <td colspan="7" class="px-4 py-16 text-center">
-                <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <p class="text-gray-500 font-medium">Belum ada jadwal pelajaran</p>
+                <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada jadwal pelajaran</p>
               </td>
             </tr>
           </tbody>
@@ -190,20 +190,20 @@ async function handleDelete() {
         <BaseFormField label="Mata Pelajaran" required>
           <input v-model="form.mapel" type="text" @input="onFormChange" required
             placeholder="contoh: Matematika"
-            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
 
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField label="Hari" required>
             <select v-model="form.hari" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 bg-white dark:bg-slate-700">
               <option v-for="h in hariList" :key="h" :value="h">{{ hariLabel[h] }}</option>
             </select>
           </BaseFormField>
 
           <BaseFormField label="Kelas" required>
             <select v-model="form.kelasId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 bg-white dark:bg-slate-700">
               <option :value="0" disabled>Pilih kelas</option>
               <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
             </select>
@@ -213,19 +213,19 @@ async function handleDelete() {
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField label="Jam Mulai" required>
             <input v-model="form.jamMulai" type="time" @input="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500" />
           </BaseFormField>
 
           <BaseFormField label="Jam Selesai" required>
             <input v-model="form.jamSelesai" type="time" @input="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500" />
           </BaseFormField>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField label="Ruangan" required>
             <select v-model="form.ruanganId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 bg-white dark:bg-slate-700">
               <option :value="0" disabled>Pilih ruangan</option>
               <option v-for="r in ruanganList" :key="r.id" :value="r.id">{{ r.nama }}</option>
             </select>
@@ -233,7 +233,7 @@ async function handleDelete() {
 
           <BaseFormField label="Guru" required>
             <select v-model="form.guruId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 bg-white dark:bg-slate-700">
               <option :value="0" disabled>Pilih guru</option>
               <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
             </select>
@@ -241,7 +241,7 @@ async function handleDelete() {
         </div>
       </form>
       <template #footer>
-        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg">Batal</button>
+        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">Batal</button>
         <button type="submit" @click="handleSave" :disabled="saving"
           class="px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2">
           <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>

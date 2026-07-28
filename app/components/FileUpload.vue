@@ -76,13 +76,13 @@ async function handleFileChange(event: Event) {
 
 <template>
   <div>
-    <label class="block text-sm font-medium text-gray-600 mb-1.5">{{ label }}</label>
+    <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">{{ label }}</label>
     <div class="flex items-center gap-3">
       <input ref="fileInput" type="file" :accept="accept" class="hidden" @change="handleFileChange" />
       <button
         type="button"
         :disabled="uploading"
-        class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 hover:text-gray-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+        class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 hover:text-gray-700 dark:hover:text-gray-200 transition-colors disabled:opacity-50 flex items-center gap-2"
         @click="handleClick"
       >
         <svg v-if="uploading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -95,16 +95,16 @@ async function handleFileChange(event: Event) {
         Pilih File
       </button>
 
-      <span v-if="fileName && !previewUrl" class="text-sm text-gray-500 truncate max-w-[200px]">{{ fileName }}</span>
-      <span v-else-if="!currentPath" class="text-sm text-gray-400 italic">Belum ada file dipilih</span>
+      <span v-if="fileName && !previewUrl" class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[200px]">{{ fileName }}</span>
+      <span v-else-if="!currentPath" class="text-sm text-gray-400 dark:text-gray-500 italic">Belum ada file dipilih</span>
 
       <div v-if="previewUrl" class="flex items-center gap-2">
-        <img :src="previewUrl" alt="Preview" class="w-8 h-8 object-contain rounded border border-gray-200" />
-        <span class="text-sm text-gray-500 truncate max-w-[150px]">{{ currentPath?.split('/').pop() }}</span>
+        <img :src="previewUrl" alt="Preview" class="w-8 h-8 object-contain rounded border border-gray-200 dark:border-slate-600" />
+        <span class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[150px]">{{ currentPath?.split('/').pop() }}</span>
         <button
           type="button"
           :disabled="deleting"
-          class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+          class="p-1.5 text-red-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors disabled:opacity-50"
           title="Hapus file"
           @click="handleDelete"
         >

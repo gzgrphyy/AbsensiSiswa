@@ -154,21 +154,21 @@ const hariIni = todayName
     <template v-else>
       <!-- Active Sessions -->
       <div v-if="activeSesiList.length > 0" class="mb-5">
-        <h2 class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
           Sesi Aktif
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div v-for="sesi in activeSesiList" :key="sesi.id"
-            class="bg-white rounded-lg border border-green-200 shadow-card p-5">
+            class="bg-white dark:bg-slate-800 rounded-lg border border-green-200 dark:border-green-800 shadow-card dark:shadow-dark-card p-5">
             <div class="flex items-start justify-between mb-3">
               <div>
-                <h3 class="font-semibold text-gray-900">{{ sesi.jadwal.mapel }}</h3>
-                <p class="text-sm text-gray-500">{{ sesi.jadwal.kelas.nama }} — {{ sesi.jadwal.ruangan.nama }}</p>
+                <h3 class="font-semibold text-gray-900 dark:text-gray-100">{{ sesi.jadwal.mapel }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ sesi.jadwal.kelas.nama }} — {{ sesi.jadwal.ruangan.nama }}</p>
               </div>
               <BaseBadge variant="green" dot pulse>AKTIF</BaseBadge>
             </div>
-            <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
+            <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
               <span class="inline-flex items-center gap-1">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -188,7 +188,7 @@ const hariIni = todayName
                 Konfirmasi Kehadiran
               </NuxtLink>
               <button @click="confirmClose = sesi"
-                class="px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition-colors">
+                class="px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg transition-colors">
                 Tutup Sesi
               </button>
             </div>
@@ -198,38 +198,38 @@ const hariIni = todayName
 
       <!-- Today's Jadwal -->
       <div>
-        <h2 class="text-sm font-semibold text-gray-900 mb-3">Jadwal {{ hariIni }}</h2>
+        <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Jadwal {{ hariIni }}</h2>
 
-        <div v-if="jadwal.length === 0" class="bg-white rounded-lg border border-gray-200 shadow-card p-10 text-center">
-          <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div v-if="jadwal.length === 0" class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card p-10 text-center">
+          <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <p class="text-gray-500 font-medium">Tidak ada jadwal untuk hari ini</p>
+          <p class="text-gray-500 dark:text-gray-400 font-medium">Tidak ada jadwal untuk hari ini</p>
         </div>
 
         <div v-else class="space-y-3">
           <div v-for="j in jadwal" :key="j.id"
-            class="bg-white rounded-lg border border-gray-200 shadow-card p-5"
-            :class="{ 'ring-1 ring-blue-300': j.isWithinTime && !j.activeSesi }">
+            class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card p-5"
+            :class="{ 'ring-1 ring-blue-300 dark:ring-blue-600': j.isWithinTime && !j.activeSesi }">
             <div class="flex flex-col sm:flex-row sm:items-center gap-3">
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-1">
-                  <h3 class="font-semibold text-gray-900">{{ j.mapel }}</h3>
+                  <h3 class="font-semibold text-gray-900 dark:text-gray-100">{{ j.mapel }}</h3>
                   <span v-if="j.todaySesi">
                     <BaseBadge :variant="j.todaySesi.status === 'AKTIF' ? 'green' : 'gray'" size="sm">
                       {{ j.todaySesi.status === 'AKTIF' ? 'Sedang Berlangsung' : 'Selesai' }}
                     </BaseBadge>
                   </span>
                 </div>
-                <p class="text-sm text-gray-500">{{ j.kelas.nama }} — {{ j.ruangan.nama }}</p>
-                <div class="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ j.kelas.nama }} — {{ j.ruangan.nama }}</p>
+                <div class="flex items-center gap-3 mt-1.5 text-xs text-gray-400 dark:text-gray-500">
                   <span class="inline-flex items-center gap-1">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     {{ j.jamMulai }} - {{ j.jamSelesai }}
                   </span>
-                  <span v-if="j.isWithinTime" class="inline-flex items-center gap-1 text-blue-600">
+                  <span v-if="j.isWithinTime" class="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400">
                     <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                     Sekarang
                   </span>
@@ -245,7 +245,7 @@ const hariIni = todayName
                 </button>
                 <NuxtLink v-else-if="j.activeSesi"
                   :to="`/absensi/sesi/${j.activeSesi.id}`"
-                  class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-primary-100 inline-flex items-center gap-1.5">
+                  class="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 inline-flex items-center gap-1.5">
                   Lihat
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                 </NuxtLink>

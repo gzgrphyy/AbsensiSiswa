@@ -27,10 +27,10 @@ const btnVariants = {
 }
 
 const iconVariants = {
-  danger: 'bg-red-50 text-red-600',
-  warning: 'bg-accent-50 text-primary-700',
-  success: 'bg-green-50 text-green-600',
-  primary: 'bg-primary-50 text-primary-600',
+  danger: 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400',
+  warning: 'bg-accent-50 dark:bg-amber-900/30 text-primary-700 dark:text-amber-300',
+  success: 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400',
+  primary: 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300',
 }
 </script>
 
@@ -38,8 +38,8 @@ const iconVariants = {
   <Teleport to="body">
     <Transition name="modal">
       <div v-if="show" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" @click="emit('cancel')" />
-        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm mx-auto p-6 border border-gray-100">
+        <div class="absolute inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm" @click="emit('cancel')" />
+        <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
           <div class="flex items-start gap-3 mb-4">
             <div :class="['p-2 rounded-full flex-shrink-0', iconVariants[variant]]">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,15 +58,15 @@ const iconVariants = {
               </svg>
             </div>
             <div>
-              <h2 class="text-base font-semibold text-gray-900">{{ title }}</h2>
-              <p class="text-xs text-gray-500 mt-0.5">{{ message }}</p>
+              <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">{{ title }}</h2>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ message }}</p>
             </div>
           </div>
 
           <div class="flex justify-end gap-3">
             <button
               @click="emit('cancel')"
-              class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-150"
+              class="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition-all duration-150"
             >
               {{ cancelLabel }}
             </button>

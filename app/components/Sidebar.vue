@@ -106,7 +106,7 @@ function renderIcon(icon: string) {
 <template>
   <aside
     :class="[
-      'bg-white border-r border-gray-200 flex flex-col transition-all duration-200 h-full z-40',
+      'bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 flex flex-col transition-all duration-200 h-full z-40',
       collapsed ? 'w-14' : 'w-60'
     ]"
   >
@@ -114,15 +114,15 @@ function renderIcon(icon: string) {
     <div class="h-0.5 bg-primary-500" />
 
     <!-- Logo Area -->
-    <div class="flex-shrink-0 border-b border-gray-200">
+    <div class="flex-shrink-0 border-b border-gray-200 dark:border-slate-700">
       <NuxtLink to="/" class="flex items-center gap-2.5 px-4 py-2.5">
         <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-sm overflow-hidden">
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
           <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
         </div>
         <div v-if="!collapsed" class="min-w-0">
-          <p class="text-sm font-semibold text-gray-900 truncate leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
-          <p class="text-[10px] text-gray-400 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
+          <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
+          <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
         </div>
       </NuxtLink>
     </div>
@@ -137,19 +137,19 @@ function renderIcon(icon: string) {
             :class="[
               'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
               isChildActive(item.children)
-                ? 'bg-primary-50 text-primary-700'
-                :              'text-gray-500 hover:bg-primary-50 hover:text-primary-600'
+                ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400'
             ]"
           >
-            <svg class="w-5 h-5 flex-shrink-0" :class="isChildActive(item.children) ? 'text-primary-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 flex-shrink-0" :class="isChildActive(item.children) ? 'text-primary-500' : 'text-gray-400 dark:text-gray-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="renderIcon(item.icon)" />
             </svg>
             <span v-if="!collapsed" class="flex-1 text-left truncate">{{ item.label }}</span>
-            <svg v-if="!collapsed" class="w-3.5 h-3.5 text-gray-400 transition-transform duration-150" :class="{ 'rotate-90 text-primary-500': openGroups[item.icon] }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg v-if="!collapsed" class="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 transition-transform duration-150" :class="{ 'rotate-90 text-primary-500': openGroups[item.icon] }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
-          <div v-show="!collapsed && openGroups[item.icon]" class="ml-3 mt-0.5 space-y-0.5 border-l-2 border-primary-100 pl-2">
+          <div v-show="!collapsed && openGroups[item.icon]" class="ml-3 mt-0.5 space-y-0.5 border-l-2 border-primary-100 dark:border-primary-900/50 pl-2">
             <NuxtLink
               v-for="child in item.children"
               :key="child.to"
@@ -157,11 +157,11 @@ function renderIcon(icon: string) {
               :class="[
                 'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all duration-150',
                 route.path === child.to
-                  ? 'bg-primary-50 text-primary-700 font-medium'
-                  : 'text-gray-500 hover:bg-primary-50 hover:text-primary-600'
+                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-medium'
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400'
               ]"
             >
-              <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :class="route.path === child.to ? 'bg-primary-500' : 'bg-gray-300'"></span>
+              <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :class="route.path === child.to ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'"></span>
               <span class="truncate">{{ child.label }}</span>
             </NuxtLink>
           </div>
@@ -174,11 +174,11 @@ function renderIcon(icon: string) {
           :class="[
             'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
             isActive(item.to)
-              ? 'bg-primary-50 text-primary-700'
-              :              'text-gray-500 hover:bg-primary-50 hover:text-primary-600'
+              ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+              : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400'
           ]"
         >
-          <svg class="w-5 h-5 flex-shrink-0" :class="isActive(item.to) ? 'text-primary-500' : 'text-gray-400'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 flex-shrink-0" :class="isActive(item.to) ? 'text-primary-500' : 'text-gray-400 dark:text-gray-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="renderIcon(item.icon)" />
           </svg>
           <span v-if="!collapsed" class="truncate">{{ item.label }}</span>
@@ -187,10 +187,10 @@ function renderIcon(icon: string) {
     </nav>
 
     <!-- Collapse toggle -->
-    <div class="flex-shrink-0 border-t border-gray-200 px-2 py-2">
+    <div class="flex-shrink-0 border-t border-gray-200 dark:border-slate-700 px-2 py-2">
       <button
         @click="collapsed = !collapsed"
-        class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-all duration-150"
+        class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-150"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />

@@ -56,8 +56,10 @@ async function main() {
   })
 
   // Pengaturan default (branding)
-  await prisma.pengaturan.create({
-    data: {
+  await prisma.pengaturan.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
       namaAplikasi: 'Aplikasi Skoria',
       titelAplikasi: 'Sistem Absensi',
     }
