@@ -14,13 +14,13 @@ function toggleColorMode() {
 }
 
 const dev = {
-  nama: 'Geza Aditya Pratama',
+  nama: 'Geza Nurhalim Irfansyah Putra',
   role: 'Pengembang Aplikasi',
-  email: 'geza.aditya@dev.com',
-  telepon: '0812-3456-7890',
-  github: 'github.com/gezaditya',
-  instagram: '@gezaditya',
-  website: 'gezadev.my.id'
+  email: 'gezanurhalimm@gmail.com',
+  telepon: '0857-2235-5108',
+  github: 'github.com/gzgrphyy',
+  instagram: '@gzgrphy',
+  website: 'gzgrphy.framer.website'
 }
 
 function toggleProfile() {
@@ -125,10 +125,8 @@ onUnmounted(() => {
             {{ dev.website }}
           </a>
           <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V8l9 6-9 6V5z" />
-            </svg>
-            {{ dev.instagram }}
+            <img src="/logo_instagram.png" class="w-4 h-4 flex-shrink-0 object-contain [filter:brightness(0)_saturate(100%)_invert(40%)] dark:[filter:brightness(0)_saturate(100%)_invert(70%)]" alt="Instagram" />
+            <a :href="'https://instagram.com/' + dev.instagram.replace('@', '')" target="_blank" class="hover:text-primary-600 dark:hover:text-primary-400">{{ dev.instagram }}</a>
           </div>
         </div>
       </div>

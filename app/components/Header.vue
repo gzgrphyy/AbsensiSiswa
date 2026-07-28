@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const { user, clear } = useUserSession()
-const { pengaturan } = usePengaturan()
 const colorMode = useColorMode()
 const isAdmin = inject('isAdmin', false)
 
@@ -34,21 +33,7 @@ async function handleLogout() {
     <!-- Garis primary di paling atas -->
     <div class="h-0.5 bg-primary-500" />
 
-    <div class="px-6 py-2.5 flex items-center justify-between">
-      <!-- Left: Branding info -->
-      <div class="flex items-center gap-3">
-        <div class="flex items-center gap-2.5">
-          <div :class="['w-8 h-8 bg-primary-500 flex items-center justify-center text-white text-sm font-bold overflow-hidden', isAdmin ? 'rounded-sm' : 'rounded-lg shadow-sm']">
-            <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
-            <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
-          </div>
-          <div class="hidden sm:block">
-            <h1 class="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</h1>
-            <p class="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
-          </div>
-        </div>
-      </div>
-
+    <div class="px-6 py-2.5 flex items-center justify-end">
       <!-- Right: User Info -->
       <div class="flex items-center gap-3">
         <span class="text-[11px] text-gray-400 dark:text-gray-500 hidden md:block">{{ today }}</span>
