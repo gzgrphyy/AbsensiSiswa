@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { user, clear } = useUserSession()
+const { pengaturan } = usePengaturan()
 
 const today = new Date().toLocaleDateString('id-ID', {
   weekday: 'long',
@@ -26,15 +27,16 @@ async function handleLogout() {
     <div class="h-0.5 bg-primary-500" />
 
     <div class="px-6 py-2.5 flex items-center justify-between">
-      <!-- Left: Breadcrumb-style info -->
+      <!-- Left: Branding info -->
       <div class="flex items-center gap-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-sm font-bold shadow-sm">
-            S
+          <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-sm font-bold shadow-sm overflow-hidden">
+            <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
+            <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
           </div>
           <div class="hidden sm:block">
-            <h1 class="text-sm font-semibold text-gray-900 leading-tight">Sistem Absensi</h1>
-            <p class="text-[10px] text-gray-400 leading-tight">SMKN 4 Bandung</p>
+            <h1 class="text-sm font-semibold text-gray-900 leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</h1>
+            <p class="text-[10px] text-gray-400 leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
           </div>
         </div>
       </div>

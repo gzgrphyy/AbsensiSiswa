@@ -44,6 +44,25 @@ async function main() {
     }
   })
 
+  // Sekolah & jurusan
+  await prisma.tahunAjaran.upsert({
+    where: { nama_semester: { nama: '2026/2027', semester: 'GANJIL' } },
+    update: {},
+    create: {
+      nama: '2026/2027',
+      semester: 'GANJIL',
+      isActive: true,
+    }
+  })
+
+  // Pengaturan default (branding)
+  await prisma.pengaturan.create({
+    data: {
+      namaAplikasi: 'Aplikasi Skoria',
+      titelAplikasi: 'Sistem Absensi',
+    }
+  })
+
   // Ruangan contoh
   await prisma.ruangan.upsert({
     where: { qrCode: 'R-001' },

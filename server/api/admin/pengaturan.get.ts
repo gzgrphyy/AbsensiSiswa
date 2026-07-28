@@ -1,4 +1,6 @@
 export default defineEventHandler(async (event) => {
+  const branding = await prisma.pengaturan.findFirst()
+
   return {
     umum: {
       namaSekolah: 'SMK Negeri 1 Bandung',
@@ -7,6 +9,17 @@ export default defineEventHandler(async (event) => {
       email: 'info@smkn1bdg.sch.id',
       kepalaSekolah: 'Drs. H. Agus Salim, M.Pd.',
       nipKepsek: '196501011990011001',
+    },
+    branding: branding ? {
+      namaAplikasi: branding.namaAplikasi,
+      titelAplikasi: branding.titelAplikasi,
+      iconPath: branding.iconPath,
+      faviconPath: branding.faviconPath,
+    } : {
+      namaAplikasi: 'Aplikasi Skoria',
+      titelAplikasi: 'Sistem Absensi',
+      iconPath: null,
+      faviconPath: null,
     },
     absensi: {
       batasScan: 10,

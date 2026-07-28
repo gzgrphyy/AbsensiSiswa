@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const { user } = useUserSession()
+const { pengaturan } = usePengaturan()
 const collapsed = ref(false)
 const openGroups = ref<Record<string, boolean>>({})
 
@@ -115,12 +116,13 @@ function renderIcon(icon: string) {
     <!-- Logo Area -->
     <div class="flex-shrink-0 border-b border-gray-200">
       <NuxtLink to="/" class="flex items-center gap-2.5 px-4 py-2.5">
-        <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-sm">
-          S
+        <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-sm overflow-hidden">
+          <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
+          <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
         </div>
         <div v-if="!collapsed" class="min-w-0">
-          <p class="text-sm font-semibold text-gray-900 truncate leading-tight">SMKN 4 Bandung</p>
-          <p class="text-[10px] text-gray-400 truncate leading-tight">Sistem Absensi</p>
+          <p class="text-sm font-semibold text-gray-900 truncate leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
+          <p class="text-[10px] text-gray-400 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
         </div>
       </NuxtLink>
     </div>

@@ -161,6 +161,21 @@ model SesiAbsensi {
   @@map("sesi_absensi")
 }
 
+model Pengaturan {
+  id              Int      @id @default(autoincrement())
+  titelAplikasi   String   @default("Sistem Absensi") @map("titel_aplikasi") @db.VarChar(100)
+  namaAplikasi    String   @default("Aplikasi Skoria") @map("nama_aplikasi") @db.VarChar(100)
+  iconPath        String?  @map("icon_path") @db.VarChar(255)
+  faviconPath     String?  @map("favicon_path") @db.VarChar(255)
+  logoDinasPath   String?  @map("logo_dinas_path") @db.VarChar(255)
+  logoKotaPath    String?  @map("logo_kota_path") @db.VarChar(255)
+  logoProvinsiPath String? @map("logo_provinsi_path") @db.VarChar(255)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("pengaturan")
+}
+
 model AbsensiRequest {
   id          Int           @id @default(autoincrement())
   sesiId      Int           @map("sesi_id")

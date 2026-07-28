@@ -1,7 +1,13 @@
 <script setup lang="ts">
 const { user } = useUserSession()
+const { fetch } = usePengaturan()
 
 const isAdmin = computed(() => user.value?.role === 'ADMIN')
+
+// Fetch pengaturan data once for global state
+onMounted(() => {
+  fetch()
+})
 </script>
 
 <template>

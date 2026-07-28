@@ -9,6 +9,12 @@ const pengaturanSchema = z.object({
     kepalaSekolah: z.string().max(100).optional().default(''),
     nipKepsek: z.string().max(30).optional().default(''),
   }),
+  branding: z.object({
+    namaAplikasi: z.string().min(1).max(100),
+    titelAplikasi: z.string().min(1).max(100),
+    iconPath: z.string().nullable().optional(),
+    faviconPath: z.string().nullable().optional(),
+  }).optional(),
   absensi: z.object({
     batasScan: z.number().int().min(1).max(60),
     autoTutupSesi: z.boolean(),
@@ -30,8 +36,30 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const parsed = pengaturanSchema.parse(body)
 
-  // TODO: Store settings to database when Setting model is added
-  // For now, settings are accepted but stored in-memory only
+  // Simpan branding ke tabel pengaturan
+  if (parsed.branding) {
+    const existing = await prisma.pengaturan.findFirst()
+    if (existing) {
+      await prisma.pengaturan.update({
+        where: { id: existing.id },
+        data: {
+          namaAplikasi: parsed.branding.namaAplikasi,
+          titelAplikasi: parsed.branding.titelAplikasi,
+          iconPath: parsed.branding.iconPath,
+          faviconPath: parsed.branding.faviconPath,
+        }
+      })
+    } else {
+      await prisma.pengaturan.create({
+        data: {
+          namaAplikasi: parsed.branding.namaAplikasi,
+          titelAplikasi: parsed.branding.titelAplikasi,
+          iconPath: parsed.branding.iconPath,
+          faviconPath: parsed.branding.faviconPath,
+        }
+      })
+    }
+  }
 
   return {
     success: true,
