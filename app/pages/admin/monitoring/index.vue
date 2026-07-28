@@ -28,11 +28,11 @@ onMounted(() => {
 
 <template>
   <AppLayout>
-    <PageHeader title="Monitoring Absensi" description="Pantau sesi absensi secara real-time">
+    <PageHeader title="Pemantauan Absensi" description="Pantau sesi absensi secara langsung">
       <template #actions>
         <div class="flex items-center gap-2 text-xs text-gray-500">
           <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          Live
+          Langsung
         </div>
       </template>
     </PageHeader>
@@ -74,7 +74,7 @@ onMounted(() => {
               </tr>
               <tr v-if="displayData.length === 0">
                 <td colspan="6" class="px-4 py-16 text-center">
-                  <p class="text-gray-500 font-medium">Belum ada data monitoring</p>
+                  <p class="text-gray-500 font-medium">Belum ada data pemantauan</p>
                 </td>
               </tr>
             </tbody>

@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
 const querySchema = z.object({
-  bulan: z.string().optional().default(new Date().toISOString().slice(0, 7))
+  bulan: z.string().optional().default(new Date().toISOString().slice(0, 7)),
+  tahunAjaranId: z.coerce.number().int().positive().optional(),
+  kelasId: z.coerce.number().int().positive().optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -11,10 +13,22 @@ export default defineEventHandler(async (event) => {
   const startDate = new Date(Date.UTC(year, month - 1, 1))
   const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999))
 
+  // Build additional where filters for jadwal
+  const jadwalFilter: Record<string, unknown> = {}
+  if (query.kelasId) {
+    jadwalFilter.kelasId = query.kelasId
+  }
+  if (query.tahunAjaranId) {
+    jadwalFilter.kelas = {
+      tahunAjaranId: query.tahunAjaranId
+    }
+  }
+
   const sesi = await prisma.sesiAbsensi.findMany({
     where: {
       tanggal: { gte: startDate, lte: endDate },
-      status: 'SELESAI'
+      status: 'SELESAI',
+      ...(Object.keys(jadwalFilter).length > 0 && { jadwal: jadwalFilter })
     },
     include: {
       jadwal: {

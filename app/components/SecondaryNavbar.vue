@@ -3,16 +3,16 @@ const route = useRoute()
 
 const activeMenu = computed(() => {
   const path = route.path
-  if (path === '/admin') return 'Dashboard'
-  if (path.startsWith('/admin/guru') || path.startsWith('/admin/siswa') || path.startsWith('/admin/kelas') || path.startsWith('/admin/tahun-ajaran') || path.startsWith('/admin/ruangan') || path.startsWith('/admin/jadwal-pelajaran')) return 'Master Data'
-  if (path.startsWith('/admin/monitoring')) return 'Monitoring'
+  if (path === '/admin') return 'Dasbor'
+  if (path.startsWith('/admin/guru') || path.startsWith('/admin/siswa') || path.startsWith('/admin/kelas') || path.startsWith('/admin/tahun-ajaran') || path.startsWith('/admin/ruangan') || path.startsWith('/admin/jadwal-pelajaran')) return 'Data Master'
+  if (path.startsWith('/admin/monitoring')) return 'Pemantauan'
   if (path.startsWith('/admin/rekap') || path.startsWith('/admin/export')) return 'Laporan'
   if (path.startsWith('/admin/pengaturan')) return 'Pengaturan'
   return ''
 })
 
 const subMenus: Record<string, { label: string; to: string }[]> = {
-  'Master Data': [
+  'Data Master': [
     { label: 'Data Guru', to: '/admin/guru' },
     { label: 'Data Siswa', to: '/admin/siswa' },
     { label: 'Data Kelas', to: '/admin/kelas' },

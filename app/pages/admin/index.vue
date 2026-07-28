@@ -33,7 +33,7 @@ const mockData = {
     { waktu: '10:32', aksi: 'Sesi ditutup', detail: 'Matematika - XII-A oleh Bu Siti' },
     { waktu: '10:15', aksi: 'Sesi dibuka', detail: 'Fisika - X-A oleh Bu Dewi' },
     { waktu: '09:50', aksi: 'Konfirmasi massal', detail: 'Bahasa Inggris - XI-B (32 siswa)' },
-    { waktu: '09:30', aksi: 'Scan QR', detail: 'Budi Santoso - Lab Komputer' },
+    { waktu: '09:30', aksi: 'Pindai QR', detail: 'Budi Santoso - Lab Komputer' },
     { waktu: '09:15', aksi: 'Sesi ditutup', detail: 'Bahasa Indonesia - X-C oleh Pak Ahmad' },
     { waktu: '08:45', aksi: 'Sesi dibuka', detail: 'Pemrograman Dasar - Lab Komputer oleh Pak Budi' },
   ]
@@ -43,7 +43,7 @@ const mockData = {
 <template>
   <AppLayout>
     <!-- Page Header -->
-    <PageHeader title="Dashboard Admin" description="Overview sistem absensi sekolah" :show-back="false" />
+    <PageHeader title="Dasbor Admin" description="Ikhtisar sistem absensi sekolah" :show-back="false" />
 
     <!-- Context Banner: Tahun Ajaran -->
     <div class="bg-primary-50 border border-primary-200 rounded-xl px-5 py-3 mb-5 flex items-center gap-3 shadow-sm">
@@ -215,8 +215,8 @@ const mockData = {
       <div class="bg-white rounded-xl border border-gray-100 shadow-card">
         <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
           <div>
-            <h3 class="text-sm font-semibold text-gray-900">Monitoring Ruangan</h3>
-            <p class="text-xs text-gray-400 mt-0.5">Status real-time ruangan</p>
+            <h3 class="text-sm font-semibold text-gray-900">Pemantauan Ruangan</h3>
+            <p class="text-xs text-gray-400 mt-0.5">Status ruangan terkini</p>
           </div>
           <BaseBadge variant="green" dot size="sm">{{ mockData.monitoring.filter(r => r.status === 'Aktif').length }} Aktif</BaseBadge>
         </div>

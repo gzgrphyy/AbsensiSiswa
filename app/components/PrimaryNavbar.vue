@@ -22,23 +22,23 @@ interface PrimaryMenuItem {
 }
 
 const primaryMenus: PrimaryMenuItem[] = [
-  { label: 'Dashboard', to: '/admin', icon: 'dashboard', hasSub: false },
-  { label: 'Master Data', icon: 'master-data', hasSub: true },
-  { label: 'Monitoring', to: '/admin/monitoring', icon: 'monitor', hasSub: false },
+  { label: 'Dasbor', to: '/admin', icon: 'dashboard', hasSub: false },
+  { label: 'Data Master', icon: 'master-data', hasSub: true },
+  { label: 'Pemantauan', to: '/admin/monitoring', icon: 'monitor', hasSub: false },
   { label: 'Laporan', icon: 'laporan', hasSub: true },
   { label: 'Pengaturan', to: '/admin/pengaturan', icon: 'settings', hasSub: false },
 ]
 
 const menuRouteMap: Record<string, string> = {
-  'Master Data': '/admin/guru',
+  'Data Master': '/admin/guru',
   'Laporan': '/admin/rekap',
 }
 
 const activeMenu = computed(() => {
   const path = route.path
-  if (path === '/admin') return 'Dashboard'
-  if (path.startsWith('/admin/guru') || path.startsWith('/admin/siswa') || path.startsWith('/admin/kelas') || path.startsWith('/admin/tahun-ajaran') || path.startsWith('/admin/ruangan') || path.startsWith('/admin/jadwal-pelajaran')) return 'Master Data'
-  if (path.startsWith('/admin/monitoring')) return 'Monitoring'
+  if (path === '/admin') return 'Dasbor'
+  if (path.startsWith('/admin/guru') || path.startsWith('/admin/siswa') || path.startsWith('/admin/kelas') || path.startsWith('/admin/tahun-ajaran') || path.startsWith('/admin/ruangan') || path.startsWith('/admin/jadwal-pelajaran')) return 'Data Master'
+  if (path.startsWith('/admin/monitoring')) return 'Pemantauan'
   if (path.startsWith('/admin/rekap') || path.startsWith('/admin/export')) return 'Laporan'
   if (path.startsWith('/admin/pengaturan')) return 'Pengaturan'
   return ''
@@ -70,34 +70,34 @@ function renderIcon(icon: string) {
 </script>
 
 <template>
-  <header class="bg-white border-b border-gray-200 flex-shrink-0 sticky top-0 z-50">
+  <header class="bg-[#212529] flex-shrink-0 sticky top-0 z-50">
     <div class="h-0.5 bg-primary-500" />
 
     <div class="px-4 sm:px-6">
-      <div class="flex items-center justify-between h-14">
+      <div class="flex items-center justify-between h-[74px]">
         <!-- Logo -->
-        <NuxtLink to="/admin" class="flex items-center gap-2.5 flex-shrink-0">
-          <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-sm font-bold shadow-sm overflow-hidden">
-            <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
+        <NuxtLink to="/admin" class="flex items-center gap-3 flex-shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center text-white text-base font-bold shadow-sm overflow-hidden">
+            <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-1" />
             <span v-else>S</span>
           </div>
           <div class="hidden sm:block min-w-0">
-            <p class="text-sm font-semibold text-gray-900 truncate leading-tight">{{ pengaturan?.namaAplikasi || 'SMKN 4 Bandung' }}</p>
-            <p class="text-[10px] text-gray-400 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
+            <p class="text-base font-semibold text-gray-100 truncate leading-tight">{{ pengaturan?.namaAplikasi || 'SMKN 4 Bandung' }}</p>
+            <p class="text-[11px] text-gray-400 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
           </div>
         </NuxtLink>
 
         <!-- Primary Menu -->
-        <nav class="hidden md:flex items-center gap-1">
+        <nav class="hidden md:flex items-center gap-1.5">
           <button
             v-for="menu in primaryMenus"
             :key="menu.label"
             @click="handleMenuClick(menu)"
             :class="[
-              'inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150',
+              'inline-flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150',
               activeMenu === menu.label
-                ? 'bg-primary-50 text-primary-700'
-                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                ? 'bg-primary-500/20 text-primary-300'
+                : 'text-gray-400 hover:bg-white/10 hover:text-gray-200'
             ]"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,29 +108,29 @@ function renderIcon(icon: string) {
         </nav>
 
         <!-- Right: User Info -->
-        <div class="flex items-center gap-3">
-          <span class="text-[11px] text-gray-400 hidden lg:block">{{ today }}</span>
-          <div class="h-4 w-px bg-gray-200 hidden lg:block" />
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-gray-400 hidden lg:block">{{ today }}</span>
+          <div class="h-5 w-px bg-gray-600 hidden lg:block" />
 
           <div class="flex items-center gap-2.5">
-            <div class="w-7 h-7 rounded-full bg-primary-50 flex items-center justify-center text-xs font-semibold text-primary-600 border border-primary-100">
+            <div class="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-sm font-semibold text-white border border-primary-400">
               {{ user?.nama?.charAt(0)?.toUpperCase() || 'U' }}
             </div>
             <div class="hidden lg:block">
-              <p class="text-sm font-medium text-gray-900 leading-tight">{{ user?.nama || 'User' }}</p>
-              <p class="text-[10px] text-gray-400 leading-tight">{{ roleLabel[user?.role] || user?.role }}</p>
+              <p class="text-sm font-medium text-gray-100 leading-tight">{{ user?.nama || 'Pengguna' }}</p>
+              <p class="text-[11px] text-gray-400 leading-tight">{{ roleLabel[user?.role] || user?.role }}</p>
             </div>
           </div>
 
           <button
             @click="handleLogout"
-            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-150"
-            title="Logout"
+            class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-400 hover:text-primary-300 hover:bg-white/10 rounded-lg transition-all duration-150"
+            title="Keluar"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span class="hidden sm:inline">Logout</span>
+            <span class="hidden sm:inline">Keluar</span>
           </button>
         </div>
       </div>

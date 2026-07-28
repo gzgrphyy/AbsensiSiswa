@@ -10,8 +10,8 @@ const exportOptions: ExportOption[] = [
   { id: 'rekap-harian', label: 'Rekap Harian', description: 'Data absensi harian semua kelas', icon: 'day' },
   { id: 'rekap-bulanan', label: 'Rekap Bulanan', description: 'Rekapitulasi bulanan per siswa', icon: 'month' },
   { id: 'rekap-kelas', label: 'Rekap Kelas', description: 'Data kehadiran per kelas', icon: 'class' },
-  { id: 'data-siswa', label: 'Data Siswa', description: 'Export data master siswa', icon: 'student' },
-  { id: 'data-guru', label: 'Data Guru', description: 'Export data master guru', icon: 'teacher' },
+  { id: 'data-siswa', label: 'Data Siswa', description: 'Ekspor data master siswa', icon: 'student' },
+  { id: 'data-guru', label: 'Data Guru', description: 'Ekspor data master guru', icon: 'teacher' },
 ]
 
 const exporting = ref<string | null>(null)
@@ -33,7 +33,7 @@ async function handleExport(id: string) {
     a.download = `${id}-${new Date().toISOString().slice(0, 10)}.xlsx`
     a.click()
     URL.revokeObjectURL(url)
-    successMsg.value = 'Export berhasil diunduh'
+    successMsg.value = 'Ekspor berhasil diunduh'
   } catch {
     // Fallback: simulate success
     successMsg.value = `Export "${exportOptions.find(o => o.id === id)?.label}" berhasil`
@@ -45,7 +45,7 @@ async function handleExport(id: string) {
 
 <template>
   <AppLayout>
-    <PageHeader title="Export Data" description="Unduh data absensi dalam format Excel" />
+    <PageHeader title="Ekspor Data" description="Unduh data absensi dalam format Excel" />
 
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />

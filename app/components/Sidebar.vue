@@ -16,9 +16,9 @@ interface MenuItem {
 }
 
 const adminMenus: MenuItem[] = [
-  { label: 'Dashboard', to: '/admin', icon: 'dashboard' },
+  { label: 'Dasbor', to: '/admin', icon: 'dashboard' },
   {
-    label: 'Master Data', icon: 'master-data',
+    label: 'Data Master', icon: 'master-data',
     children: [
       { label: 'Data Guru', to: '/admin/guru' },
       { label: 'Data Siswa', to: '/admin/siswa' },
@@ -28,14 +28,14 @@ const adminMenus: MenuItem[] = [
       { label: 'Jadwal Pelajaran', to: '/admin/jadwal-pelajaran' },
     ]
   },
-  { label: 'Monitoring Ruangan', to: '/admin/monitoring', icon: 'monitor' },
+  { label: 'Pemantauan Ruangan', to: '/admin/monitoring', icon: 'monitor' },
   { label: 'Rekap Absensi', to: '/admin/rekap', icon: 'rekap' },
-  { label: 'Export Laporan', to: '/admin/export', icon: 'export' },
+  { label: 'Ekspor Laporan', to: '/admin/export', icon: 'export' },
   { label: 'Pengaturan', to: '/admin/pengaturan', icon: 'settings' },
 ]
 
 const guruMenus: MenuItem[] = [
-  { label: 'Dashboard', to: '/absensi', icon: 'dashboard' },
+  { label: 'Dasbor', to: '/absensi', icon: 'dashboard' },
   { label: 'Buka Sesi Kelas', to: '/absensi', icon: 'sesi' },
   { label: 'Riwayat Absensi', to: '/absensi/riwayat', icon: 'riwayat' },
   { label: 'Rekap Absensi', to: '/absensi/rekap', icon: 'rekap' },
@@ -44,8 +44,8 @@ const guruMenus: MenuItem[] = [
 ]
 
 const siswaMenus: MenuItem[] = [
-  { label: 'Dashboard', to: '/siswa', icon: 'dashboard' },
-  { label: 'Scan QR', to: '/siswa/scan', icon: 'scan' },
+  { label: 'Dasbor', to: '/siswa', icon: 'dashboard' },
+  { label: 'Pindai QR', to: '/siswa/scan', icon: 'scan' },
   { label: 'Riwayat Absensi', to: '/siswa/riwayat', icon: 'riwayat' },
   { label: 'Profil', to: '/siswa/profil', icon: 'profile' },
 ]
