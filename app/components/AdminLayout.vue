@@ -8,6 +8,7 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col min-h-screen bg-[#FEFEFE]">
+    <MiniNavbar />
     <PrimaryNavbar />
     <SecondaryNavbar />
 

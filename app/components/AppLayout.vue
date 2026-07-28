@@ -11,6 +11,9 @@ onMounted(() => {
 </script>
 
 <template>
+  <!-- MiniNavbar: only for Admin, sits above everything -->
+  <MiniNavbar v-if="isAdmin" />
+
   <div class="flex min-h-screen bg-[#FEFEFE]">
     <!-- Sidebar -->
     <Sidebar />
