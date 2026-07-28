@@ -4,7 +4,8 @@ const { fetch } = usePengaturan()
 
 const isAdmin = computed(() => user.value?.role === 'ADMIN')
 
-// Fetch pengaturan data once for global state
+provide('isAdmin', isAdmin)
+
 onMounted(() => {
   fetch()
 })

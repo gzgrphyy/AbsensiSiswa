@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const { pengaturan } = usePengaturan()
 const colorMode = useColorMode()
+const isAdmin = inject('isAdmin', false)
 
 const showProfile = ref(false)
 
@@ -47,7 +48,7 @@ onUnmounted(() => {
     <div class="px-3 sm:px-4 flex items-center justify-between h-[26px]">
       <!-- Left: Logo & App Name -->
       <NuxtLink to="/admin" class="flex items-center gap-1.5 min-w-0">
-        <div class="w-4 h-4 rounded bg-primary-500 flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0 overflow-hidden">
+        <div :class="['w-4 h-4 bg-primary-500 flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0 overflow-hidden', isAdmin ? 'rounded-none' : 'rounded']">
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain" />
           <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
         </div>
@@ -59,7 +60,7 @@ onUnmounted(() => {
         <!-- Theme Toggle -->
         <button
           @click="toggleColorMode"
-          class="w-4 h-4 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
+          :class="['w-4 h-4 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors', isAdmin ? 'rounded-none' : 'rounded']"
           :title="isDark ? 'Mode Terang' : 'Mode Gelap'"
         >
           <!-- Sun icon (show in dark mode) -->
@@ -86,10 +87,10 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div v-if="showProfile" class="fixed top-8 right-3 sm:right-4 w-72 bg-white dark:bg-slate-800 rounded border border-gray-200 dark:border-slate-700 z-[100] shadow-lg" @click.stop>
+    <div v-if="showProfile" :class="['fixed top-8 right-3 sm:right-4 w-72 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 z-[100]', isAdmin ? 'rounded-none shadow' : 'rounded shadow-lg']" @click.stop>
       <div class="p-4">
         <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold flex-shrink-0">
+          <div :class="['w-10 h-10 bg-primary-500 flex items-center justify-center text-white font-bold flex-shrink-0', isAdmin ? 'rounded-sm' : 'rounded-full']">
             {{ dev.nama.charAt(0) }}
           </div>
           <div>

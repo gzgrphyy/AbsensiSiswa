@@ -14,6 +14,8 @@ withDefaults(defineProps<{
   loading: false,
 })
 
+const isAdmin = inject('isAdmin', false)
+
 const emit = defineEmits<{
   confirm: []
   cancel: []
@@ -39,9 +41,9 @@ const iconVariants = {
     <Transition name="modal">
       <div v-if="show" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm" @click="emit('cancel')" />
-        <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
+        <div :class="['relative bg-white dark:bg-slate-800 w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700', isAdmin ? 'rounded-sm' : 'rounded-2xl shadow-xl dark:shadow-2xl']">
           <div class="flex items-start gap-3 mb-4">
-            <div :class="['p-2 rounded-full flex-shrink-0', iconVariants[variant]]">
+            <div :class="['p-2 flex-shrink-0', isAdmin ? 'rounded-sm' : 'rounded-full', iconVariants[variant]]">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
@@ -66,14 +68,14 @@ const iconVariants = {
           <div class="flex justify-end gap-3">
             <button
               @click="emit('cancel')"
-              class="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-lg transition-all duration-150"
+              :class="['px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-150', isAdmin ? '' : 'rounded-lg']"
             >
               {{ cancelLabel }}
             </button>
             <button
               @click="emit('confirm')"
               :disabled="loading"
-              :class="['px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 inline-flex items-center gap-1.5 shadow-sm disabled:opacity-50', btnVariants[variant]]"
+              :class="['px-4 py-2 text-sm font-medium transition-all duration-150 inline-flex items-center gap-1.5 disabled:opacity-50', isAdmin ? 'rounded-sm' : 'rounded-lg shadow-sm', btnVariants[variant]]"
             >
               <svg v-if="loading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

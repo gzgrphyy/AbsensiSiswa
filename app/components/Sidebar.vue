@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const { user } = useUserSession()
 const { pengaturan } = usePengaturan()
+const isAdmin = inject('isAdmin', false)
 const collapsed = ref(false)
 const openGroups = ref<Record<string, boolean>>({})
 
@@ -116,7 +117,7 @@ function renderIcon(icon: string) {
     <!-- Logo Area -->
     <div class="flex-shrink-0 border-b border-gray-200 dark:border-slate-700">
       <NuxtLink to="/" class="flex items-center gap-2.5 px-4 py-2.5">
-        <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 shadow-sm overflow-hidden">
+        <div :class="['w-8 h-8 bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden', isAdmin ? 'rounded-sm' : 'rounded-lg']">
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
           <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
         </div>
@@ -135,10 +136,11 @@ function renderIcon(icon: string) {
           <button
             @click="toggleGroup(item.icon)"
             :class="[
-              'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
+              'w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium transition-all duration-150',
               isChildActive(item.children)
                 ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
-                : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400'
+                : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400',
+              isAdmin ? '' : 'rounded-lg'
             ]"
           >
             <svg class="w-5 h-5 flex-shrink-0" :class="isChildActive(item.children) ? 'text-primary-500' : 'text-gray-400 dark:text-gray-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,10 +157,11 @@ function renderIcon(icon: string) {
               :key="child.to"
               :to="child.to"
               :class="[
-                'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all duration-150',
+                'flex items-center gap-2 px-3 py-1.5 text-sm transition-all duration-150',
                 route.path === child.to
                   ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-medium'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400'
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400',
+                isAdmin ? '' : 'rounded-lg'
               ]"
             >
               <span class="w-1.5 h-1.5 rounded-full flex-shrink-0" :class="route.path === child.to ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'"></span>
@@ -172,10 +175,11 @@ function renderIcon(icon: string) {
           v-else
           :to="item.to"
           :class="[
-            'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
+            'flex items-center gap-2.5 px-3 py-2 text-sm font-medium transition-all duration-150',
             isActive(item.to)
               ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
-              : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400'
+              : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400',
+            isAdmin ? '' : 'rounded-lg'
           ]"
         >
           <svg class="w-5 h-5 flex-shrink-0" :class="isActive(item.to) ? 'text-primary-500' : 'text-gray-400 dark:text-gray-500'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +194,7 @@ function renderIcon(icon: string) {
     <div class="flex-shrink-0 border-t border-gray-200 dark:border-slate-700 px-2 py-2">
       <button
         @click="collapsed = !collapsed"
-        class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-150"
+        :class="['w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-150', isAdmin ? '' : 'rounded-lg']"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />

@@ -41,7 +41,7 @@ const isActive = (to: string) => route.path === to
         v-for="item in currentSubMenus"
         :key="item.to"
         :to="item.to"          :class="[
-          'px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150',
+          'px-3 py-1.5 text-sm font-medium transition-all duration-150',
           isActive(item.to)
             ? 'bg-primary-500 text-white shadow-sm'
             : 'text-gray-600 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400'

@@ -77,7 +77,7 @@ function renderIcon(icon: string) {
       <div class="flex items-center justify-between h-[74px]">
         <!-- Logo -->
         <NuxtLink to="/admin" class="flex items-center gap-3 flex-shrink-0">
-          <div class="w-10 h-10 rounded-xl bg-primary-500 flex items-center justify-center text-white text-base font-bold shadow-sm overflow-hidden">
+          <div class="w-10 h-10 bg-primary-500 flex items-center justify-center text-white text-base font-bold overflow-hidden">
             <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-1" />
             <span v-else>S</span>
           </div>
@@ -94,7 +94,7 @@ function renderIcon(icon: string) {
             :key="menu.label"
             @click="handleMenuClick(menu)"
             :class="[
-              'inline-flex items-center gap-2.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150',
+              'inline-flex items-center gap-2.5 px-4 py-2 text-sm font-medium transition-all duration-150',
               activeMenu === menu.label
                 ? 'bg-primary-500/20 text-primary-300'
                 : 'text-gray-400 hover:bg-white/10 hover:text-gray-200'
@@ -124,7 +124,7 @@ function renderIcon(icon: string) {
 
           <button
             @click="handleLogout"
-            class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-400 hover:text-primary-300 hover:bg-white/10 rounded-lg transition-all duration-150"
+            class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-400 hover:text-primary-300 hover:bg-white/10 transition-all duration-150"
             title="Keluar"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

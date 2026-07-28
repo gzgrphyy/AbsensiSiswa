@@ -169,7 +169,7 @@ function promptDelete(item: TahunAjaran) {
     <PageHeader title="Tahun Ajaran" description="Kelola tahun ajaran dan semester aktif">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 active:bg-primary-700 text-sm font-medium shadow-sm transition-all duration-150">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 active:bg-blue-800 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -182,7 +182,7 @@ function promptDelete(item: TahunAjaran) {
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
 
       <!-- Loading skeleton -->
-      <div v-if="pending" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm dark:shadow-dark-card border border-gray-200 dark:border-slate-700 overflow-hidden">
+      <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 overflow-hidden">
         <div class="p-6 space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-center gap-4 animate-pulse">
             <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-32"></div>
@@ -195,7 +195,7 @@ function promptDelete(item: TahunAjaran) {
       </div>
 
       <!-- Table -->
-      <div v-else class="bg-white dark:bg-slate-800 rounded-xl shadow-sm dark:shadow-dark-card border border-gray-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-shadow duration-200">
+      <div v-else class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
@@ -211,8 +211,8 @@ function promptDelete(item: TahunAjaran) {
               <tr v-for="item in data" :key="item.id"
                 class="transition-all duration-150"
                 :class="item.isActive
-                  ? 'bg-green-50/60 dark:bg-green-900/20 hover:bg-green-100/60 dark:hover:bg-green-900/30 border-l-4 border-l-green-500'
-                  : 'hover:bg-gray-50 dark:hover:bg-slate-700/30 border-l-4 border-l-transparent'">
+                  ? 'bg-green-50/60 dark:bg-green-900/20 hover:bg-green-100/60 dark:hover:bg-green-900/30 border-l-2 border-l-green-500'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700/30'">
                 <td class="px-4 sm:px-6 py-4">
                   <div class="flex items-center gap-2">
                     <span class="font-medium text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
@@ -254,7 +254,7 @@ function promptDelete(item: TahunAjaran) {
                   <div class="flex items-center justify-center gap-1">
                     <!-- Edit -->
                     <button @click="openEdit(item)"
-                      class="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-150"
+                      class="p-2 text-gray-400 hover:text-blue-600 hover:bg-gray-100 rounded-sm transition-all duration-150"
                       :title="`Edit ${fullLabel(item)}`">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -263,7 +263,7 @@ function promptDelete(item: TahunAjaran) {
 
                     <!-- Activate (only if not active) -->
                     <button v-if="!item.isActive" @click="promptToggle(item)"
-                      class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-150"
+                      class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-sm transition-all duration-150"
                       :title="`Aktifkan ${fullLabel(item)}`">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -279,7 +279,7 @@ function promptDelete(item: TahunAjaran) {
 
                     <!-- Delete (only if not active) -->
                     <button v-if="!item.isActive" @click="promptDelete(item)"
-                      class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-150"
+                      class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-sm transition-all duration-150"
                       :title="`Hapus ${fullLabel(item)}`">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -298,7 +298,7 @@ function promptDelete(item: TahunAjaran) {
                     </svg>
                     <p class="text-gray-500 font-medium">Belum ada data tahun ajaran</p>
                     <button @click="openCreate"
-                      class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-primary-100 transition-colors">
+                      class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 bg-gray-100 rounded-sm hover:bg-gray-200 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                       </svg>
@@ -319,9 +319,9 @@ function promptDelete(item: TahunAjaran) {
           <!-- Backdrop -->
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="handleCloseClick"></div>
 
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-md mx-auto overflow-hidden border border-gray-100 dark:border-slate-700">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-md mx-auto overflow-hidden border border-gray-300 dark:border-gray-600">
             <!-- Modal header -->
-            <div class="flex items-center justify-between px-6 pt-6 pb-2">
+            <div class="flex items-center justify-between px-4 pt-4 pb-2">
               <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {{ editing ? 'Edit Tahun Ajaran' : 'Tambah Tahun Ajaran' }}
               </h2>
@@ -333,14 +333,14 @@ function promptDelete(item: TahunAjaran) {
               </button>
             </div>
 
-            <form @submit.prevent="handleSave" class="p-6 space-y-5">
+            <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <!-- Nama -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nama Tahun Ajaran</label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
                   placeholder="contoh: 2026/2027"
                   :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 <Transition name="fade">
                   <p v-if="editing && editing._count.kelas > 0" class="flex items-center gap-1 text-xs text-amber-600 mt-1.5">
                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -356,7 +356,7 @@ function promptDelete(item: TahunAjaran) {
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Semester</label>
                 <select v-model="form.semester" @change="onFormChange"
                   :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
                   <option value="GANJIL">Ganjil</option>
                   <option value="GENAP">Genap</option>
                 </select>
@@ -378,7 +378,7 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Edit mode info -->
               <Transition name="fade">
-                <div v-if="editing && editing.isActive" class="flex items-center gap-2 p-3 bg-primary-50 border border-primary-100 rounded-lg text-sm text-primary-700">
+                <div v-if="editing && editing.isActive" class="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-sm text-sm text-blue-700">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -388,7 +388,7 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Error -->
               <Transition name="fade">
-                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 border border-red-100 rounded-lg text-sm text-red-700">
+                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-sm text-sm text-red-700">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -403,7 +403,7 @@ function promptDelete(item: TahunAjaran) {
                   Batal
                 </button>
                 <button type="submit" :disabled="saving"
-                  class="px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 active:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow transition-all duration-150 inline-flex items-center gap-2">
+                  class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-sm hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
                   <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -420,7 +420,7 @@ function promptDelete(item: TahunAjaran) {
       <Transition name="modal">
         <div v-if="confirmClose" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmClose = false"></div>
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Batalkan perubahan?</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Perubahan yang belum disimpan akan hilang.</p>
             <div class="flex justify-end gap-3">
@@ -429,7 +429,7 @@ function promptDelete(item: TahunAjaran) {
                 Lanjutkan Edit
               </button>
               <button @click="showModal = false; confirmClose = false"
-                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-sm hover:bg-red-700 transition-colors">
                 Ya, Batalkan
               </button>
             </div>
@@ -441,7 +441,7 @@ function promptDelete(item: TahunAjaran) {
       <Transition name="modal">
         <div v-if="confirmToggle" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmToggle = null"></div>
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
             <div class="flex items-center gap-3 mb-4">
               <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-full">
                 <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -462,7 +462,7 @@ function promptDelete(item: TahunAjaran) {
                 Batal
               </button>
               <button @click="handleToggle"
-                class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 active:bg-green-800 shadow-sm transition-all duration-150">
+                class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-sm hover:bg-green-700 active:bg-green-800">
                 Ya, Aktifkan
               </button>
             </div>
@@ -474,7 +474,7 @@ function promptDelete(item: TahunAjaran) {
       <Transition name="modal">
         <div v-if="confirmDelete" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmDelete = null"></div>
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
             <div class="flex items-center gap-3 mb-4">
               <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
                 <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -507,7 +507,7 @@ function promptDelete(item: TahunAjaran) {
                 Batal
               </button>
               <button @click="handleDelete"
-                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800 shadow-sm transition-all duration-150">
+                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-sm hover:bg-red-700 active:bg-red-800">
                 Ya, Hapus
               </button>
             </div>

@@ -53,10 +53,10 @@ async function handleExport(id: string) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div v-for="opt in exportOptions" :key="opt.id"
         @click="handleExport(opt.id)"
-        class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card p-5 hover:shadow-card-hover hover:border-blue-200 dark:hover:border-blue-500 transition-all cursor-pointer"
+        class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 p-4 hover:border-blue-500 dark:hover:border-blue-400 transition-all cursor-pointer"
         :class="{ 'opacity-50 pointer-events-none': !!exporting }">
         <div class="flex items-start gap-4">
-          <div class="p-2.5 bg-green-100 dark:bg-green-900/30 rounded-lg flex-shrink-0">
+          <div class="p-2.5 bg-gray-100 dark:bg-gray-700 rounded-sm flex-shrink-0">
             <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>

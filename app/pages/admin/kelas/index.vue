@@ -115,7 +115,7 @@ async function handleDelete() {
     <PageHeader title="Data Kelas" description="Kelola kelas dan wali kelas">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium shadow-sm">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -129,7 +129,7 @@ async function handleDelete() {
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="5" />
 
-    <div v-else class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
+    <div v-else class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 overflow-hidden">
       <div class="overflow-x-auto scrollbar-thin">
         <table class="w-full text-sm">
           <thead>
@@ -151,12 +151,12 @@ async function handleDelete() {
               </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
-                  <button @click="openEdit(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg" title="Edit">
+                  <button @click="openEdit(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-sm" title="Edit">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                  <button @click="promptDelete(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg" title="Hapus">
+                  <button @click="promptDelete(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-sm" title="Hapus">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -183,7 +183,7 @@ async function handleDelete() {
         <BaseFormField label="Nama Kelas" required>
           <input v-model="form.nama" type="text" @input="onFormChange" required
             placeholder="contoh: X-A, XI-B, XII-C"
-            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </BaseFormField>
 
         <BaseFormField label="Wali Kelas">
@@ -204,7 +204,7 @@ async function handleDelete() {
       <template #footer>
         <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">Batal</button>
         <button type="submit" @click="handleSave" :disabled="saving"
-          class="px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2">
+          class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-sm hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
           <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           {{ saving ? 'Menyimpan...' : 'Simpan' }}
         </button>

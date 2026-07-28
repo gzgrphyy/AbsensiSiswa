@@ -149,7 +149,7 @@ function ruanganUrl(item: Ruangan) {
     <PageHeader title="Data Ruangan" description="Kelola ruangan kelas dan generate QR Code">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium shadow-sm">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -161,7 +161,7 @@ function ruanganUrl(item: Ruangan) {
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
 
-      <div v-if="pending" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm dark:shadow-dark-card border border-gray-200 dark:border-slate-700 overflow-hidden">
+      <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 overflow-hidden">
         <div class="p-6 space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-center gap-4 animate-pulse">
             <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-40"></div>
@@ -171,7 +171,7 @@ function ruanganUrl(item: Ruangan) {
         </div>
       </div>
 
-      <div v-else class="bg-white dark:bg-slate-800 rounded-xl shadow-sm dark:shadow-dark-card border border-gray-200 dark:border-slate-700 overflow-hidden">
+      <div v-else class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
@@ -192,7 +192,7 @@ function ruanganUrl(item: Ruangan) {
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
                   <button @click="openQR(item)"
-                    class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                     </svg>
@@ -201,12 +201,12 @@ function ruanganUrl(item: Ruangan) {
                 </td>
                 <td class="px-4 sm:px-6 py-4">
                   <div class="flex items-center justify-center gap-1">
-                    <button @click="openEdit(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg" title="Edit">
+                    <button @click="openEdit(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-sm" title="Edit">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </button>
-                    <button @click="confirmDelete = item" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg" title="Hapus">
+                    <button @click="confirmDelete = item" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-sm" title="Hapus">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
@@ -221,7 +221,7 @@ function ruanganUrl(item: Ruangan) {
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                     <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada data ruangan</p>
-                    <button @click="openCreate" class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50">
+                    <button @click="openCreate" class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600">
                       Tambah sekarang
                     </button>
                   </div>
@@ -237,21 +237,21 @@ function ruanganUrl(item: Ruangan) {
       <Transition name="modal">
         <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="handleCloseClick">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="handleCloseClick"></div>
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md mx-auto overflow-hidden border border-gray-100 dark:border-slate-700">
-            <div class="flex items-center justify-between px-6 pt-6 pb-2">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-md mx-auto overflow-hidden border border-gray-300 dark:border-gray-600">
+            <div class="flex items-center justify-between px-4 pt-4 pb-2">
               <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ editing ? 'Edit Ruangan' : 'Tambah Ruangan' }}</h2>
               <button @click="handleCloseClick" class="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
-            <form @submit.prevent="handleSave" class="p-6 space-y-5">
+            <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nama Ruangan</label>
                 <input v-model="form.nama" type="text" @input="onFormChange" placeholder="contoh: Kelas 9A, Lab Komputer"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
               <Transition name="fade">
-                <div v-if="!editing" class="flex items-center gap-2 p-3 bg-primary-50 dark:bg-primary-900/30 border border-primary-100 dark:border-primary-800 rounded-lg text-sm text-primary-700 dark:text-primary-300">
+                <div v-if="!editing" class="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-sm text-sm text-blue-700 dark:text-blue-300">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -259,14 +259,14 @@ function ruanganUrl(item: Ruangan) {
                 </div>
               </Transition>
               <Transition name="fade">
-                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300">
+                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-sm text-sm text-red-700 dark:text-red-300">
                   <span>{{ errorMsg }}</span>
                 </div>
               </Transition>
               <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-slate-700">
                 <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">Batal</button>
                 <button type="submit" :disabled="saving"
-                  class="px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2">
+                  class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-sm hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
                   <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                   {{ saving ? 'Menyimpan...' : 'Simpan' }}
                 </button>
@@ -280,8 +280,8 @@ function ruanganUrl(item: Ruangan) {
       <Transition name="modal">
         <div v-if="showQR" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click="showQR = null">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="showQR = null"></div>
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700 text-center">
-            <button @click="showQR = null" class="absolute top-3 right-3 p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600 text-center">
+            <button @click="showQR = null" class="absolute top-3 right-3 p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
 
@@ -333,7 +333,7 @@ function ruanganUrl(item: Ruangan) {
             </div>
 
             <div class="flex gap-2 justify-center">
-              <button @click="printQR" class="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 inline-flex items-center gap-1.5">
+              <button @click="printQR" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-sm hover:bg-blue-700 inline-flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                 Cetak QR
               </button>
@@ -346,7 +346,7 @@ function ruanganUrl(item: Ruangan) {
       <Transition name="modal">
         <div v-if="confirmDelete" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmDelete = null"></div>
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Hapus Ruangan</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Yakin ingin menghapus <strong>{{ confirmDelete.nama }}</strong>?</p>
             <p v-if="confirmDelete._count.jadwalPelajaran > 0" class="mt-3 p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-lg text-sm text-amber-700 dark:text-amber-300">
@@ -354,7 +354,7 @@ function ruanganUrl(item: Ruangan) {
             </p>
             <div class="flex justify-end gap-3 mt-5 pt-4 border-t border-gray-100 dark:border-slate-700">
               <button @click="confirmDelete = null" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">Batal</button>
-              <button @click="handleDelete" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">Ya, Hapus</button>
+              <button @click="handleDelete" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-sm hover:bg-red-700">Ya, Hapus</button>
             </div>
           </div>
         </div>

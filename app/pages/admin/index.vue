@@ -46,18 +46,18 @@ const mockData = {
     <PageHeader title="Dasbor Admin" description="Ikhtisar sistem absensi sekolah" :show-back="false" />
 
     <!-- Context Banner: Tahun Ajaran -->
-      <div class="bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-xl px-5 py-3 mb-5 flex items-center gap-3 shadow-sm dark:shadow-dark-card">
-      <div class="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-800 flex items-center justify-center flex-shrink-0">
-        <svg class="w-4 h-4 text-primary-600 dark:text-primary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-sm px-4 py-3 mb-5 flex items-center gap-3">
+      <div class="w-8 h-8 rounded-sm bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+        <svg class="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       </div>
       <div class="flex items-center gap-2 flex-wrap">
-        <span class="text-sm font-semibold text-primary-800 dark:text-primary-200">Tahun Ajaran {{ mockData.stats.tahunAjaran }}</span>
-        <span class="hidden sm:inline text-primary-300 dark:text-primary-600">•</span>
-        <span class="text-xs font-medium text-primary-600 dark:text-primary-300 bg-primary-100/60 dark:bg-primary-800/60 px-2 py-0.5 rounded-full">Semester Ganjil</span>
-        <span class="hidden sm:inline text-primary-300 dark:text-primary-600">•</span>
-        <span class="text-xs text-primary-500 dark:text-primary-400">Aktif</span>
+        <span class="text-sm font-semibold text-blue-800 dark:text-blue-300">Tahun Ajaran {{ mockData.stats.tahunAjaran }}</span>
+        <span class="hidden sm:inline text-gray-300 dark:text-gray-600">•</span>
+        <span class="text-xs font-medium text-blue-600 dark:text-blue-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">Semester Ganjil</span>
+        <span class="hidden sm:inline text-gray-300 dark:text-gray-600">•</span>
+        <span class="text-xs text-blue-500 dark:text-blue-400">Aktif</span>
       </div>
     </div>
 
@@ -181,28 +181,28 @@ const mockData = {
     <!-- Tables Section — sejajar dengan lebar card di atas -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
       <!-- Top Alpha Siswa -->
-      <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card">
-        <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+      <div class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600">
+        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <div>
             <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Siswa Alpha Terbanyak</h3>
             <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Periode bulan ini</p>
           </div>
-          <span class="text-xs text-gray-400 dark:text-gray-500 font-medium bg-gray-50 dark:bg-slate-700 px-2 py-1 rounded-md">{{ mockData.topAlpha.length }} siswa</span>
+          <span class="text-xs text-gray-400 dark:text-gray-500 font-medium bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-sm">{{ mockData.topAlpha.length }} siswa</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50">
-                <th class="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Nama</th>
-                <th class="text-center px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Kelas</th>
-                <th class="text-center px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Total Alpha</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Nama</th>
+                <th class="text-center px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Kelas</th>
+                <th class="text-center px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Total Alpha</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50 dark:divide-slate-700">
-              <tr v-for="(item, idx) in mockData.topAlpha" :key="idx" class="hover:bg-primary-50/40 dark:hover:bg-primary-900/20 transition-colors">
-                <td class="px-5 py-3 text-gray-900 dark:text-gray-100 font-medium">{{ item.nama }}</td>
-                <td class="px-5 py-3 text-gray-600 dark:text-gray-400 text-center">{{ item.kelas }}</td>
-                <td class="px-5 py-3 text-center">
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <tr v-for="(item, idx) in mockData.topAlpha" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
+                <td class="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">{{ item.nama }}</td>
+                <td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-center">{{ item.kelas }}</td>
+                <td class="px-4 py-3 text-center">
                   <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 ring-1 ring-red-200 dark:ring-red-800">{{ item.total }}x</span>
                 </td>
               </tr>
@@ -212,8 +212,8 @@ const mockData = {
       </div>
 
       <!-- Monitoring Ruangan -->
-      <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card">
-        <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+      <div class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600">
+        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <div>
             <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Pemantauan Ruangan</h3>
             <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Status ruangan terkini</p>
@@ -224,16 +224,16 @@ const mockData = {
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50">
-                <th class="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Ruangan</th>
-                <th class="text-center px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Status</th>
-                <th class="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Sesi</th>
-                <th class="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider hidden md:table-cell">Guru</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Ruangan</th>
+                <th class="text-center px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Status</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Sesi</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider hidden md:table-cell">Guru</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-50 dark:divide-slate-700">
-              <tr v-for="(item, idx) in mockData.monitoring" :key="idx" class="hover:bg-primary-50/40 dark:hover:bg-primary-900/20 transition-colors">
-                <td class="px-5 py-3 text-gray-900 dark:text-gray-100 font-medium">{{ item.ruangan }}</td>
-                <td class="px-5 py-3 text-center">
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <tr v-for="(item, idx) in mockData.monitoring" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
+                <td class="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">{{ item.ruangan }}</td>
+                <td class="px-4 py-3 text-center">
                   <BaseBadge
                     :variant="item.status === 'Aktif' ? 'green' : item.status === 'Istirahat' ? 'amber' : 'gray'"
                     :dot="item.status === 'Aktif'"
@@ -242,8 +242,8 @@ const mockData = {
                     {{ item.status }}
                   </BaseBadge>
                 </td>
-                <td class="px-5 py-3 text-gray-700 dark:text-gray-300">{{ item.sesi }}</td>
-                <td class="px-5 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.guru }}</td>
+                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ item.sesi }}</td>
+                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.guru }}</td>
               </tr>
             </tbody>
           </table>
@@ -252,8 +252,8 @@ const mockData = {
     </div>
 
     <!-- Aktivitas Terbaru -->
-    <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card">
-      <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+    <div class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600">
+      <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
         <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Aktivitas Terbaru</h3>
         <span class="text-xs text-gray-400 dark:text-gray-500">Hari ini</span>
       </div>
@@ -261,15 +261,15 @@ const mockData = {
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-700/50">
-              <th class="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider w-20">Waktu</th>
-              <th class="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Aksi</th>
-              <th class="text-left px-5 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Detail</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider w-20">Waktu</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Aksi</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Detail</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-50 dark:divide-slate-700">
-            <tr v-for="(item, idx) in mockData.aktivitas" :key="idx" class="hover:bg-primary-50/40 dark:hover:bg-primary-900/20 transition-colors">
-              <td class="px-5 py-3 text-gray-400 dark:text-gray-500 text-xs font-mono">{{ item.waktu }}</td>
-              <td class="px-5 py-3">
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            <tr v-for="(item, idx) in mockData.aktivitas" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
+              <td class="px-4 py-3 text-gray-400 dark:text-gray-500 text-xs font-mono">{{ item.waktu }}</td>
+              <td class="px-4 py-3">
                 <BaseBadge
                   :variant="item.aksi.includes('dibuka') ? 'green' : item.aksi.includes('ditutup') ? 'gray' : 'primary'"
                   size="sm"

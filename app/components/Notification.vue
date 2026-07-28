@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { inject } from 'vue'
+
 withDefaults(defineProps<{
   type?: 'success' | 'error' | 'warning' | 'info'
   message: string
@@ -8,6 +10,8 @@ withDefaults(defineProps<{
   show: false,
 })
 
+const isAdmin = inject('isAdmin', false)
+
 const emit = defineEmits<{ dismiss: [] }>()
 
 const styles = {
@@ -15,6 +19,13 @@ const styles = {
   error: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300',
   warning: 'bg-accent-50 dark:bg-amber-900/30 border-accent-200 dark:border-amber-800 text-primary-900 dark:text-amber-200',
   info: 'bg-primary-50 dark:bg-primary-900/30 border-primary-200 dark:border-primary-800 text-primary-800 dark:text-primary-200',
+}
+
+const adminStyles = {
+  success: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200',
+  error: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200',
+  warning: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200',
+  info: 'bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200',
 }
 
 const icons = {
@@ -27,7 +38,7 @@ const icons = {
 
 <template>
   <Transition name="slide">
-    <div v-if="show" :class="['mb-4 px-4 py-3 rounded-xl border text-sm flex items-center gap-2.5 shadow-card', styles[type]]">
+    <div v-if="show" :class="[isAdmin ? 'mb-3 px-3 py-2 rounded-sm border text-xs flex items-center gap-2' : 'mb-4 px-4 py-3 rounded-xl border text-sm flex items-center gap-2.5 shadow-card', isAdmin ? adminStyles[type] : styles[type]]">
       <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons[type]" />
       </svg>

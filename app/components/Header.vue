@@ -2,6 +2,7 @@
 const { user, clear } = useUserSession()
 const { pengaturan } = usePengaturan()
 const colorMode = useColorMode()
+const isAdmin = inject('isAdmin', false)
 
 const isDark = computed(() => colorMode.value === 'dark')
 
@@ -37,7 +38,7 @@ async function handleLogout() {
       <!-- Left: Branding info -->
       <div class="flex items-center gap-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-sm font-bold shadow-sm overflow-hidden">
+          <div :class="['w-8 h-8 bg-primary-500 flex items-center justify-center text-white text-sm font-bold overflow-hidden', isAdmin ? 'rounded-sm' : 'rounded-lg shadow-sm']">
             <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
             <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
           </div>
@@ -56,7 +57,7 @@ async function handleLogout() {
         <!-- Theme Toggle -->
         <button
           @click="toggleColorMode"
-          class="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-150"
+          :class="['p-1.5 text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-150', isAdmin ? 'rounded-sm' : 'rounded-lg']"
           :title="isDark ? 'Mode Terang' : 'Mode Gelap'"
         >
           <!-- Sun icon (show in dark mode) -->
@@ -81,7 +82,7 @@ async function handleLogout() {
 
         <button
           @click="handleLogout"
-          class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-all duration-150"
+          :class="['inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-150', isAdmin ? 'rounded-sm' : 'rounded-lg']"
           title="Keluar"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

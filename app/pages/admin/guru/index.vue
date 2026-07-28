@@ -187,7 +187,7 @@ function copyPassword() {
     <PageHeader title="Data Guru" description="Kelola akun guru dan hak akses">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 active:bg-primary-700 text-sm font-medium shadow-sm transition-all duration-150">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 active:bg-blue-800 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -208,10 +208,10 @@ function copyPassword() {
             :aria-checked="showInactive"
             @click="showInactive = !showInactive"
             :class="showInactive
-              ? 'bg-primary-500 ring-1 ring-primary-300'
+              ? 'bg-blue-600 ring-1 ring-blue-300'
               : 'bg-gray-200 dark:bg-slate-600 ring-1 ring-gray-300 dark:ring-slate-500'
             "
-            class="relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-1"
+            class="relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
           >
             <span
               :class="showInactive ? 'translate-x-[18px]' : 'translate-x-[2px]'"
@@ -222,8 +222,8 @@ function copyPassword() {
       </div>
 
       <!-- Loading skeleton -->
-      <div v-if="pending" class="bg-white dark:bg-slate-800 rounded-xl shadow-sm dark:shadow-dark-card border border-gray-200 dark:border-slate-700 overflow-hidden">
-        <div class="p-6 space-y-4">
+      <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 overflow-hidden">
+        <div class="p-4 space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-center gap-4 animate-pulse">
             <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-40"></div>
             <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-52"></div>
@@ -235,7 +235,7 @@ function copyPassword() {
       </div>
 
       <!-- Table -->
-      <div v-else class="bg-white dark:bg-slate-800 rounded-xl shadow-sm dark:shadow-dark-card border border-gray-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-shadow duration-200">
+      <div v-else class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
@@ -251,8 +251,8 @@ function copyPassword() {
               <tr v-for="item in data" :key="item.id"
                 class="transition-all duration-150"
                 :class="item.isActive
-                  ? 'hover:bg-gray-50 dark:hover:bg-slate-700/30 border-l-4 border-l-transparent'
-                  : 'bg-gray-50/50 dark:bg-slate-800/50 hover:bg-gray-100/50 dark:hover:bg-slate-700/50 border-l-4 border-l-gray-300 dark:border-l-slate-600'">
+                  ? 'hover:bg-gray-50 dark:hover:bg-gray-700/30'
+                  : 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 border-l-2 border-l-gray-300 dark:border-l-gray-600'">
                 <td class="px-4 sm:px-6 py-4">
                   <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
@@ -293,7 +293,7 @@ function copyPassword() {
                   <div class="flex items-center justify-center gap-1">
                     <!-- Edit -->
                     <button @click="openEdit(item)"
-                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-all duration-150"
+                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-sm transition-all duration-150"
                       :title="`Edit ${item.nama}`">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -302,7 +302,7 @@ function copyPassword() {
 
                     <!-- Reset Password -->
                     <button @click="promptResetPassword(item)"
-                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-lg transition-all duration-150"
+                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-sm transition-all duration-150"
                       :title="`Reset password ${item.nama}`">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -335,7 +335,7 @@ function copyPassword() {
                     </svg>
                     <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada data guru</p>
                     <button @click="openCreate"
-                      class="inline-flex items-center gap-1 px-4 py-2 text-sm text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors">
+                      class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                       </svg>
@@ -355,8 +355,8 @@ function copyPassword() {
         <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="handleCloseClick">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="handleCloseClick"></div>
 
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-md mx-auto overflow-hidden border border-gray-100 dark:border-slate-700">
-            <div class="flex items-center justify-between px-6 pt-6 pb-2">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-md mx-auto overflow-hidden border border-gray-300 dark:border-gray-600">
+            <div class="flex items-center justify-between px-4 pt-4 pb-2">
               <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {{ editing ? 'Edit Data Guru' : 'Tambah Guru Baru' }}
               </h2>
@@ -368,7 +368,7 @@ function copyPassword() {
               </button>
             </div>
 
-            <form @submit.prevent="handleSave" class="p-6 space-y-5">
+            <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <!-- Nama Lengkap -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -376,7 +376,7 @@ function copyPassword() {
                 </label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
                   placeholder="Nama lengkap guru"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-sm text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
               <!-- Email -->
@@ -386,7 +386,7 @@ function copyPassword() {
                 </label>
                 <input v-model="form.email" type="email" @input="onFormChange"
                   placeholder="email@sekolah.sch.id"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-sm text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
               <!-- NIP -->
@@ -394,12 +394,12 @@ function copyPassword() {
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">NIP (opsional)</label>
                 <input v-model="form.nip" type="text" @input="onFormChange"
                   placeholder="Nomor Induk Pegawai"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-sm text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
               <!-- Info create -->
               <Transition name="fade">
-                <div v-if="!editing" class="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 rounded-lg text-sm text-primary-700 dark:text-primary-300">
+                <div v-if="!editing" class="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-sm text-sm text-blue-700 dark:text-blue-300">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -409,7 +409,7 @@ function copyPassword() {
 
               <!-- Error -->
               <Transition name="fade">
-                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300">
+                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-sm text-sm text-red-700 dark:text-red-300">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -418,13 +418,13 @@ function copyPassword() {
               </Transition>
 
               <!-- Actions -->
-              <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-slate-700">
+              <div class="flex justify-end gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                 <button type="button" @click="handleCloseClick"
                   class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
                   Batal
                 </button>
                 <button type="submit" :disabled="saving"
-                  class="px-5 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 active:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow transition-all duration-150 inline-flex items-center gap-2">
+                  class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-sm hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
                   <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -441,7 +441,7 @@ function copyPassword() {
       <Transition name="modal">
         <div v-if="confirmClose" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmClose = false"></div>
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Batalkan perubahan?</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Perubahan yang belum disimpan akan hilang.</p>
             <div class="flex justify-end gap-3">
@@ -462,7 +462,7 @@ function copyPassword() {
       <Transition name="modal">
         <div v-if="showPasswordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="showPasswordModal = false"></div>
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
             <div class="flex items-center gap-3 mb-4">
               <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-full">
                 <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -488,7 +488,7 @@ function copyPassword() {
                 Tutup
               </button>
               <button @click="copyPassword"
-                class="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 active:bg-primary-700 shadow-sm transition-all duration-150 inline-flex items-center gap-1.5">
+                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-sm hover:bg-blue-700 active:bg-blue-800 inline-flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
@@ -503,7 +503,7 @@ function copyPassword() {
       <Transition name="modal">
         <div v-if="confirmToggle" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmToggle = null"></div>
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
             <div class="flex items-center gap-3 mb-4">
               <div :class="confirmToggle.active ? 'p-2 bg-red-100 dark:bg-red-900/30 rounded-full' : 'p-2 bg-green-100 dark:bg-green-900/30 rounded-full'">
                 <svg v-if="confirmToggle.active" class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -535,8 +535,8 @@ function copyPassword() {
               </button>
               <button @click="handleToggleActive"
                 :class="confirmToggle.active
-                  ? 'px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-150'
-                  : 'px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-all duration-150'">
+                  ? 'px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-sm hover:bg-red-700'
+                  : 'px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-sm hover:bg-green-700'">
                 {{ confirmToggle.active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan' }}
               </button>
             </div>
@@ -548,7 +548,7 @@ function copyPassword() {
       <Transition name="modal">
         <div v-if="resetPasswordFor" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="resetPasswordFor = null"></div>
-          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl dark:shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100 dark:border-slate-700">
+          <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
             <div class="flex items-center gap-3 mb-4">
               <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-full">
                 <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -571,7 +571,7 @@ function copyPassword() {
                 Batal
               </button>
               <button @click="handleResetPassword"
-                class="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 active:bg-amber-800 shadow-sm transition-all duration-150">
+                class="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-sm hover:bg-amber-700 active:bg-amber-800">
                 Ya, Reset
               </button>
             </div>
