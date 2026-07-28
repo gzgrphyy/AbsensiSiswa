@@ -16,8 +16,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Tipe file tidak didukung. Gunakan PNG, JPEG, GIF, WebP, SVG, atau ICO' })
   }
 
-  if (file.size > 2 * 1024 * 1024) {
-    throw createError({ statusCode: 400, statusMessage: 'File terlalu besar. Maksimal 2MB' })
+  if (file.size > 10 * 1024 * 1024) {
+    throw createError({ statusCode: 400, statusMessage: 'File terlalu besar. Maksimal 10MB' })
   }
 
   const uploadDir = path.resolve('public/uploads')

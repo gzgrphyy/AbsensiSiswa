@@ -48,6 +48,23 @@ const formKeamanan = reactive({
 const saving = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
+const iconUploading = ref(false)
+const faviconUploading = ref(false)
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024
+
+const logoAllowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp', 'image/svg+xml']
+const faviconAllowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/x-icon', 'image/vnd.microsoft.icon']
+
+function validateFile(file: File, allowedTypes: string[]): string | null {
+  if (file.size > MAX_FILE_SIZE) {
+    return 'File terlalu besar. Maksimal 2MB'
+  }
+  if (!allowedTypes.includes(file.type)) {
+    return 'Tipe file tidak didukung'
+  }
+  return null
+}
 
 // Init branding from existing data
 onMounted(() => {
@@ -69,34 +86,46 @@ watch(pengaturan, (val) => {
   }
 })
 
-async function uploadFile(file: File, type: string): Promise<string | null> {
-  try {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('type', type)
-    const res = await $fetch<{ success: boolean; path: string }>('/api/admin/upload', {
-      method: 'POST',
-      body: formData,
-    })
-    return res.path
-  } catch {
-    return null
-  }
+async function uploadFile(file: File, type: string): Promise<string> {
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('type', type)
+  const res = await $fetch<{ success: boolean; path: string }>('/api/admin/upload', {
+    method: 'POST',
+    body: formData,
+  })
+  return res.path
 }
 
 function handleIconSelect(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files && target.files[0]) {
-    iconFile.value = target.files[0]
-    iconPreview.value = URL.createObjectURL(target.files[0])
+    const file = target.files[0]
+    errorMsg.value = ''
+    const validationError = validateFile(file, logoAllowedTypes)
+    if (validationError) {
+      errorMsg.value = `Logo: ${validationError}`
+      target.value = ''
+      return
+    }
+    iconFile.value = file
+    iconPreview.value = URL.createObjectURL(file)
   }
 }
 
 function handleFaviconSelect(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.files && target.files[0]) {
-    faviconFile.value = target.files[0]
-    faviconPreview.value = URL.createObjectURL(target.files[0])
+    const file = target.files[0]
+    errorMsg.value = ''
+    const validationError = validateFile(file, faviconAllowedTypes)
+    if (validationError) {
+      errorMsg.value = `Favicon: ${validationError}`
+      target.value = ''
+      return
+    }
+    faviconFile.value = file
+    faviconPreview.value = URL.createObjectURL(file)
   }
 }
 
@@ -118,16 +147,18 @@ async function handleSave() {
   successMsg.value = ''
 
   try {
-    // Upload icon jika ada file baru
     if (iconFile.value) {
+      iconUploading.value = true
       const path = await uploadFile(iconFile.value, 'icon')
-      if (path) formBranding.iconPath = path
+      formBranding.iconPath = path
+      iconUploading.value = false
     }
 
-    // Upload favicon jika ada file baru
     if (faviconFile.value) {
+      faviconUploading.value = true
       const path = await uploadFile(faviconFile.value, 'favicon')
-      if (path) formBranding.faviconPath = path
+      formBranding.faviconPath = path
+      faviconUploading.value = false
     }
 
     await $fetch('/api/admin/pengaturan', {
@@ -145,18 +176,19 @@ async function handleSave() {
       },
     })
 
-    // Refresh global state
     await fetchPengaturan()
 
-    // Reset file inputs
     iconFile.value = null
     faviconFile.value = null
     iconPreview.value = null
     faviconPreview.value = null
 
     successMsg.value = 'Pengaturan berhasil disimpan'
-  } catch {
-    errorMsg.value = 'Gagal menyimpan pengaturan. Silakan coba lagi.'
+  } catch (err: any) {
+    iconUploading.value = false
+    faviconUploading.value = false
+    const message = err?.data?.statusMessage || err?.message || 'Gagal menyimpan pengaturan. Silakan coba lagi.'
+    errorMsg.value = message
   } finally {
     saving.value = false
   }
@@ -240,16 +272,17 @@ async function handleSave() {
                     </div>
                     <!-- Upload controls -->
                     <div class="flex items-center gap-2">
-                      <label class="relative cursor-pointer">
-                        <input type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml" class="sr-only" @change="handleIconSelect" />
+                      <label class="relative cursor-pointer" :class="{ 'opacity-50 pointer-events-none': iconUploading }">
+                        <input type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml" class="sr-only" @change="handleIconSelect" :disabled="iconUploading" />
                         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600">
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg v-if="iconUploading" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                          <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                           </svg>
-                          Pilih File
+                          {{ iconUploading ? 'Mengunggah...' : 'Pilih File' }}
                         </span>
                       </label>
-                      <button v-if="formBranding.iconPath || iconPreview" type="button" @click="removeIcon"
+                      <button v-if="(formBranding.iconPath || iconPreview) && !iconUploading" type="button" @click="removeIcon"
                         class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-sm transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -257,7 +290,7 @@ async function handleSave() {
                         Hapus
                       </button>
                     </div>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">PNG, JPEG, SVG • Maks 2MB</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">PNG, JPEG, SVG • Maks 10MB</p>
                   </div>
                 </div>
 
@@ -284,16 +317,17 @@ async function handleSave() {
                     </div>
                     <!-- Upload controls -->
                     <div class="flex items-center gap-2">
-                      <label class="relative cursor-pointer">
-                        <input type="file" accept="image/png,image/jpeg,image/jpg,image/x-icon,image/vnd.microsoft.icon" class="sr-only" @change="handleFaviconSelect" />
+                      <label class="relative cursor-pointer" :class="{ 'opacity-50 pointer-events-none': faviconUploading }">
+                        <input type="file" accept="image/png,image/jpeg,image/jpg,image/x-icon,image/vnd.microsoft.icon" class="sr-only" @change="handleFaviconSelect" :disabled="faviconUploading" />
                         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600">
-                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg v-if="faviconUploading" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                          <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                           </svg>
-                          Pilih File
+                          {{ faviconUploading ? 'Mengunggah...' : 'Pilih File' }}
                         </span>
                       </label>
-                      <button v-if="formBranding.faviconPath || faviconPreview" type="button" @click="removeFavicon"
+                      <button v-if="(formBranding.faviconPath || faviconPreview) && !faviconUploading" type="button" @click="removeFavicon"
                         class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-sm transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -301,7 +335,7 @@ async function handleSave() {
                         Hapus
                       </button>
                     </div>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">PNG, JPEG, ICO • Maks 2MB</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">PNG, JPEG, ICO • Maks 10MB</p>
                   </div>
                 </div>
               </div>
