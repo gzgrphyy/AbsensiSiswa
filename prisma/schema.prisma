@@ -41,6 +41,14 @@ enum Hari {
   MINGGU
 }
 
+enum JenisRuangan {
+  KELAS
+  LAB
+  PERPUSTAKAAN
+  AULA
+  LAINNYA
+}
+
 model User {
   id           Int      @id @default(autoincrement())
   nama         String   @db.VarChar(100)
@@ -117,11 +125,12 @@ model Siswa {
 }
 
 model Ruangan {
-  id        Int      @id @default(autoincrement())
-  nama      String   @db.VarChar(100)
-  qrCode    String   @unique @map("qr_code") @db.VarChar(50)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id        Int           @id @default(autoincrement())
+  nama      String        @db.VarChar(100)
+  jenis     JenisRuangan  @default(KELAS)
+  qrCode    String        @unique @map("qr_code") @db.VarChar(50)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
 
   jadwalPelajaran JadwalPelajaran[]
 

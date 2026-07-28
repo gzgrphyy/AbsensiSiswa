@@ -6,10 +6,11 @@ interface RekapItem {
   sakit: number
   izin: number
   alpha: number
+  pending: number
   persentase: number
 }
 
-const selectedBulan = ref(new Date().toISOString().slice(0, 7))
+const selectedBulan = ref('')
 const selectedTa = ref<number | ''>('')
 const selectedKelas = ref<number | ''>('')
 
@@ -30,7 +31,7 @@ watch(selectedTa, () => {
 })
 
 const queryParams = computed(() => ({
-  bulan: selectedBulan.value,
+  ...(selectedBulan.value ? { bulan: selectedBulan.value } : {}),
   ...(selectedTa.value ? { tahunAjaranId: selectedTa.value } : {}),
   ...(selectedKelas.value ? { kelasId: selectedKelas.value } : {}),
 }))
@@ -62,6 +63,7 @@ const totalSiswa = computed(() => displayData.value.reduce((a, b) => a + b.total
 const totalSakit = computed(() => displayData.value.reduce((a, b) => a + b.sakit, 0))
 const totalIzin = computed(() => displayData.value.reduce((a, b) => a + b.izin, 0))
 const totalAlpha = computed(() => displayData.value.reduce((a, b) => a + b.alpha, 0))
+const totalPending = computed(() => displayData.value.reduce((a, b) => a + b.pending, 0))
 const rataPersentase = computed(() =>
   displayData.value.length ? (displayData.value.reduce((a, b) => a + b.persentase, 0) / displayData.value.length).toFixed(1) : 0
 )
@@ -97,6 +99,7 @@ const rataPersentase = computed(() =>
         <label class="text-xs font-medium text-gray-500">Periode</label>
         <select v-model="selectedBulan"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-sm text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Semua Periode</option>
           <option v-for="o in bulanOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
       </div>
@@ -104,16 +107,17 @@ const rataPersentase = computed(() =>
       <!-- Tombol Reset -->
       <button @click="selectedTa = ''; selectedKelas = ''"
         class="px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-sm border border-gray-300 dark:border-slate-600 transition-colors">
-        Reset Filter
+        Ulang Menyaring
       </button>
     </div>
 
-    <LoadingSkeleton v-if="pending" type="table" :rows="6" :columns="7" />
+    <LoadingSkeleton v-if="pending" type="table" :rows="6" :columns="8" />
 
     <template v-else>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-5">
         <StatCard label="Total Murid" :value="totalSiswa" variant="blue" />
         <StatCard label="Hadir" :value="totalHadir" variant="green" />
+        <StatCard label="Pending" :value="totalPending" variant="gray" />
         <StatCard label="Sakit" :value="totalSakit" variant="amber" />
         <StatCard label="Izin" :value="totalIzin" variant="blue" />
         <StatCard label="Alpha" :value="totalAlpha" variant="red" />
@@ -128,6 +132,7 @@ const rataPersentase = computed(() =>
                 <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Kelas</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Total Murid</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Hadir</th>
+                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Pending</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Sakit</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Izin</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Alpha</th>
@@ -139,6 +144,7 @@ const rataPersentase = computed(() =>
                 <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.kelas }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.totalSiswa }}</td>
                 <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 font-medium">{{ item.hadir }}</td>
+                <td class="px-4 py-3 text-center text-gray-500 dark:text-gray-400">{{ item.pending }}</td>
                 <td class="px-4 py-3 text-center text-amber-600 dark:text-amber-400">{{ item.sakit }}</td>
                 <td class="px-4 py-3 text-center text-blue-600 dark:text-blue-400">{{ item.izin }}</td>
                 <td class="px-4 py-3 text-center text-red-600 dark:text-red-400">{{ item.alpha }}</td>

@@ -11,11 +11,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { nama } = result.data
+  const { nama, jenis } = result.data
 
   const qrCode = randomUUID()
 
   return await prisma.ruangan.create({
-    data: { nama, qrCode }
+    data: { nama, jenis, qrCode }
   })
 })

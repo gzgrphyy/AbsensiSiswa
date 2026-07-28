@@ -16,10 +16,13 @@ export default defineEventHandler(async (event) => {
   const existing = await prisma.ruangan.findUnique({ where: { id } })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Ruangan tidak ditemukan' })
 
-  const { nama } = result.data
+  const { nama, jenis } = result.data
 
   return await prisma.ruangan.update({
     where: { id },
-    data: { ...(nama !== undefined && { nama }) }
+    data: {
+      ...(nama !== undefined && { nama }),
+      ...(jenis !== undefined && { jenis })
+    }
   })
 })

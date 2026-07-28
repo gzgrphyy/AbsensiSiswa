@@ -2,16 +2,34 @@
 interface Ruangan {
   id: number
   nama: string
+  jenis: string
   qrCode: string
   createdAt: string
   _count: { jadwalPelajaran: number }
 }
 
+const jenisOptions = ['KELAS', 'LAB', 'PERPUSTAKAAN', 'AULA', 'LAINNYA']
+
 const { data, pending, refresh } = useFetch<Ruangan[]>('/api/admin/ruangan', { immediate: true })
+const searchQuery = ref('')
+const filterJenis = ref('')
+
+const filteredData = computed(() => {
+  if (!data.value) return []
+  let result = data.value
+  if (filterJenis.value) {
+    result = result.filter(r => r.jenis === filterJenis.value)
+  }
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase()
+    result = result.filter(r => r.nama.toLowerCase().includes(q) || r.qrCode.toLowerCase().includes(q))
+  }
+  return result
+})
 
 const showModal = ref(false)
 const editing = ref<Ruangan | null>(null)
-const form = ref({ nama: '' })
+const form = ref({ nama: '', jenis: 'KELAS' })
 const saving = ref(false)
 const confirmDelete = ref<Ruangan | null>(null)
 const showQR = ref<Ruangan | null>(null)
@@ -59,13 +77,13 @@ function showSuccess(msg: string) {
 
 function openCreate() {
   editing.value = null
-  form.value = { nama: '' }
+  form.value = { nama: '', jenis: 'KELAS' }
   showModal.value = true
 }
 
 function openEdit(item: Ruangan) {
   editing.value = item
-  form.value = { nama: item.nama }
+  form.value = { nama: item.nama, jenis: item.jenis }
   showModal.value = true
 }
 
@@ -83,6 +101,7 @@ async function handleSave() {
     if (editing.value) {
       const body: Record<string, unknown> = {}
       if (form.value.nama !== editing.value.nama) body.nama = form.value.nama
+      if (form.value.jenis !== editing.value.jenis) body.jenis = form.value.jenis
       if (Object.keys(body).length === 0) { showModal.value = false; return }
       const { error } = await useFetch(`/api/admin/ruangan/${editing.value.id}`, { method: 'PATCH', body })
       if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
@@ -172,20 +191,39 @@ function ruanganUrl(item: Ruangan) {
       </div>
 
       <div v-else class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 overflow-hidden">
+        <!-- Search + Filter -->
+        <div class="px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center gap-3">
+          <div class="relative max-w-xs flex-1">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input v-model="searchQuery" type="text" placeholder="Cari ruangan atau kode QR..."
+              class="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-sm text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+          </div>
+          <select v-model="filterJenis"
+            class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-sm text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Semua Jenis</option>
+            <option v-for="j in jenisOptions" :key="j" :value="j">{{ j }}</option>
+          </select>
+        </div>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
                 <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Nama Ruangan</th>
+                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Jenis</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Jadwal</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">QR Code</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Aksi</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-              <tr v-for="item in data" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+              <tr v-for="item in filteredData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 sm:px-6 py-4">
                   <span class="font-medium text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
+                </td>
+                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
+                  <BaseBadge :variant="item.jenis === 'KELAS' ? 'blue' : item.jenis === 'LAB' ? 'purple' : item.jenis === 'PERPUSTAKAAN' ? 'amber' : 'gray'" size="sm">{{ item.jenis }}</BaseBadge>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
                   <span class="text-gray-600 dark:text-gray-300 font-medium">{{ item._count.jadwalPelajaran }}</span>
@@ -214,8 +252,8 @@ function ruanganUrl(item: Ruangan) {
                   </div>
                 </td>
               </tr>
-              <tr v-if="!data || data.length === 0">
-                <td colspan="4" class="px-4 sm:px-6 py-16 text-center">
+              <tr v-if="!filteredData || filteredData.length === 0">
+                <td colspan="5" class="px-4 sm:px-6 py-16 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <svg class="w-12 h-12 text-gray-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -247,8 +285,15 @@ function ruanganUrl(item: Ruangan) {
             <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nama Ruangan</label>
-                <input v-model="form.nama" type="text" @input="onFormChange" placeholder="contoh: Kelas 9A, Lab Komputer"
+                <input v-model="form.nama" type="text" @input="onFormChange" placeholder="contoh: Kelas XII-A, Lab Komputer"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Jenis Ruangan</label>
+                <select v-model="form.jenis" @change="onFormChange"
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700">
+                  <option v-for="j in jenisOptions" :key="j" :value="j">{{ j }}</option>
+                </select>
               </div>
               <Transition name="fade">
                 <div v-if="!editing" class="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-sm text-sm text-blue-700 dark:text-blue-300">
