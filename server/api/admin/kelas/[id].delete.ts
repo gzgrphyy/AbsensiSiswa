@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   if (existing._count.siswa > 0) {
     throw createError({
       statusCode: 400,
-      statusMessage: `Kelas "${existing.nama}" masih memiliki ${existing._count.siswa} siswa. Pindahkan atau hapus siswa terlebih dahulu.`
+      statusMessage: `Kelas "${existing.nama}" masih memiliki ${existing._count.siswa} murid. Pindahkan atau hapus murid terlebih dahulu.`
     })
   }
 

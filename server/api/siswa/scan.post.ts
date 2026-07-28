@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const user = session.user
   const siswa = await prisma.siswa.findUnique({ where: { userId: user.id } })
   if (!siswa) {
-    throw createError({ statusCode: 404, statusMessage: 'Data siswa tidak ditemukan' })
+    throw createError({ statusCode: 404, statusMessage: 'Data murid tidak ditemukan' })
   }
 
   const result = bodySchema.safeParse(await readBody(event))

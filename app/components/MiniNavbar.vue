@@ -73,6 +73,8 @@ onUnmounted(() => {
           </svg>
         </button>
 
+        <img src="/bendera_indonesia.png" class="w-4 h-3 object-contain flex-shrink-0" alt="Merdeka" />
+
         <!-- Developer Profile -->
         <button
           id="profile-dropdown"

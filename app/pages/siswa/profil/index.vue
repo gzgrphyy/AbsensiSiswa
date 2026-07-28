@@ -101,7 +101,7 @@ async function handleChangePassword() {
 
 <template>
   <AppLayout>
-    <PageHeader title="Profil Saya" description="Informasi akun siswa" />
+    <PageHeader title="Profil Saya" description="Informasi akun murid" />
 
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
@@ -115,7 +115,7 @@ async function handleChangePassword() {
           </div>
           <div>
             <h2 class="font-semibold text-gray-900 dark:text-gray-100">{{ profile?.namaSiswa || profile?.nama || '-' }}</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Siswa — {{ profile?.kelas?.nama || '-' }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Murid — {{ profile?.kelas?.nama || '-' }}</p>
             <p class="text-xs text-gray-400 dark:text-gray-500">NISN: {{ profile?.nisn || '-' }}</p>
           </div>
         </div>

@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { nisn, nama, email, kelasId, namaWali, kontakWali } = result.data
+  const { nisn, nama, email, kelasId, namaWali, kontakWali, nomorHp1, nomorHp2 } = result.data
 
   const existingNisn = await prisma.siswa.findUnique({ where: { nisn } })
   if (existingNisn) {
@@ -48,7 +48,9 @@ export default defineEventHandler(async (event) => {
         nama,
         kelasId,
         namaWali: namaWali || null,
-        kontakWali: kontakWali || null
+        kontakWali: kontakWali || null,
+        nomorHp1: nomorHp1 || null,
+        nomorHp2: nomorHp2 || null
       },
       include: {
         user: { select: { id: true, nama: true, email: true, isActive: true } },

@@ -327,7 +327,7 @@ function ruanganUrl(item: Ruangan) {
                       </svg>
                     </button>
                   </div>
-                  <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Ketik kode QR atau URL ini di halaman scan siswa</p>
+                  <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Ketik kode QR atau URL ini di halaman scan murid</p>
                 </div>
               </div>
             </div>

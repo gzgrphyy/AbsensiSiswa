@@ -18,8 +18,8 @@ const today = new Date().toLocaleDateString('id-ID', {
 
 const roleLabel: Record<string, string> = {
   ADMIN: 'Administrator',
-  GURU: 'Guru',
-  SISWA: 'Siswa'
+  GURU: 'PTK',
+  SISWA: 'Murid'
 }
 
 async function handleLogout() {

@@ -8,10 +8,10 @@ interface ExportOption {
 
 const exportOptions: ExportOption[] = [
   { id: 'rekap-harian', label: 'Rekap Harian', description: 'Data absensi harian semua kelas', icon: 'day' },
-  { id: 'rekap-bulanan', label: 'Rekap Bulanan', description: 'Rekapitulasi bulanan per siswa', icon: 'month' },
+  { id: 'rekap-bulanan', label: 'Rekap Bulanan', description: 'Rekapitulasi bulanan per murid', icon: 'month' },
   { id: 'rekap-kelas', label: 'Rekap Kelas', description: 'Data kehadiran per kelas', icon: 'class' },
-  { id: 'data-siswa', label: 'Data Siswa', description: 'Ekspor data master siswa', icon: 'student' },
-  { id: 'data-guru', label: 'Data Guru', description: 'Ekspor data master guru', icon: 'teacher' },
+  { id: 'data-siswa', label: 'Data Murid', description: 'Ekspor data master murid', icon: 'student' },
+  { id: 'data-guru', label: 'Data PTK', description: 'Ekspor data master PTK', icon: 'teacher' },
 ]
 
 const exporting = ref<string | null>(null)

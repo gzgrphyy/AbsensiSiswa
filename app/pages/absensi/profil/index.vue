@@ -96,7 +96,7 @@ async function handleChangePassword() {
 
 <template>
   <AppLayout>
-    <PageHeader title="Profil Saya" description="Informasi akun guru" />
+    <PageHeader title="Profil Saya" description="Informasi akun PTK" />
 
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
@@ -110,7 +110,7 @@ async function handleChangePassword() {
           </div>
           <div>
             <h2 class="font-semibold text-gray-900 dark:text-gray-100">{{ profile?.nama || '-' }}</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Guru — {{ profile?.nip || 'Belum ada NIP' }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">PTK — {{ profile?.nip || 'Belum ada NIP' }}</p>
             <div v-if="profile?.waliKelas && profile.waliKelas.length > 0" class="flex flex-wrap gap-1 mt-1.5">
               <span v-for="k in profile.waliKelas" :key="k.id"
                 class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">

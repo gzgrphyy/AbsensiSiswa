@@ -45,6 +45,8 @@ model User {
   id           Int      @id @default(autoincrement())
   nama         String   @db.VarChar(100)
   nip          String?  @unique @db.VarChar(30)
+  nomorHp1     String?  @map("nomor_hp1") @db.VarChar(20)
+  nomorHp2     String?  @map("nomor_hp2") @db.VarChar(20)
   email        String   @unique @db.VarChar(150)
   passwordHash String   @map("password_hash") @db.VarChar(255)
   role         Role
@@ -99,6 +101,8 @@ model Siswa {
   userId     Int?     @unique @map("user_id")
   nisn       String   @unique @db.VarChar(20)
   nama       String   @db.VarChar(100)
+  nomorHp1   String?  @map("nomor_hp1") @db.VarChar(20)
+  nomorHp2   String?  @map("nomor_hp2") @db.VarChar(20)
   kelasId    Int      @map("kelas_id")
   namaWali   String?  @map("nama_wali") @db.VarChar(100)
   kontakWali String?  @map("kontak_wali") @db.VarChar(20)

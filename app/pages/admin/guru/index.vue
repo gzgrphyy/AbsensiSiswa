@@ -5,6 +5,8 @@ interface Guru {
   nama: string
   email: string
   nip: string | null
+  nomorHp1: string | null
+  nomorHp2: string | null
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -22,7 +24,7 @@ const { data, pending, refresh } = useFetch<Guru[]>('/api/admin/guru', {
 const showModal = ref(false)
 const showPasswordModal = ref(false)
 const editing = ref<Guru | null>(null)
-const form = ref({ nama: '', email: '', nip: '' })
+const form = ref({ nama: '', email: '', nip: '', nomorHp1: '', nomorHp2: '' })
 const saving = ref(false)
 const generatedPassword = ref('')
 const resetPasswordFor = ref<Guru | null>(null)
@@ -44,7 +46,7 @@ function showSuccess(msg: string) {
 
 function openCreate() {
   editing.value = null
-  form.value = { nama: '', email: '', nip: '' }
+  form.value = { nama: '', email: '', nip: '', nomorHp1: '', nomorHp2: '' }
   errorMsg.value = ''
   successMsg.value = ''
   dirtyForm.value = false
@@ -56,7 +58,9 @@ function openEdit(item: Guru) {
   form.value = {
     nama: item.nama,
     email: item.email,
-    nip: item.nip || ''
+    nip: item.nip || '',
+    nomorHp1: item.nomorHp1 || '',
+    nomorHp2: item.nomorHp2 || ''
   }
   errorMsg.value = ''
   successMsg.value = ''
@@ -87,6 +91,8 @@ async function handleSave() {
       if (form.value.nama !== editing.value.nama) body.nama = form.value.nama
       if (form.value.email !== editing.value.email) body.email = form.value.email
       if ((form.value.nip || null) !== editing.value.nip) body.nip = form.value.nip || null
+      if ((form.value.nomorHp1 || null) !== editing.value.nomorHp1) body.nomorHp1 = form.value.nomorHp1 || null
+      if ((form.value.nomorHp2 || null) !== editing.value.nomorHp2) body.nomorHp2 = form.value.nomorHp2 || null
 
       if (Object.keys(body).length === 0) {
         showModal.value = false
@@ -101,14 +107,16 @@ async function handleSave() {
         showError(error.value.statusMessage || 'Gagal menyimpan')
         return
       }
-      showSuccess('Data guru berhasil diperbarui')
+      showSuccess('Data PTK berhasil diperbarui')
     } else {
       const { data: result, error } = await useFetch('/api/admin/guru', {
         method: 'POST',
         body: {
           nama: form.value.nama,
           email: form.value.email,
-          nip: form.value.nip || undefined
+          nip: form.value.nip || undefined,
+          nomorHp1: form.value.nomorHp1 || undefined,
+          nomorHp2: form.value.nomorHp2 || undefined
         }
       })
       if (error.value) {
@@ -119,7 +127,7 @@ async function handleSave() {
         generatedPassword.value = result.value.generatedPassword
         showPasswordModal.value = true
       }
-      showSuccess('Akun guru berhasil ditambahkan')
+      showSuccess('Akun PTK berhasil ditambahkan')
     }
     showModal.value = false
     confirmClose.value = false
@@ -159,7 +167,7 @@ async function handleToggleActive() {
     await $fetch(`/api/admin/guru/${id}/toggle-active`, {
       method: 'PATCH'
     })
-    showSuccess(active ? 'Akun guru dinonaktifkan' : 'Akun guru diaktifkan')
+    showSuccess(active ? 'Akun PTK dinonaktifkan' : 'Akun PTK diaktifkan')
     await refresh()
   } catch (err: any) {
     showError(err?.data?.statusMessage || 'Gagal mengubah status')
@@ -184,14 +192,14 @@ function copyPassword() {
 
 <template>
   <AppLayout>
-    <PageHeader title="Data Guru" description="Kelola akun guru dan hak akses">
+    <PageHeader title="Data PTK" description="Kelola akun PTK dan hak akses">
       <template #actions>
         <button @click="openCreate"
           class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 active:bg-blue-800 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="hidden sm:inline">Tambah Guru</span>
+          <span class="hidden sm:inline">Tambah PTK</span>
         </button>
       </template>
     </PageHeader>
@@ -243,6 +251,7 @@ function copyPassword() {
                 <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Nama</th>
                 <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Email</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">NIP</th>
+                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden lg:table-cell">No. HP</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Status</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Aksi</th>
               </tr>
@@ -254,17 +263,10 @@ function copyPassword() {
                   ? 'hover:bg-gray-50 dark:hover:bg-gray-700/30'
                   : 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 border-l-2 border-l-gray-300 dark:border-l-gray-600'">
                 <td class="px-4 sm:px-6 py-4">
-                  <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                      {{ item.nama.charAt(0).toUpperCase() }}
-                    </div>
-                    <div>
-                      <span class="font-medium text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.isActive }">
-                        {{ item.nama }}
-                      </span>
-                      <div class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ item.email }}</div>
-                    </div>
-                  </div>
+                  <span class="font-medium text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.isActive }">
+                    {{ item.nama }}
+                  </span>
+                  <div class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ item.email }}</div>
                 </td>
                 <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
                   <span class="text-gray-600 dark:text-gray-300" :class="{ 'text-gray-400 dark:text-gray-500': !item.isActive }">
@@ -274,6 +276,11 @@ function copyPassword() {
                 <td class="px-4 sm:px-6 py-4 text-center hidden md:table-cell">
                   <span class="text-gray-500 dark:text-gray-400" :class="{ 'text-gray-300 dark:text-gray-600': !item.isActive }">
                     {{ item.nip || '-' }}
+                  </span>
+                </td>
+                <td class="px-4 sm:px-6 py-4 text-center hidden lg:table-cell">
+                  <span class="text-gray-500 dark:text-gray-400 text-xs" :class="{ 'text-gray-300 dark:text-gray-600': !item.isActive }">
+                    {{ item.nomorHp1 || item.nomorHp2 ? (item.nomorHp1 || '-') : '-' }}
                   </span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
@@ -328,12 +335,12 @@ function copyPassword() {
 
               <!-- Empty state -->
               <tr v-if="!data || data.length === 0">
-                <td colspan="5" class="px-4 sm:px-6 py-16 text-center">
+                <td colspan="6" class="px-4 sm:px-6 py-16 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <svg class="w-12 h-12 text-gray-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada data guru</p>
+                    <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada data PTK</p>
                     <button @click="openCreate"
                       class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,7 +365,7 @@ function copyPassword() {
           <div class="relative bg-white dark:bg-gray-800 rounded-sm w-full max-w-md mx-auto overflow-hidden border border-gray-300 dark:border-gray-600">
             <div class="flex items-center justify-between px-4 pt-4 pb-2">
               <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {{ editing ? 'Edit Data Guru' : 'Tambah Guru Baru' }}
+                {{ editing ? 'Edit Data PTK' : 'Tambah PTK Baru' }}
               </h2>
               <button @click="handleCloseClick"
                 class="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
@@ -375,7 +382,7 @@ function copyPassword() {
                   Nama Lengkap <span class="text-red-500">*</span>
                 </label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
-                  placeholder="Nama lengkap guru"
+                  placeholder="Nama lengkap PTK"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-sm text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
@@ -395,6 +402,22 @@ function copyPassword() {
                 <input v-model="form.nip" type="text" @input="onFormChange"
                   placeholder="Nomor Induk Pegawai"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-sm text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+              </div>
+
+              <!-- Nomor HP -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">No. HP 1 (opsional)</label>
+                  <input v-model="form.nomorHp1" type="text" @input="onFormChange"
+                    placeholder="Nomor HP"
+                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-sm text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">No. HP 2 (opsional)</label>
+                  <input v-model="form.nomorHp2" type="text" @input="onFormChange"
+                    placeholder="Nomor HP cadangan"
+                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-sm text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                </div>
               </div>
 
               <!-- Info create -->
@@ -473,7 +496,7 @@ function copyPassword() {
             </div>
 
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              Password untuk akun ini. Salin dan sampaikan ke guru yang bersangkutan.
+              Password untuk akun ini. Salin dan sampaikan ke PTK yang bersangkutan.
             </p>
 
             <div class="flex items-center gap-2 p-4 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg mb-4">
@@ -522,10 +545,10 @@ function copyPassword() {
             </div>
 
             <p v-if="confirmToggle.active" class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Guru ini tidak akan bisa login sampai diaktifkan kembali. Data kelas dan absensi tetap aman.
+              PTK ini tidak akan bisa login sampai diaktifkan kembali. Data kelas dan absensi tetap aman.
             </p>
             <p v-else class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Guru ini akan bisa login kembali setelah diaktifkan.
+              PTK ini akan bisa login kembali setelah diaktifkan.
             </p>
 
             <div class="flex justify-end gap-3">

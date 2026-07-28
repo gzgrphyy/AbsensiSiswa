@@ -112,7 +112,7 @@ const rataPersentase = computed(() =>
 
     <template v-else>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
-        <StatCard label="Total Siswa" :value="totalSiswa" variant="blue" />
+        <StatCard label="Total Murid" :value="totalSiswa" variant="blue" />
         <StatCard label="Hadir" :value="totalHadir" variant="green" />
         <StatCard label="Sakit" :value="totalSakit" variant="amber" />
         <StatCard label="Izin" :value="totalIzin" variant="blue" />
@@ -126,7 +126,7 @@ const rataPersentase = computed(() =>
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
                 <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Kelas</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Total Siswa</th>
+                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Total Murid</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Hadir</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Sakit</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Izin</th>

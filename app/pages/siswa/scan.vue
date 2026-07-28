@@ -503,7 +503,7 @@ const statusLabels: Record<string, string> = {
                 <span class="font-medium text-gray-900 dark:text-gray-100">{{ result.sesi.jamMulai }} - {{ result.sesi.jamSelesai }}</span>
               </div>
               <div v-if="result.sesi?.guru" class="flex justify-between items-center">
-                <span class="text-gray-500 dark:text-gray-400">Guru</span>
+                <span class="text-gray-500 dark:text-gray-400">PTK</span>
                 <span class="font-medium text-gray-900 dark:text-gray-100">{{ result.sesi.guru }}</span>
               </div>
               <div v-if="result.status" class="flex justify-between items-center">

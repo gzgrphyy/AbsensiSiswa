@@ -4,6 +4,8 @@ interface Siswa {
   nisn: string
   nama: string
   kelasId: number
+  nomorHp1: string | null
+  nomorHp2: string | null
   namaWali: string | null
   kontakWali: string | null
   kelas: { id: number; nama: string }
@@ -16,7 +18,7 @@ const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin
 
 const showModal = ref(false)
 const editing = ref<Siswa | null>(null)
-const form = ref({ nama: '', nisn: '', email: '', kelasId: 0, namaWali: '', kontakWali: '' })
+const form = ref({ nama: '', nisn: '', email: '', kelasId: 0, namaWali: '', kontakWali: '', nomorHp1: '', nomorHp2: '' })
 const saving = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
@@ -40,7 +42,7 @@ function showSuccess(msg: string) {
 
 function openCreate() {
   editing.value = null
-  form.value = { nama: '', nisn: '', email: '', kelasId: 0, namaWali: '', kontakWali: '' }
+  form.value = { nama: '', nisn: '', email: '', kelasId: 0, namaWali: '', kontakWali: '', nomorHp1: '', nomorHp2: '' }
   errorMsg.value = ''
   dirtyForm.value = false
   showModal.value = true
@@ -54,7 +56,9 @@ function openEdit(item: Siswa) {
     email: item.user.email,
     kelasId: item.kelasId,
     namaWali: item.namaWali || '',
-    kontakWali: item.kontakWali || ''
+    kontakWali: item.kontakWali || '',
+    nomorHp1: item.nomorHp1 || '',
+    nomorHp2: item.nomorHp2 || ''
   }
   errorMsg.value = ''
   dirtyForm.value = false
@@ -80,12 +84,14 @@ async function handleSave() {
       if (form.value.kelasId !== editing.value.kelasId) body.kelasId = form.value.kelasId
       if (form.value.namaWali !== (editing.value.namaWali || '')) body.namaWali = form.value.namaWali || null
       if (form.value.kontakWali !== (editing.value.kontakWali || '')) body.kontakWali = form.value.kontakWali || null
+      if (form.value.nomorHp1 !== (editing.value.nomorHp1 || '')) body.nomorHp1 = form.value.nomorHp1 || null
+      if (form.value.nomorHp2 !== (editing.value.nomorHp2 || '')) body.nomorHp2 = form.value.nomorHp2 || null
 
       if (Object.keys(body).length === 0) { showModal.value = false; return }
 
       const { error } = await useFetch(`/api/admin/siswa/${editing.value.id}`, { method: 'PATCH', body })
       if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
-      showSuccess('Data siswa berhasil diperbarui')
+      showSuccess('Data murid berhasil diperbarui')
     } else {
       const { data: result, error } = await useFetch('/api/admin/siswa', {
         method: 'POST',
@@ -95,7 +101,9 @@ async function handleSave() {
           email: form.value.email,
           kelasId: form.value.kelasId,
           namaWali: form.value.namaWali || undefined,
-          kontakWali: form.value.kontakWali || undefined
+          kontakWali: form.value.kontakWali || undefined,
+          nomorHp1: form.value.nomorHp1 || undefined,
+          nomorHp2: form.value.nomorHp2 || undefined
         }
       })
       if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
@@ -103,7 +111,7 @@ async function handleSave() {
         generatedPassword.value = result.value.generatedPassword
         showPasswordModal.value = true
       }
-      showSuccess('Akun siswa berhasil ditambahkan')
+      showSuccess('Akun murid berhasil ditambahkan')
     }
     showModal.value = false
     confirmClose.value = false
@@ -121,7 +129,7 @@ async function handleDelete() {
   confirmDelete.value = null
   const { error } = await useFetch(`/api/admin/siswa/${id}`, { method: 'DELETE' })
   if (error.value) { showError(error.value.statusMessage || 'Gagal menghapus'); return }
-  showSuccess('Data siswa berhasil dihapus')
+  showSuccess('Data murid berhasil dihapus')
   await refresh()
 }
 
@@ -157,14 +165,14 @@ function copyPassword() {
 
 <template>
   <AppLayout>
-    <PageHeader title="Data Siswa" description="Kelola data siswa dan akun">
+    <PageHeader title="Data Murid" description="Kelola data murid dan akun">
       <template #actions>
         <button @click="openCreate"
           class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="hidden sm:inline">Tambah Siswa</span>
+          <span class="hidden sm:inline">Tambah Murid</span>
         </button>
       </template>
     </PageHeader>
@@ -185,6 +193,7 @@ function copyPassword() {
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">NISN</th>
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">Kelas</th>
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden lg:table-cell">Wali</th>
+              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden xl:table-cell">No. HP</th>
               <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Status</th>
               <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Aksi</th>
             </tr>
@@ -192,19 +201,13 @@ function copyPassword() {
           <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
             <tr v-for="item in siswaList" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
               <td class="px-4 py-3">
-                <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-slate-600 flex items-center justify-center text-gray-600 dark:text-gray-300 text-xs font-semibold">
-                    {{ item.nama.charAt(0).toUpperCase() }}
-                  </div>
-                  <div>
-                    <span class="font-medium text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
-                    <div class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ item.nisn }}</div>
-                  </div>
-                </div>
+                <span class="font-medium text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
+                <div class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ item.nisn }}</div>
               </td>
               <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.nisn }}</td>
               <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden md:table-cell">{{ item.kelas?.nama || '-' }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.namaWali || '-' }}</td>
+              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs text-center hidden xl:table-cell">{{ item.nomorHp1 || item.nomorHp2 ? (item.nomorHp1 || '-') : '-' }}</td>
               <td class="px-4 py-3 text-center">
                 <BaseBadge :variant="item.user.isActive ? 'green' : 'gray'" size="sm">
                   {{ item.user.isActive ? 'Aktif' : 'Nonaktif' }}
@@ -237,11 +240,11 @@ function copyPassword() {
             </tr>
             <!-- Empty state -->
             <tr v-if="!siswaList || siswaList.length === 0">
-              <td colspan="6" class="px-4 py-16 text-center">
+              <td colspan="7" class="px-4 py-16 text-center">
                 <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5zm0-7l-9-5 9-5 9 5-9 5z" />
                 </svg>
-                <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada data siswa</p>
+                <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada data murid</p>
               </td>
             </tr>
           </tbody>
@@ -250,11 +253,11 @@ function copyPassword() {
     </div>
 
     <!-- Modal Create/Edit -->
-    <BaseModal :show="showModal" :title="editing ? 'Edit Data Siswa' : 'Tambah Siswa Baru'" @close="handleCloseClick">
+    <BaseModal :show="showModal" :title="editing ? 'Edit Data Murid' : 'Tambah Murid Baru'" @close="handleCloseClick">
       <form @submit.prevent="handleSave" class="space-y-4">
         <BaseFormField label="Nama Lengkap" required :error="undefined">
           <input v-model="form.nama" type="text" @input="onFormChange" required
-            placeholder="Nama lengkap siswa"
+            placeholder="Nama lengkap murid"
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
 
@@ -294,6 +297,20 @@ function copyPassword() {
           </BaseFormField>
         </div>
 
+        <div class="grid grid-cols-2 gap-4">
+          <BaseFormField label="No. HP 1">
+            <input v-model="form.nomorHp1" type="text" @input="onFormChange"
+              placeholder="Nomor HP murid"
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+          </BaseFormField>
+
+          <BaseFormField label="No. HP 2">
+            <input v-model="form.nomorHp2" type="text" @input="onFormChange"
+              placeholder="Nomor HP cadangan"
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+          </BaseFormField>
+        </div>
+
         <Transition name="fade">
           <div v-if="!editing" class="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-sm text-sm text-blue-700 dark:text-blue-300">
             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,7 +340,7 @@ function copyPassword() {
 
     <!-- Modal Password -->
     <BaseModal :show="showPasswordModal" title="Password Generated" max-w="max-w-sm" @close="showPasswordModal = false">
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Password untuk akun siswa. Salin dan sampaikan ke siswa.</p>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Password untuk akun murid. Salin dan sampaikan ke murid.</p>
       <div class="flex items-center gap-2 p-4 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg mb-4">
         <code class="flex-1 text-lg font-mono font-bold text-center text-gray-900 dark:text-gray-100 tracking-wider select-all">{{ generatedPassword }}</code>
       </div>
@@ -377,7 +394,7 @@ function copyPassword() {
     <!-- Modal Confirm Delete -->
     <ConfirmDialog
       :show="!!confirmDelete"
-      title="Hapus Data Siswa"
+      title="Hapus Data Murid"
       :message="`Yakin ingin menghapus ${confirmDelete?.nama}?`"
       variant="danger"
       @confirm="handleDelete"

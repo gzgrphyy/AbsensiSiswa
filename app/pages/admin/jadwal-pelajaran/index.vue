@@ -142,7 +142,7 @@ async function handleDelete() {
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Jam</th>
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Kelas</th>
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">Ruangan</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden lg:table-cell">Guru</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden lg:table-cell">PTK</th>
               <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Aksi</th>
             </tr>
           </thead>
@@ -231,10 +231,10 @@ async function handleDelete() {
             </select>
           </BaseFormField>
 
-          <BaseFormField label="Guru" required>
+          <BaseFormField label="PTK" required>
             <select v-model="form.guruId" @change="onFormChange" required
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
-              <option :value="0" disabled>Pilih guru</option>
+              <option :value="0" disabled>Pilih PTK</option>
               <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
             </select>
           </BaseFormField>

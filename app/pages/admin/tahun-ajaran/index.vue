@@ -495,7 +495,7 @@ function promptDelete(item: TahunAjaran) {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <span>
-                Tahun ajaran ini masih memiliki <strong>{{ confirmDelete.kelasCount }} kelas</strong> terkait. Data siswa/absensi tidak akan hilang, tetapi tahun ajaran tidak akan muncul di pilihan baru.
+                Tahun ajaran ini masih memiliki <strong>{{ confirmDelete.kelasCount }} kelas</strong> terkait. Data murid/absensi tidak akan hilang, tetapi tahun ajaran tidak akan muncul di pilihan baru.
               </span>
             </div>
             <p v-else class="mt-3 text-sm text-gray-500 dark:text-gray-400">

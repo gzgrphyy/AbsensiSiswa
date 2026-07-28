@@ -86,7 +86,7 @@ async function tutupSesi(id: number) {
   errorMsg.value = ''
   try {
     await $fetch(`/api/absensi/sesi/${id}/tutup`, { method: 'POST' })
-    showSuccess('Sesi ditutup. Siswa yang tidak hadir otomatis tercatat Alpha.')
+    showSuccess('Sesi ditutup. Murid yang tidak hadir otomatis tercatat Alpha.')
     confirmClose.value = null
     await fetchData()
   } catch (err: any) {
@@ -260,7 +260,7 @@ const hariIni = todayName
     <ConfirmDialog
       :show="!!confirmClose"
       title="Tutup Sesi"
-      :message="`${confirmClose?.jadwal.mapel} — ${confirmClose?.jadwal.kelas.nama}. Siswa yang belum scan akan tercatat Alpha.`"
+      :message="`${confirmClose?.jadwal.mapel} — ${confirmClose?.jadwal.kelas.nama}. Murid yang belum scan akan tercatat Alpha.`"
       variant="warning"
       confirm-label="Ya, Tutup Sesi"
       :loading="closingSesi === confirmClose?.id"

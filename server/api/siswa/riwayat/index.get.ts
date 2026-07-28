@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
   const siswa = await prisma.siswa.findUnique({ where: { userId: session.user.id } })
   if (!siswa) {
-    throw createError({ statusCode: 404, statusMessage: 'Data siswa tidak ditemukan' })
+    throw createError({ statusCode: 404, statusMessage: 'Data murid tidak ditemukan' })
   }
 
   const requests = await prisma.absensiRequest.findMany({

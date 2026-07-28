@@ -16,6 +16,8 @@ export default defineEventHandler(async (event) => {
       nama: true,
       email: true,
       nip: true,
+      nomorHp1: true,
+      nomorHp2: true,
       isActive: true,
       createdAt: true,
       updatedAt: true,

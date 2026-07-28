@@ -6,7 +6,9 @@ export const createSiswaSchema = z.object({
   email: z.string().email('Format email tidak valid'),
   kelasId: z.number().int().positive('Kelas wajib dipilih'),
   namaWali: z.string().optional(),
-  kontakWali: z.string().max(20).optional()
+  kontakWali: z.string().max(20).optional(),
+  nomorHp1: z.string().max(20).optional(),
+  nomorHp2: z.string().max(20).optional()
 })
 
 export const updateSiswaSchema = z.object({
@@ -15,5 +17,7 @@ export const updateSiswaSchema = z.object({
   email: z.string().email('Format email tidak valid').optional(),
   kelasId: z.number().int().positive('Kelas wajib dipilih').optional(),
   namaWali: z.string().optional().nullable(),
-  kontakWali: z.string().max(20).optional().nullable()
+  kontakWali: z.string().max(20).optional().nullable(),
+  nomorHp1: z.string().max(20).optional().nullable(),
+  nomorHp2: z.string().max(20).optional().nullable()
 })

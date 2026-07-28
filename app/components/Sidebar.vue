@@ -21,8 +21,8 @@ const adminMenus: MenuItem[] = [
   {
     label: 'Data Master', icon: 'master-data',
     children: [
-      { label: 'Data Guru', to: '/admin/guru' },
-      { label: 'Data Siswa', to: '/admin/siswa' },
+      { label: 'Data PTK', to: '/admin/guru' },
+      { label: 'Data Murid', to: '/admin/siswa' },
       { label: 'Data Kelas', to: '/admin/kelas' },
       { label: 'Tahun Ajaran', to: '/admin/tahun-ajaran' },
       { label: 'Data Ruangan', to: '/admin/ruangan' },

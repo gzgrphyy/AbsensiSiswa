@@ -4,7 +4,7 @@ const successMsg = ref('')
 
 const options = [
   { id: 'rekap-saya', label: 'Rekap Saya', description: 'Rekap absensi pribadi' },
-  { id: 'rekap-kelas', label: 'Rekap Kelas', description: 'Rekap absensi seluruh siswa kelas' },
+  { id: 'rekap-kelas', label: 'Rekap Kelas', description: 'Rekap absensi seluruh murid kelas' },
 ]
 
 async function handleExport(id: string) {
