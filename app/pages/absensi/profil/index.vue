@@ -16,9 +16,19 @@ const form = reactive({
   email: ''
 })
 
+const pwForm = reactive({
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: ''
+})
+
 const errorMsg = ref('')
 const successMsg = ref('')
 const saving = ref(false)
+
+const pwErrorMsg = ref('')
+const pwSuccessMsg = ref('')
+const savingPw = ref(false)
 
 watch(profile, (val) => {
   if (val) {
@@ -39,6 +49,47 @@ async function handleSave() {
     errorMsg.value = err?.data?.statusMessage || 'Gagal menyimpan profil'
   } finally {
     saving.value = false
+  }
+}
+
+async function handleChangePassword() {
+  pwErrorMsg.value = ''
+  pwSuccessMsg.value = ''
+
+  if (!pwForm.currentPassword) {
+    pwErrorMsg.value = 'Password saat ini wajib diisi'
+    return
+  }
+  if (!pwForm.newPassword) {
+    pwErrorMsg.value = 'Password baru wajib diisi'
+    return
+  }
+  if (pwForm.newPassword.length < 6) {
+    pwErrorMsg.value = 'Password baru minimal 6 karakter'
+    return
+  }
+  if (pwForm.newPassword !== pwForm.confirmPassword) {
+    pwErrorMsg.value = 'Konfirmasi password tidak cocok'
+    return
+  }
+
+  savingPw.value = true
+  try {
+    await $fetch('/api/user/password', {
+      method: 'PUT',
+      body: {
+        currentPassword: pwForm.currentPassword,
+        newPassword: pwForm.newPassword
+      }
+    })
+    pwSuccessMsg.value = 'Password berhasil diubah'
+    pwForm.currentPassword = ''
+    pwForm.newPassword = ''
+    pwForm.confirmPassword = ''
+  } catch (err: any) {
+    pwErrorMsg.value = err?.data?.statusMessage || 'Gagal mengubah password'
+  } finally {
+    savingPw.value = false
   }
 }
 </script>
@@ -95,6 +146,42 @@ async function handleSave() {
             class="px-6 py-2.5 bg-primary-500 text-sm font-medium text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </BaseCard>
+
+    <!-- Ubah Password -->
+    <BaseCard class="mt-6">
+      <div class="flex items-center gap-2 mb-5">
+        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        <h3 class="text-base font-semibold text-gray-900">Ubah Password</h3>
+      </div>
+
+      <Notification type="success" :message="pwSuccessMsg" :show="!!pwSuccessMsg" @dismiss="pwSuccessMsg = ''" />
+      <Notification type="error" :message="pwErrorMsg" :show="!!pwErrorMsg" @dismiss="pwErrorMsg = ''" />
+
+      <form @submit.prevent="handleChangePassword" class="space-y-4 max-w-md">
+        <BaseFormField label="Password Saat Ini" required>
+          <input v-model="pwForm.currentPassword" type="password" placeholder="Masukkan password saat ini"
+            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
+        </BaseFormField>
+        <BaseFormField label="Password Baru" required>
+          <input v-model="pwForm.newPassword" type="password" placeholder="Minimal 6 karakter"
+            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
+        </BaseFormField>
+        <BaseFormField label="Konfirmasi Password Baru" required>
+          <input v-model="pwForm.confirmPassword" type="password" placeholder="Ketik ulang password baru"
+            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400" />
+        </BaseFormField>
+
+        <div class="flex justify-end pt-2">
+          <button type="submit" :disabled="savingPw"
+            class="px-6 py-2.5 bg-orange-500 text-sm font-medium text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
+            <svg v-if="savingPw" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+            Ubah Password
           </button>
         </div>
       </form>

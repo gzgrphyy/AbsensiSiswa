@@ -106,7 +106,7 @@ function renderIcon(icon: string) {
 <template>
   <aside
     :class="[
-      'bg-white border-r border-gray-200 flex flex-col transition-all duration-200 h-screen sticky top-0 z-40',
+      'bg-white border-r border-gray-200 flex flex-col transition-all duration-200 h-full z-40',
       collapsed ? 'w-14' : 'w-60'
     ]"
   >

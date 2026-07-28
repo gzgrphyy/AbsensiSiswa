@@ -25,6 +25,8 @@ const confirmClose = ref(false)
 const dirtyForm = ref(false)
 const generatedPassword = ref('')
 const showPasswordModal = ref(false)
+const resetPasswordFor = ref<Siswa | null>(null)
+const resettingPw = ref(false)
 
 function showError(msg: string) {
   errorMsg.value = msg
@@ -123,6 +125,30 @@ async function handleDelete() {
   await refresh()
 }
 
+function promptResetPassword(item: Siswa) {
+  resetPasswordFor.value = item
+}
+
+async function handleResetPassword() {
+  if (!resetPasswordFor.value) return
+  resettingPw.value = true
+  errorMsg.value = ''
+
+  try {
+    const data = await $fetch(`/api/admin/siswa/${resetPasswordFor.value.id}/reset-password`, {
+      method: 'POST'
+    })
+    generatedPassword.value = data.generatedPassword
+    showPasswordModal.value = true
+    resetPasswordFor.value = null
+    showSuccess('Password berhasil di-reset')
+  } catch (err: any) {
+    showError(err?.data?.statusMessage || 'Gagal reset password')
+  } finally {
+    resettingPw.value = false
+  }
+}
+
 function copyPassword() {
   navigator.clipboard.writeText(generatedPassword.value)
   showSuccess('Password berhasil disalin!')
@@ -191,6 +217,16 @@ function copyPassword() {
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
+
+                  <!-- Reset Password -->
+                  <button @click="promptResetPassword(item)"
+                    class="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-all duration-150"
+                    title="Reset password">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                  </button>
+
                   <button @click="promptDelete(item)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="Hapus">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -301,6 +337,42 @@ function copyPassword() {
         </button>
       </template>
     </BaseModal>
+
+    <!-- Modal Confirm Reset Password -->
+    <Transition name="fade">
+      <div v-if="resetPasswordFor" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="resetPasswordFor = null"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-auto p-6 border border-gray-100">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="p-2 bg-amber-100 rounded-full">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900">Reset Password</h2>
+              <p class="text-sm text-gray-500">{{ resetPasswordFor.nama }}</p>
+            </div>
+          </div>
+
+          <p class="text-sm text-gray-600 mb-5">
+            Password baru akan digenerate otomatis. Password lama tidak bisa digunakan lagi. Lanjutkan?
+          </p>
+
+          <div class="flex justify-end gap-3">
+            <button @click="resetPasswordFor = null"
+              class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              Batal
+            </button>
+            <button @click="handleResetPassword" :disabled="resettingPw"
+              class="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-lg hover:bg-amber-700 active:bg-amber-800 disabled:opacity-50 shadow-sm transition-all duration-150 inline-flex items-center gap-2">
+              <svg v-if="resettingPw" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+              Ya, Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
 
     <!-- Modal Confirm Delete -->
     <ConfirmDialog
