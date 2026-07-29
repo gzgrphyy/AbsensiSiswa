@@ -78,7 +78,7 @@ const rataPersentase = computed(() =>
       <div class="flex flex-col gap-1 min-w-[180px]">
         <label class="text-xs font-medium text-gray-500">Tahun Ajaran</label>
         <select v-model="selectedTa"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-sm text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="''">Semua Tahun Ajaran</option>
           <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ t.semester }})</option>
         </select>
@@ -88,7 +88,7 @@ const rataPersentase = computed(() =>
       <div class="flex flex-col gap-1 min-w-[160px]">
         <label class="text-xs font-medium text-gray-500">Kelas</label>
         <select v-model="selectedKelas"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-sm text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="''">Semua Kelas</option>
           <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
@@ -98,7 +98,7 @@ const rataPersentase = computed(() =>
       <div class="flex flex-col gap-1 min-w-[180px]">
         <label class="text-xs font-medium text-gray-500">Periode</label>
         <select v-model="selectedBulan"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-sm text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="">Semua Periode</option>
           <option v-for="o in bulanOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
@@ -106,8 +106,8 @@ const rataPersentase = computed(() =>
 
       <!-- Tombol Reset -->
       <button @click="selectedTa = ''; selectedKelas = ''"
-        class="px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-sm border border-gray-300 dark:border-slate-600 transition-colors">
-        Ulang Menyaring
+        class="px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none border border-gray-300 dark:border-slate-600 transition-colors">
+        Atur Ulang
       </button>
     </div>
 

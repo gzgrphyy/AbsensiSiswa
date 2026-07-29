@@ -46,7 +46,7 @@ const emitEmptyAction = () => {
 </script>
 
 <template>
-  <div v-if="isAdmin" class="bg-white dark:bg-slate-800 rounded-sm border border-gray-300 dark:border-gray-600 overflow-hidden">
+  <div v-if="isAdmin" class="bg-white dark:bg-slate-800 rounded-none border border-gray-300 dark:border-gray-600 overflow-hidden">
     <div class="overflow-x-auto scrollbar-thin">
       <table class="w-full text-sm">
         <thead>

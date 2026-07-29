@@ -10,13 +10,51 @@ interface Jadwal {
   guru: { id: number; nama: string }
 }
 
-const { data: jadwalList, pending, refresh } = useFetch<Jadwal[]>('/api/admin/jadwal-pelajaran', { immediate: true })
 const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin/kelas', { immediate: true })
 const { data: guruList } = useFetch<{ id: number; nama: string }[]>('/api/admin/guru', { immediate: true })
 const { data: ruanganList } = useFetch<{ id: number; nama: string }[]>('/api/admin/ruangan', { immediate: true })
 
 const hariList = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU']
 const hariLabel: Record<string, string> = { SENIN: 'Senin', SELASA: 'Selasa', RABU: 'Rabu', KAMIS: 'Kamis', JUMAT: 'Jumat', SABTU: 'Sabtu', MINGGU: 'Minggu' }
+
+const route = useRoute()
+
+const filterKelasId = ref<number | undefined>(route.query.kelasId ? Number(route.query.kelasId) : undefined)
+const filterHari = ref<string | undefined>(route.query.hari ? String(route.query.hari) : undefined)
+const filterGuruId = ref<number | undefined>(route.query.guruId ? Number(route.query.guruId) : undefined)
+
+const queryParams = computed(() => {
+  const params: Record<string, any> = {}
+  if (filterKelasId.value) params.kelasId = filterKelasId.value
+  if (filterHari.value) params.hari = filterHari.value
+  if (filterGuruId.value) params.guruId = filterGuruId.value
+  return params
+})
+
+const { data: jadwalList, pending, refresh } = useFetch<Jadwal[]>('/api/admin/jadwal-pelajaran', {
+  query: queryParams,
+  immediate: true,
+  watch: [queryParams]
+})
+
+const activeFilterCount = computed(() => {
+  let count = 0
+  if (filterKelasId.value) count++
+  if (filterHari.value) count++
+  if (filterGuruId.value) count++
+  return count
+})
+
+function applyFilter() {
+  navigateTo({ query: queryParams.value })
+}
+
+function resetFilter() {
+  filterKelasId.value = undefined
+  filterHari.value = undefined
+  filterGuruId.value = undefined
+  navigateTo({ query: {} })
+}
 
 const showModal = ref(false)
 const editing = ref<Jadwal | null>(null)
@@ -118,7 +156,7 @@ async function handleDelete() {
     <PageHeader title="Jadwal Pelajaran" description="Kelola jadwal pelajaran">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-sm hover:bg-blue-700 text-sm font-medium">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm font-medium">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -130,9 +168,59 @@ async function handleDelete() {
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
 
+    <!-- Filter Bar -->
+    <div class="mb-4 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-none">
+      <div class="flex flex-wrap items-end gap-3">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Hari</label>
+          <select v-model="filterHari"
+            class="px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 min-w-[130px]">
+            <option :value="undefined">Semua Hari</option>
+            <option v-for="h in hariList" :key="h" :value="h">{{ hariLabel[h] }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Kelas</label>
+          <select v-model="filterKelasId"
+            class="px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 min-w-[150px]">
+            <option :value="undefined">Semua Kelas</option>
+            <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">PTK</label>
+          <select v-model="filterGuruId"
+            class="px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 min-w-[180px]">
+            <option :value="undefined">Semua PTK</option>
+            <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-transparent mb-1">Aksi</label>
+          <div class="flex items-center gap-2">
+            <button @click="applyFilter"
+              class="px-4 py-2.5 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm font-medium inline-flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Penyaring
+            </button>
+            <button v-if="activeFilterCount > 0" @click="resetFilter"
+              class="px-4 py-2.5 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-none hover:bg-gray-200 dark:hover:bg-slate-600 text-sm font-medium inline-flex items-center gap-1.5">
+              Atur Ulang
+              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-blue-600 text-white rounded-none">{{ activeFilterCount }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="7" />
 
-    <div v-else class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 overflow-hidden">
+    <div v-else class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600 overflow-hidden">
       <div class="overflow-x-auto scrollbar-thin">
         <table class="w-full text-sm">
           <thead>
@@ -158,12 +246,12 @@ async function handleDelete() {
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.guru.nama }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
-                  <button @click="openEdit(item)" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-gray-100 rounded-sm" title="Edit">
+                  <button @click="openEdit(item)" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-gray-100 rounded-none" title="Edit">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                  <button @click="promptDelete(item)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-sm" title="Hapus">
+                  <button @click="promptDelete(item)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-none" title="Hapus">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -190,20 +278,20 @@ async function handleDelete() {
         <BaseFormField label="Mata Pelajaran" required>
           <input v-model="form.mapel" type="text" @input="onFormChange" required
             placeholder="contoh: Matematika"
-            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
 
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField label="Hari" required>
             <select v-model="form.hari" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
               <option v-for="h in hariList" :key="h" :value="h">{{ hariLabel[h] }}</option>
             </select>
           </BaseFormField>
 
           <BaseFormField label="Kelas" required>
             <select v-model="form.kelasId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
               <option :value="0" disabled>Pilih kelas</option>
               <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
             </select>
@@ -213,19 +301,19 @@ async function handleDelete() {
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField label="Jam Mulai" required>
             <input v-model="form.jamMulai" type="time" @input="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
           </BaseFormField>
 
           <BaseFormField label="Jam Selesai" required>
             <input v-model="form.jamSelesai" type="time" @input="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
           </BaseFormField>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField label="Ruangan" required>
             <select v-model="form.ruanganId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
               <option :value="0" disabled>Pilih ruangan</option>
               <option v-for="r in ruanganList" :key="r.id" :value="r.id">{{ r.nama }}</option>
             </select>
@@ -233,7 +321,7 @@ async function handleDelete() {
 
           <BaseFormField label="PTK" required>
             <select v-model="form.guruId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
               <option :value="0" disabled>Pilih PTK</option>
               <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
             </select>
@@ -241,9 +329,9 @@ async function handleDelete() {
         </div>
       </form>
       <template #footer>
-        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">Batal</button>
+        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none">Batal</button>
         <button type="submit" @click="handleSave" :disabled="saving"
-          class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-sm hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
+          class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-none hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
           <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           {{ saving ? 'Menyimpan...' : 'Simpan' }}
         </button>

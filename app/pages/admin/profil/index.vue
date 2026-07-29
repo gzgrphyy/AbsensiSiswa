@@ -157,17 +157,17 @@ async function handleChangePassword() {
 
     <BaseCard>
       <form @submit.prevent="handleSave" class="space-y-5">
-        <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-100 dark:border-slate-600">
+        <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-none border border-gray-100 dark:border-slate-600">
           <div class="relative flex-shrink-0">
             <div v-if="fotoPreview || profile?.foto"
-              class="w-14 h-14 rounded-full overflow-hidden border-2 border-blue-200 dark:border-blue-800">
+              class="w-14 h-14 rounded-none overflow-hidden border-2 border-blue-200 dark:border-blue-800">
               <img :src="fotoPreview || profile?.foto" class="w-full h-full object-cover" />
             </div>
             <div v-else
-              class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 text-xl font-bold">
+              class="w-14 h-14 rounded-none bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 text-xl font-bold">
               {{ profile?.nama?.charAt(0)?.toUpperCase() || 'A' }}
             </div>
-            <label class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer shadow-sm border-2 border-white dark:border-slate-700">
+            <label class="absolute -bottom-1 -right-1 w-5 h-5 rounded-none bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer shadow-sm border-2 border-white dark:border-slate-700">
               <input type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" class="sr-only" @change="handleFotoSelect" />
               <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -187,23 +187,23 @@ async function handleChangePassword() {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <BaseFormField label="Nama Lengkap" required>
             <input v-model="form.nama" type="text"
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
            </BaseFormField>
            <BaseFormField label="Role">
              <input value="Administrator" type="text" disabled
-               class="w-full px-3.5 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-gray-50 dark:bg-slate-700 text-gray-500 dark:text-gray-400 cursor-not-allowed" />
+               class="w-full px-3.5 py-2.5 border border-gray-200 dark:border-slate-600 rounded-none text-sm bg-gray-50 dark:bg-slate-700 text-gray-500 dark:text-gray-400 cursor-not-allowed" />
           </BaseFormField>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <BaseFormField label="Email" required>
             <input v-model="form.email" type="email"
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
            </BaseFormField>
         </div>
 
         <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-slate-700">
           <button type="submit" :disabled="saving"
-            class="px-6 py-2.5 bg-primary-500 text-sm font-medium text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
+            class="px-6 py-2.5 bg-primary-500 text-sm font-medium text-white rounded-none hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             Simpan Perubahan
           </button>
@@ -225,20 +225,20 @@ async function handleChangePassword() {
       <form @submit.prevent="handleChangePassword" class="space-y-4 max-w-md">
         <BaseFormField label="Password Saat Ini" required>
           <input v-model="pwForm.currentPassword" type="password" placeholder="Masukkan password saat ini"
-            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
         <BaseFormField label="Password Baru" required>
           <input v-model="pwForm.newPassword" type="password" placeholder="Minimal 6 karakter"
-            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
         <BaseFormField label="Konfirmasi Password Baru" required>
           <input v-model="pwForm.confirmPassword" type="password" placeholder="Ketik ulang password baru"
-            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
 
         <div class="flex justify-end pt-2">
           <button type="submit" :disabled="savingPw"
-            class="px-6 py-2.5 bg-orange-500 text-sm font-medium text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
+            class="px-6 py-2.5 bg-orange-500 text-sm font-medium text-white rounded-none hover:bg-orange-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="savingPw" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             Ubah Password
           </button>

@@ -47,6 +47,7 @@ const guruMenus: MenuItem[] = [
 const siswaMenus: MenuItem[] = [
   { label: 'Dasbor', to: '/siswa', icon: 'dashboard' },
   { label: 'Pindai QR', to: '/siswa/scan', icon: 'scan' },
+  { label: 'Jadwal', to: '/siswa/jadwal', icon: 'jadwal' },
   { label: 'Riwayat Absensi', to: '/siswa/riwayat', icon: 'riwayat' },
   { label: 'Profil', to: '/siswa/profil', icon: 'profile' },
 ]
@@ -99,6 +100,7 @@ function renderIcon(icon: string) {
     riwayat: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
     profile: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
     scan: 'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z',
+    jadwal: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
   }
   return icons[icon] || icons.dashboard
 }
@@ -117,7 +119,7 @@ function renderIcon(icon: string) {
     <!-- Logo Area -->
     <div class="flex-shrink-0 border-b border-gray-200 dark:border-slate-700">
       <NuxtLink to="/" class="flex items-center gap-2.5 px-4 py-2.5">
-        <div :class="['w-8 h-8 bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden', isAdmin ? 'rounded-sm' : 'rounded-lg']">
+        <div :class="['w-8 h-8 bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden', isAdmin ? 'rounded-none' : 'rounded-lg']">
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
           <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
         </div>

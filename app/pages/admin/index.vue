@@ -115,13 +115,13 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
       <!-- Tables Section -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
         <!-- Top Alpha Siswa -->
-        <div class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600">
+        <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
           <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
               <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Murid Alpha Terbanyak</h3>
               <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Periode bulan ini</p>
             </div>
-            <span class="text-xs text-gray-400 dark:text-gray-500 font-medium bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-sm">{{ data.topAlpha.length }} murid</span>
+            <span class="text-xs text-gray-400 dark:text-gray-500 font-medium bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.topAlpha.length }} murid</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -137,7 +137,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
                   <td class="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">{{ item.nama }}</td>
                   <td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-center">{{ item.kelas }}</td>
                   <td class="px-4 py-3 text-center">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 ring-1 ring-red-200 dark:ring-red-800">{{ item.totalAlpha }}x</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 ring-1 ring-red-200 dark:ring-red-800">{{ item.totalAlpha }}x</span>
                   </td>
                 </tr>
                 <tr v-if="data.topAlpha.length === 0">
@@ -149,7 +149,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
         </div>
 
         <!-- Monitoring Ruangan -->
-        <div class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600">
+        <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
           <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
               <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Pemantauan Ruangan</h3>
@@ -189,7 +189,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
       </div>
 
       <!-- Aktivitas Terbaru -->
-      <div class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600">
+      <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
         <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Aktivitas Terbaru</h3>
           <span class="text-xs text-gray-400 dark:text-gray-500">Hari ini</span>

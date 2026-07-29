@@ -36,9 +36,9 @@ const cardStyle = {
 </script>
 
 <template>
-  <div v-if="isAdmin" class="rounded-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 p-3">
+  <div v-if="isAdmin" class="rounded-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 p-3">
     <div class="flex items-center gap-3">
-      <div v-if="$slots.icon" class="p-2 rounded-sm bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 flex-shrink-0">
+      <div v-if="$slots.icon" class="p-2 rounded-none bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 flex-shrink-0">
         <slot name="icon" />
       </div>
       <div class="min-w-0">

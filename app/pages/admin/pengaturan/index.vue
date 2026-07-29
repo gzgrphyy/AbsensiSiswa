@@ -202,19 +202,19 @@ async function handleSave() {
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
 
-    <div class="flex gap-1 mb-5 bg-gray-100 dark:bg-gray-700 rounded-sm p-1">
+    <div class="flex gap-1 mb-5 bg-gray-100 dark:bg-gray-700 rounded-none p-1">
       <button @click="activeTab = 'umum'"
-        class="flex-1 py-2 px-4 text-sm font-medium rounded-sm transition-all"
+        class="flex-1 py-2 px-4 text-sm font-medium rounded-none transition-all"
         :class="activeTab === 'umum' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
         Umum
       </button>
       <button @click="activeTab = 'absensi'"
-        class="flex-1 py-2 px-4 text-sm font-medium rounded-sm transition-all"
+        class="flex-1 py-2 px-4 text-sm font-medium rounded-none transition-all"
         :class="activeTab === 'absensi' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
         Absensi
       </button>
       <button @click="activeTab = 'keamanan'"
-        class="flex-1 py-2 px-4 text-sm font-medium rounded-sm transition-all"
+        class="flex-1 py-2 px-4 text-sm font-medium rounded-none transition-all"
         :class="activeTab === 'keamanan' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
         Keamanan
       </button>
@@ -232,7 +232,7 @@ async function handleSave() {
               </svg>
               Branding & Visual
             </h3>
-            <div class="bg-white dark:bg-gray-800 rounded-sm p-4 space-y-4 border border-gray-300 dark:border-gray-600">
+            <div class="bg-white dark:bg-gray-800 rounded-none p-4 space-y-4 border border-gray-300 dark:border-gray-600">
               <!-- Nama Aplikasi & Titel -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <BaseFormField label="Nama Aplikasi">
@@ -250,7 +250,7 @@ async function handleSave() {
               <!-- Logo & Favicon side by side -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Logo Aplikasi (Icon) -->
-                <div class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600 p-4">
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     <span class="flex items-center gap-1.5">
                       <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,7 +261,7 @@ async function handleSave() {
                   </label>
                   <!-- Preview -->
                   <div class="flex flex-col items-center gap-3">
-                    <div class="w-24 h-24 rounded-sm border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
+                    <div class="w-24 h-24 rounded-none border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
                       <img v-if="iconPreview || formBranding.iconPath"
                         :src="iconPreview || formBranding.iconPath"
                         class="w-full h-full object-contain p-2"
@@ -274,7 +274,7 @@ async function handleSave() {
                     <div class="flex items-center gap-2">
                       <label class="relative cursor-pointer" :class="{ 'opacity-50 pointer-events-none': iconUploading }">
                         <input type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml" class="sr-only" @change="handleIconSelect" :disabled="iconUploading" />
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-none hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600">
                           <svg v-if="iconUploading" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                           <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -283,7 +283,7 @@ async function handleSave() {
                         </span>
                       </label>
                       <button v-if="(formBranding.iconPath || iconPreview) && !iconUploading" type="button" @click="removeIcon"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-sm transition-colors">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-none transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -295,7 +295,7 @@ async function handleSave() {
                 </div>
 
                 <!-- Favicon -->
-                <div class="bg-white dark:bg-gray-800 rounded-sm border border-gray-300 dark:border-gray-600 p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600 p-4">
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     <span class="flex items-center gap-1.5">
                       <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -306,7 +306,7 @@ async function handleSave() {
                   </label>
                   <!-- Preview -->
                   <div class="flex flex-col items-center gap-3">
-                    <div class="w-16 h-16 rounded-sm border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
+                    <div class="w-16 h-16 rounded-none border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
                       <img v-if="faviconPreview || formBranding.faviconPath"
                         :src="faviconPreview || formBranding.faviconPath"
                         class="w-full h-full object-contain p-1.5"
@@ -319,7 +319,7 @@ async function handleSave() {
                     <div class="flex items-center gap-2">
                       <label class="relative cursor-pointer" :class="{ 'opacity-50 pointer-events-none': faviconUploading }">
                         <input type="file" accept="image/png,image/jpeg,image/jpg,image/x-icon,image/vnd.microsoft.icon" class="sr-only" @change="handleFaviconSelect" :disabled="faviconUploading" />
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-none hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600">
                           <svg v-if="faviconUploading" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                           <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -328,7 +328,7 @@ async function handleSave() {
                         </span>
                       </label>
                       <button v-if="(formBranding.faviconPath || faviconPreview) && !faviconUploading" type="button" @click="removeFavicon"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-sm transition-colors">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-none transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -466,7 +466,7 @@ async function handleSave() {
 
         <div class="flex justify-end mt-6 pt-4 border-t border-gray-200 dark:border-slate-700">
           <button type="submit" :disabled="saving"
-            class="px-6 py-2.5 bg-blue-600 text-sm font-medium text-white rounded-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
+            class="px-6 py-2.5 bg-blue-600 text-sm font-medium text-white rounded-none hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />

@@ -24,7 +24,7 @@ const paddings = {
     :class="[
       'bg-white dark:bg-slate-800 transition-all duration-200',
       isAdmin
-        ? 'rounded-sm border border-gray-300 dark:border-gray-600'
+        ? 'rounded-none border border-gray-300 dark:border-gray-600'
         : 'rounded-xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card',
       paddings[padding],
       { 'hover:border-gray-400 dark:hover:border-gray-500': hover && isAdmin },
