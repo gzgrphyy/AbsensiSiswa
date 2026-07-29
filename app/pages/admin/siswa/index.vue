@@ -233,8 +233,8 @@ function copyPassword() {
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.namaWali || '-' }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs text-center hidden xl:table-cell">{{ item.nomorHp1 || item.nomorHp2 ? (item.nomorHp1 || '-') : '-' }}</td>
               <td class="px-4 py-3 text-center">
-                <BaseBadge :variant="item.user.isActive ? 'green' : 'gray'" size="sm">
-                  {{ item.user.isActive ? 'Aktif' : 'Nonaktif' }}
+                <BaseBadge :variant="item.user.isActive ? 'green' : 'gray'" size="sm" :dot="item.user.isActive" :pulse="item.user.isActive">
+                  {{ item.user.isActive ? 'Aktif' : 'Tidak Aktif' }}
                 </BaseBadge>
               </td>
               <td class="px-4 py-3">

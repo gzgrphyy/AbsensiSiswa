@@ -6,7 +6,7 @@ const route = useRoute()
 const { user } = useUserSession()
 const { pengaturan } = usePengaturan()
 const isAdmin = inject('isAdmin', false)
-const collapsed = ref(false)
+const collapsed = useCookie('sidebarCollapsed', { default: () => false })
 const openGroups = ref<Record<string, boolean>>({})
 
 interface MenuItem {
@@ -33,6 +33,7 @@ const adminMenus: MenuItem[] = [
   { label: 'Rekap Absensi', to: '/admin/rekap', icon: 'rekap' },
   { label: 'Ekspor Laporan', to: '/admin/export', icon: 'export' },
   { label: 'Pengaturan', to: '/admin/pengaturan', icon: 'settings' },
+  { label: 'Profil', to: '/admin/profil', icon: 'profile' },
 ]
 
 const guruMenus: MenuItem[] = [

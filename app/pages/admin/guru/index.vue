@@ -295,17 +295,9 @@ function copyPassword() {
                   </span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
-                  <div class="flex items-center justify-center">
-                    <span v-if="item.isActive"
-                      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-none text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 ring-1 ring-green-200 dark:ring-green-800 shadow-sm">
-                      <span class="w-1.5 h-1.5 rounded-none bg-green-500 animate-pulse"></span>
-                      Aktif
-                    </span>
-                    <span v-else
-                      class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-gray-200 dark:bg-slate-700 text-gray-500 dark:text-gray-400 ring-1 ring-gray-200 dark:ring-slate-600">
-                      Nonaktif
-                    </span>
-                  </div>
+                  <BaseBadge :variant="item.isActive ? 'green' : 'gray'" size="sm" :dot="item.isActive" :pulse="item.isActive">
+                    {{ item.isActive ? 'Aktif' : 'Tidak Aktif' }}
+                  </BaseBadge>
                 </td>
                 <td class="px-4 sm:px-6 py-4">
                   <div class="flex items-center justify-center gap-1">

@@ -20,7 +20,8 @@ const dev = {
   telepon: '0857-2235-5108',
   github: 'github.com/gzgrphyy',
   instagram: '@gzgrphy',
-  website: 'gzgrphy.framer.website'
+  website: 'gzgrphy.framer.website',
+  foto: '/photo/profile_geza.jpg'
 }
 
 function toggleProfile() {
@@ -92,7 +93,10 @@ onUnmounted(() => {
     <div v-if="showProfile" :class="['fixed top-8 right-3 sm:right-4 w-72 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 z-[100]', isAdmin ? 'rounded-none shadow' : 'rounded shadow-lg']" @click.stop>
       <div class="p-4">
         <div class="flex items-center gap-3 mb-3">
-          <div :class="['w-10 h-10 bg-primary-500 flex items-center justify-center text-white font-bold flex-shrink-0', isAdmin ? 'rounded-none' : 'rounded-full']">
+          <div v-if="dev.foto" class="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden">
+            <img :src="dev.foto" class="w-full h-full object-cover" />
+          </div>
+          <div v-else :class="['w-10 h-10 bg-primary-500 flex items-center justify-center text-white font-bold flex-shrink-0', isAdmin ? 'rounded-none' : 'rounded-full']">
             {{ dev.nama.charAt(0) }}
           </div>
           <div>

@@ -27,24 +27,24 @@ const variants = {
 }
 
 const adminVariants: Record<string, string> = {
-  green: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
-  red: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
-  blue: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
-  amber: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
-  gray: 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
-  purple: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
-  cyan: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
+  green: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 ring-1 ring-green-300 dark:ring-green-800',
+  red: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 ring-1 ring-red-300 dark:ring-red-800',
+  blue: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 ring-1 ring-blue-300 dark:ring-blue-800',
+  amber: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 ring-1 ring-amber-300 dark:ring-amber-800',
+  gray: 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 ring-1 ring-gray-200 dark:ring-gray-600',
+  purple: 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 ring-1 ring-purple-300 dark:ring-purple-800',
+  cyan: 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-300 ring-1 ring-cyan-300 dark:ring-cyan-800',
   primary: 'bg-blue-600 text-white',
 }
 
 const adminDotColors: Record<string, string> = {
-  green: 'bg-gray-500',
-  red: 'bg-gray-500',
-  blue: 'bg-gray-500',
-  amber: 'bg-gray-500',
+  green: 'bg-green-500',
+  red: 'bg-red-500',
+  blue: 'bg-blue-500',
+  amber: 'bg-amber-500',
   gray: 'bg-gray-400 dark:bg-gray-500',
-  purple: 'bg-gray-500',
-  cyan: 'bg-gray-500',
+  purple: 'bg-purple-500',
+  cyan: 'bg-cyan-500',
   primary: 'bg-blue-600',
 }
 

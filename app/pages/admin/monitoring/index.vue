@@ -30,9 +30,12 @@ onMounted(() => {
   <AppLayout>
     <PageHeader title="Pemantauan Absensi" description="Pantau sesi absensi secara langsung">
       <template #actions>
-        <div class="flex items-center gap-2 text-xs text-gray-500">
-          <span class="w-2 h-2 rounded-none bg-green-500 animate-pulse"></span>
-          Langsung
+        <div class="flex items-center gap-3 text-xs text-gray-500">
+          <div class="flex items-center gap-1">
+            <span class="w-2 h-2 rounded-none bg-green-500 animate-pulse"></span>
+            Langsung
+          </div>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-none bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-semibold">Hari ini</span>
         </div>
       </template>
     </PageHeader>
