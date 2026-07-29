@@ -37,7 +37,8 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       email: user.email,
       nama: user.nama,
-      role: user.role
+      role: user.role,
+      foto: user.foto
     }
   })
 
@@ -46,7 +47,8 @@ export default defineEventHandler(async (event) => {
       id: user.id,
       email: user.email,
       nama: user.nama,
-      role: user.role
+      role: user.role,
+      foto: user.foto
     }
   }
 })

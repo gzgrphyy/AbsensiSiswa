@@ -3,6 +3,7 @@ interface ProfileData {
   id: number
   nama: string
   nip: string | null
+  foto: string | null
   email: string
   role: string
   isActive: boolean
@@ -13,7 +14,8 @@ const { data: profile, refresh } = useFetch<ProfileData>('/api/user/profile', { 
 
 const form = reactive({
   nama: '',
-  email: ''
+  email: '',
+  foto: null as string | null
 })
 
 const pwForm = reactive({
@@ -25,6 +27,9 @@ const pwForm = reactive({
 const errorMsg = ref('')
 const successMsg = ref('')
 const saving = ref(false)
+const fotoFile = ref<File | null>(null)
+const fotoPreview = ref<string | null>(null)
+const fotoUploading = ref(false)
 
 const pwErrorMsg = ref('')
 const pwSuccessMsg = ref('')
@@ -34,18 +39,69 @@ watch(profile, (val) => {
   if (val) {
     form.nama = val.nama
     form.email = val.email
+    form.foto = val.foto
   }
 }, { immediate: true })
+
+async function uploadFile(file: File): Promise<string> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const res = await $fetch<{ success: boolean; path: string }>('/api/user/upload', {
+    method: 'POST',
+    body: formData,
+  })
+  return res.path
+}
+
+function handleFotoSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    const file = target.files[0]
+    errorMsg.value = ''
+    if (file.size > 10 * 1024 * 1024) {
+      errorMsg.value = 'Foto: File terlalu besar. Maksimal 10MB'
+      target.value = ''
+      return
+    }
+    if (!['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'].includes(file.type)) {
+      errorMsg.value = 'Foto: Tipe file tidak didukung'
+      target.value = ''
+      return
+    }
+    fotoFile.value = file
+    fotoPreview.value = URL.createObjectURL(file)
+  }
+}
+
+function removeFoto() {
+  fotoPreview.value = null
+  fotoFile.value = null
+  form.foto = null
+}
 
 async function handleSave() {
   saving.value = true
   errorMsg.value = ''
   successMsg.value = ''
+
   try {
-    await $fetch('/api/user/profile', { method: 'PUT', body: form })
+    if (fotoFile.value) {
+      fotoUploading.value = true
+      const foto = await uploadFile(fotoFile.value)
+      form.foto = foto
+      fotoUploading.value = false
+    }
+
+    const body: Record<string, any> = {}
+    if (form.nama) body.nama = form.nama
+    if (form.email) body.email = form.email
+    if (form.foto !== undefined) body.foto = form.foto
+
+    await $fetch('/api/user/profile', { method: 'PUT', body })
     successMsg.value = 'Profil berhasil diperbarui'
     await refresh()
   } catch (err: any) {
+    fotoUploading.value = false
     errorMsg.value = err?.data?.statusMessage || 'Gagal menyimpan profil'
   } finally {
     saving.value = false
@@ -105,8 +161,21 @@ async function handleChangePassword() {
       <form @submit.prevent="handleSave" class="space-y-5">
         <!-- Info Card -->
         <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-100 dark:border-slate-600">
-          <div class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 text-xl font-bold flex-shrink-0">
-            {{ profile?.nama?.charAt(0)?.toUpperCase() || 'G' }}
+          <div class="relative flex-shrink-0">
+            <div v-if="fotoPreview || profile?.foto"
+              class="w-14 h-14 rounded-full overflow-hidden border-2 border-blue-200 dark:border-blue-800">
+              <img :src="fotoPreview || profile?.foto" class="w-full h-full object-cover" />
+            </div>
+            <div v-else
+              class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 text-xl font-bold">
+              {{ profile?.nama?.charAt(0)?.toUpperCase() || 'G' }}
+            </div>
+            <label class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer shadow-sm border-2 border-white dark:border-slate-700">
+              <input type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" class="sr-only" @change="handleFotoSelect" />
+              <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </label>
           </div>
           <div>
             <h2 class="font-semibold text-gray-900 dark:text-gray-100">{{ profile?.nama || '-' }}</h2>
@@ -117,6 +186,10 @@ async function handleChangePassword() {
                 Wali {{ k.nama }}
               </span>
             </div>
+            <button v-if="fotoPreview || form.foto" type="button" @click="removeFoto"
+              class="mt-1 text-[11px] text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+              Hapus foto
+            </button>
           </div>
         </div>
 

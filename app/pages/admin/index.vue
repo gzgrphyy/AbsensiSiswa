@@ -20,7 +20,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
 
 <template>
   <AppLayout>
-    <PageHeader title="Dasbor Admin" description="Ikhtisar sistem absensi sekolah" :show-back="false" />
+    <PageHeader title="Beranda Admin" description="Ikhtisar sistem absensi sekolah" :show-back="false" />
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="5" />
 

@@ -55,6 +55,7 @@ model User {
   nip          String?  @unique @db.VarChar(30)
   nomorHp1     String?  @map("nomor_hp1") @db.VarChar(20)
   nomorHp2     String?  @map("nomor_hp2") @db.VarChar(20)
+  foto         String?  @db.VarChar(255)
   email        String   @unique @db.VarChar(150)
   passwordHash String   @map("password_hash") @db.VarChar(255)
   role         Role

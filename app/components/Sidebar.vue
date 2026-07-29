@@ -17,7 +17,7 @@ interface MenuItem {
 }
 
 const adminMenus: MenuItem[] = [
-  { label: 'Dasbor', to: '/admin', icon: 'dashboard' },
+  { label: 'Beranda', to: '/admin', icon: 'dashboard' },
   {
     label: 'Data Master', icon: 'master-data',
     children: [

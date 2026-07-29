@@ -56,7 +56,10 @@ async function handleLogout() {
         </button>
 
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs font-semibold text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800">
+          <div v-if="user?.foto" class="w-8 h-8 rounded-full overflow-hidden border border-primary-100 dark:border-primary-800">
+            <img :src="user.foto" class="w-full h-full object-cover" />
+          </div>
+          <div v-else class="w-8 h-8 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs font-semibold text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800">
             {{ user?.nama?.charAt(0)?.toUpperCase() || 'U' }}
           </div>
           <div class="hidden md:block">
