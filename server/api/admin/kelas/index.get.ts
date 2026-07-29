@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     where: {
       ...(tahunAjaranId && { tahunAjaranId })
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { nama: 'desc' },
     include: {
       waliKelas: {
         select: { id: true, nama: true, nip: true }

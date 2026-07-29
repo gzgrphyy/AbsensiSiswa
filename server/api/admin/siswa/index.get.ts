@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const kelasId = query.kelasId ? parseInt(query.kelasId as string) : undefined
   const search = query.search as string | undefined
 
-  return await prisma.siswa.findMany({
+  const data = await prisma.siswa.findMany({
     where: {
       ...(kelasId && { kelasId }),
       ...(search && {
@@ -13,10 +13,15 @@ export default defineEventHandler(async (event) => {
         ]
       })
     },
-    orderBy: [{ kelasId: 'asc' }, { nama: 'asc' }],
     include: {
       user: { select: { id: true, nama: true, email: true, isActive: true } },
       kelas: { select: { id: true, nama: true } }
     }
+  })
+
+  return data.sort((a, b) => {
+    const kelasCompare = b.kelas.nama.localeCompare(a.kelas.nama)
+    if (kelasCompare !== 0) return kelasCompare
+    return a.nama.localeCompare(b.nama)
   })
 })

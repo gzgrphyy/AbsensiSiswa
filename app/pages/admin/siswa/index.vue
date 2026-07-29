@@ -13,7 +13,15 @@ interface Siswa {
   createdAt: string
 }
 
-const { data: siswaList, pending, refresh } = useFetch<Siswa[]>('/api/admin/siswa', { immediate: true })
+const searchQuery = ref('')
+const filterKelas = ref(0)
+
+const { data: siswaList, pending, refresh } = useFetch<Siswa[]>(() => {
+  const params = new URLSearchParams()
+  if (searchQuery.value) params.set('search', searchQuery.value)
+  if (filterKelas.value) params.set('kelasId', String(filterKelas.value))
+  return `/api/admin/siswa?${params.toString()}`
+}, { immediate: true })
 const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin/kelas', { immediate: true })
 
 const showModal = ref(false)
@@ -179,6 +187,22 @@ function copyPassword() {
 
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
+
+    <!-- Filter -->
+    <div class="flex items-center gap-3 mb-4">
+      <div class="relative flex-1 max-w-xs">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input v-model="searchQuery" type="text" placeholder="Cari murid..."
+          class="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+      </div>
+      <select v-model="filterKelas"
+        class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option :value="0">Semua Kelas</option>
+        <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
+      </select>
+    </div>
 
     <!-- Loading -->
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="6" />

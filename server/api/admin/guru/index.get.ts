@@ -1,11 +1,13 @@
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const showInactive = query.showInactive === 'true'
+  const search = query.search as string | undefined
 
   return await prisma.user.findMany({
     where: {
       role: 'GURU',
-      ...(!showInactive && { isActive: true })
+      ...(!showInactive && { isActive: true }),
+      ...(search && { nama: { contains: search } })
     },
     orderBy: [
       { isActive: 'desc' },

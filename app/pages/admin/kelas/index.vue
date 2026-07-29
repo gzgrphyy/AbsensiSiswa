@@ -9,7 +9,13 @@ interface Kelas {
   _count: { siswa: number; jadwalPelajaran: number }
 }
 
-const { data: kelasList, pending, refresh } = useFetch<Kelas[]>('/api/admin/kelas', { immediate: true })
+const filterTa = ref(0)
+
+const { data: kelasList, pending, refresh } = useFetch<Kelas[]>(() => {
+  const params = new URLSearchParams()
+  if (filterTa.value) params.set('tahunAjaranId', String(filterTa.value))
+  return `/api/admin/kelas?${params.toString()}`
+}, { immediate: true })
 const { data: guruList } = useFetch<{ id: number; nama: string }[]>('/api/admin/guru', { immediate: true })
 const { data: taList } = useFetch<{ id: number; nama: string; semester: string; isActive: boolean }[]>('/api/admin/tahun-ajaran', { immediate: true })
 
@@ -126,6 +132,16 @@ async function handleDelete() {
 
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
+
+    <!-- Filter -->
+    <div class="flex items-center gap-3 mb-4">
+      <div class="flex-1"></div>
+      <select v-model="filterTa"
+        class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option :value="0">Semua Tahun Ajaran</option>
+        <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ t.semester }})</option>
+      </select>
+    </div>
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="5" />
 
