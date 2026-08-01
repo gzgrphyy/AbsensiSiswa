@@ -3,7 +3,8 @@ export default defineEventHandler(async (event) => {
 
   return {
     umum: {
-      namaSekolah: 'SMK Negeri 1 Bandung',
+      namaSekolah: branding?.namaSekolah || 'SMK Negeri 1 Bandung',
+      logoSekolahPath: branding?.logoSekolahPath || null,
       alamat: 'Jl. Merdeka No. 123, Bandung',
       telp: '022-1234567',
       email: 'info@smkn1bdg.sch.id',

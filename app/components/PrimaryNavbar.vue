@@ -78,14 +78,14 @@ function renderIcon(icon: string) {
 
     <div class="px-4 sm:px-6">
       <div class="flex items-center justify-between h-[74px]">
-        <!-- Logo -->
+        <!-- Logo Sekolah -->
         <NuxtLink to="/admin" class="flex items-center gap-3 flex-shrink-0">
           <div class="w-10 h-10 bg-primary-500 flex items-center justify-center text-white text-base font-bold overflow-hidden">
-            <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-1" />
-            <span v-else>S</span>
+            <img v-if="pengaturan?.logoSekolahPath" :src="pengaturan.logoSekolahPath" class="w-full h-full object-contain p-1" />
+            <span v-else class="text-xs font-bold text-center leading-tight px-1">SMK</span>
           </div>
           <div class="hidden sm:block min-w-0">
-            <p class="text-base font-semibold text-gray-100 truncate leading-tight">{{ pengaturan?.namaAplikasi || 'SMKN 4 Bandung' }}</p>
+            <p class="text-base font-semibold text-gray-100 truncate leading-tight">{{ pengaturan?.namaSekolah || 'SMK Negeri 1 Bandung' }}</p>
             <p class="text-[11px] text-gray-400 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
           </div>
         </NuxtLink>

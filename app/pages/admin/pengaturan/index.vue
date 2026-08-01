@@ -6,6 +6,7 @@ const activeTab = ref<'umum' | 'absensi' | 'keamanan'>('umum')
 
 const formUmum = reactive({
   namaSekolah: 'SMK Negeri 1 Bandung',
+  logoSekolahPath: null as string | null,
   alamat: 'Jl. Merdeka No. 123, Bandung',
   telp: '022-1234567',
   email: 'info@smkn1bdg.sch.id',
@@ -27,6 +28,10 @@ const iconPreview = ref<string | null>(null)
 const faviconPreview = ref<string | null>(null)
 const iconFile = ref<File | null>(null)
 const faviconFile = ref<File | null>(null)
+
+// Preview state for school logo
+const logoSekolahPreview = ref<string | null>(null)
+const logoSekolahFile = ref<File | null>(null)
 
 const formAbsensi = reactive({
   batasScan: 10,
@@ -50,6 +55,7 @@ const errorMsg = ref('')
 const successMsg = ref('')
 const iconUploading = ref(false)
 const faviconUploading = ref(false)
+const logoSekolahUploading = ref(false)
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024
 
@@ -66,9 +72,11 @@ function validateFile(file: File, allowedTypes: string[]): string | null {
   return null
 }
 
-// Init branding from existing data
+// Init branding & umum from existing data
 onMounted(() => {
   if (pengaturan.value) {
+    formUmum.namaSekolah = pengaturan.value.namaSekolah
+    formUmum.logoSekolahPath = pengaturan.value.logoSekolahPath
     formBranding.namaAplikasi = pengaturan.value.namaAplikasi
     formBranding.titelAplikasi = pengaturan.value.titelAplikasi
     formBranding.iconPath = pengaturan.value.iconPath
@@ -79,6 +87,8 @@ onMounted(() => {
 // Watch for pengaturan changes (after save from other sources)
 watch(pengaturan, (val) => {
   if (val) {
+    formUmum.namaSekolah = val.namaSekolah
+    formUmum.logoSekolahPath = val.logoSekolahPath
     formBranding.namaAplikasi = val.namaAplikasi
     formBranding.titelAplikasi = val.titelAplikasi
     formBranding.iconPath = val.iconPath
@@ -141,6 +151,28 @@ function removeFavicon() {
   formBranding.faviconPath = null
 }
 
+function handleLogoSekolahSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    const file = target.files[0]
+    errorMsg.value = ''
+    const validationError = validateFile(file, logoAllowedTypes)
+    if (validationError) {
+      errorMsg.value = `Logo Sekolah: ${validationError}`
+      target.value = ''
+      return
+    }
+    logoSekolahFile.value = file
+    logoSekolahPreview.value = URL.createObjectURL(file)
+  }
+}
+
+function removeLogoSekolah() {
+  logoSekolahPreview.value = null
+  logoSekolahFile.value = null
+  formUmum.logoSekolahPath = null
+}
+
 async function handleSave() {
   saving.value = true
   errorMsg.value = ''
@@ -159,6 +191,13 @@ async function handleSave() {
       const path = await uploadFile(faviconFile.value, 'favicon')
       formBranding.faviconPath = path
       faviconUploading.value = false
+    }
+
+    if (logoSekolahFile.value) {
+      logoSekolahUploading.value = true
+      const path = await uploadFile(logoSekolahFile.value, 'logo-sekolah')
+      formUmum.logoSekolahPath = path
+      logoSekolahUploading.value = false
     }
 
     await $fetch('/api/admin/pengaturan', {
@@ -182,11 +221,14 @@ async function handleSave() {
     faviconFile.value = null
     iconPreview.value = null
     faviconPreview.value = null
+    logoSekolahFile.value = null
+    logoSekolahPreview.value = null
 
     successMsg.value = 'Pengaturan berhasil disimpan'
   } catch (err: any) {
     iconUploading.value = false
     faviconUploading.value = false
+    logoSekolahUploading.value = false
     const message = err?.data?.statusMessage || err?.message || 'Gagal menyimpan pengaturan. Silakan coba lagi.'
     errorMsg.value = message
   } finally {
@@ -346,6 +388,48 @@ async function handleSave() {
           <div class="border-t border-gray-200 dark:border-slate-700 pt-6">
             <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">Informasi Sekolah</h3>
             <div class="space-y-4">
+              <!-- Logo Sekolah -->
+              <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600 p-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <span class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Logo Sekolah
+                  </span>
+                </label>
+                <div class="flex flex-col items-center gap-3">
+                  <div class="w-24 h-24 rounded-none border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
+                    <img v-if="logoSekolahPreview || formUmum.logoSekolahPath"
+                      :src="logoSekolahPreview || formUmum.logoSekolahPath"
+                      class="w-full h-full object-contain p-2"
+                      alt="Preview Logo Sekolah" />
+                    <svg v-else class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <label class="relative cursor-pointer" :class="{ 'opacity-50 pointer-events-none': logoSekolahUploading }">
+                      <input type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml" class="sr-only" @change="handleLogoSekolahSelect" :disabled="logoSekolahUploading" />
+                      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-none hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600">
+                        <svg v-if="logoSekolahUploading" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                        <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        {{ logoSekolahUploading ? 'Mengunggah...' : 'Pilih File' }}
+                      </span>
+                    </label>
+                    <button v-if="(formUmum.logoSekolahPath || logoSekolahPreview) && !logoSekolahUploading" type="button" @click="removeLogoSekolah"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-none transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Hapus
+                    </button>
+                  </div>
+                  <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">PNG, JPEG, SVG • Maks 10MB</p>
+                </div>
+              </div>
               <BaseFormField label="Nama Sekolah" required>
                 <input v-model="formUmum.namaSekolah" type="text"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />

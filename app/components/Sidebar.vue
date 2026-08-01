@@ -120,7 +120,7 @@ function renderIcon(icon: string) {
     <!-- Logo Area -->
     <div class="flex-shrink-0 border-b border-gray-200 dark:border-slate-700">
       <NuxtLink to="/" class="flex items-center gap-2.5 px-4 py-2.5">
-        <div :class="['w-8 h-8 bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden', isAdmin ? 'rounded-none' : 'rounded-lg']">
+        <div :class="['w-9 h-9 bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden', isAdmin ? 'rounded-none' : 'rounded-lg']">
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
           <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
         </div>

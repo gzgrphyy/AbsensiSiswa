@@ -3,6 +3,7 @@ import { z } from 'zod'
 const pengaturanSchema = z.object({
   umum: z.object({
     namaSekolah: z.string().min(1).max(200),
+    logoSekolahPath: z.string().nullable().optional(),
     alamat: z.string().max(500).optional().default(''),
     telp: z.string().max(20).optional().default(''),
     email: z.string().email().max(150).optional().default(''),
@@ -36,29 +37,44 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const parsed = pengaturanSchema.parse(body)
 
-  // Simpan branding ke tabel pengaturan
-  if (parsed.branding) {
-    const existing = await prisma.pengaturan.findFirst()
-    if (existing) {
-      await prisma.pengaturan.update({
-        where: { id: existing.id },
-        data: {
-          namaAplikasi: parsed.branding.namaAplikasi,
-          titelAplikasi: parsed.branding.titelAplikasi,
-          iconPath: parsed.branding.iconPath,
-          faviconPath: parsed.branding.faviconPath,
-        }
-      })
-    } else {
-      await prisma.pengaturan.create({
-        data: {
-          namaAplikasi: parsed.branding.namaAplikasi,
-          titelAplikasi: parsed.branding.titelAplikasi,
-          iconPath: parsed.branding.iconPath,
-          faviconPath: parsed.branding.faviconPath,
-        }
-      })
+  const existing = await prisma.pengaturan.findFirst()
+
+  const data: any = {}
+
+  if (parsed.umum) {
+    data.namaSekolah = parsed.umum.namaSekolah
+    if (parsed.umum.logoSekolahPath !== undefined) {
+      data.logoSekolahPath = parsed.umum.logoSekolahPath
     }
+  }
+
+  if (parsed.branding) {
+    data.namaAplikasi = parsed.branding.namaAplikasi
+    data.titelAplikasi = parsed.branding.titelAplikasi
+    if (parsed.branding.iconPath !== undefined) {
+      data.iconPath = parsed.branding.iconPath
+    }
+    if (parsed.branding.faviconPath !== undefined) {
+      data.faviconPath = parsed.branding.faviconPath
+    }
+  }
+
+  if (existing) {
+    await prisma.pengaturan.update({
+      where: { id: existing.id },
+      data,
+    })
+  } else {
+    await prisma.pengaturan.create({
+      data: {
+        namaSekolah: data.namaSekolah || 'SMK Negeri 1 Bandung',
+        logoSekolahPath: data.logoSekolahPath || null,
+        namaAplikasi: data.namaAplikasi || 'Aplikasi Skoria',
+        titelAplikasi: data.titelAplikasi || 'Sistem Absensi',
+        iconPath: data.iconPath || null,
+        faviconPath: data.faviconPath || null,
+      }
+    })
   }
 
   return {

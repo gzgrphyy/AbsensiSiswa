@@ -213,6 +213,7 @@ async function main() {
   // ============================================
   await prisma.pengaturan.create({
     data: {
+      namaSekolah: 'SMK Negeri 1 Bandung',
       namaAplikasi: 'Aplikasi Skoria',
       titelAplikasi: 'Sistem Absensi',
     }

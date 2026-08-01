@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { user, clear } = useUserSession()
+const { pengaturan } = usePengaturan()
 const colorMode = useColorMode()
 const isAdmin = inject('isAdmin', false)
 
@@ -33,7 +34,19 @@ async function handleLogout() {
     <!-- Garis primary di paling atas -->
     <div class="h-0.5 bg-primary-500" />
 
-    <div class="px-6 py-2.5 flex items-center justify-end">
+    <div class="px-6 py-2.5 flex items-center justify-between">
+      <!-- Left: Logo & School Name (Admin only) -->
+      <NuxtLink v-if="isAdmin" to="/admin" class="flex items-center gap-2.5 min-w-0 flex-shrink-0">
+        <div class="w-9 h-9 bg-primary-500 flex items-center justify-center text-white text-sm font-bold overflow-hidden flex-shrink-0 rounded-full">
+          <img v-if="pengaturan?.logoSekolahPath" :src="pengaturan.logoSekolahPath" class="w-full h-full object-contain p-1" />
+          <span v-else class="text-[10px] font-bold text-center leading-tight px-1">SMK</span>
+        </div>
+        <div class="min-w-0 hidden md:block">
+          <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight">{{ pengaturan?.namaSekolah || 'SMK Negeri 1 Bandung' }}</p>
+          <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
+        </div>
+      </NuxtLink>
+
       <!-- Right: User Info -->
       <div class="flex items-center gap-3">
         <span class="text-[11px] text-gray-400 dark:text-gray-500 hidden md:block">{{ today }}</span>

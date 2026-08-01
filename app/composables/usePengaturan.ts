@@ -1,5 +1,7 @@
 interface PengaturanData {
   id: number
+  namaSekolah: string
+  logoSekolahPath: string | null
   titelAplikasi: string
   namaAplikasi: string
   faviconPath: string | null
