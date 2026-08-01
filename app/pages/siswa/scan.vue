@@ -328,10 +328,11 @@ const statusLabels: Record<string, string> = {
 </script>
 
 <template>
-  <AppLayout>
+  <StudentLayout>
     <PageHeader
       title="Scan QR Absensi"
       description="Arahkan kamera ke QR Code ruangan untuk absen"
+      back-to="/siswa"
     />
 
     <div v-if="errorMsg && !result" class="max-w-lg mx-auto mb-4">
@@ -553,7 +554,7 @@ const statusLabels: Record<string, string> = {
         </div>
       </div>
     </div>
-  </AppLayout>
+  </StudentLayout>
 </template>
 
 <style scoped>

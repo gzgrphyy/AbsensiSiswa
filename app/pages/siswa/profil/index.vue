@@ -157,8 +157,8 @@ async function handleChangePassword() {
 </script>
 
 <template>
-  <AppLayout>
-    <PageHeader title="Profil Saya" description="Informasi akun murid" />
+  <StudentLayout>
+    <PageHeader title="Profil Saya" description="Informasi akun murid" :show-back="false" />
 
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
@@ -274,5 +274,5 @@ async function handleChangePassword() {
         </div>
       </form>
     </BaseCard>
-  </AppLayout>
+  </StudentLayout>
 </template>

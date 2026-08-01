@@ -9,6 +9,8 @@ export default defineNuxtConfig({
 
   modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
 
+  components: [{ path: '~/components', pathPrefix: false }],
+
   colorMode: {
     classSuffix: '',
     preference: 'system',

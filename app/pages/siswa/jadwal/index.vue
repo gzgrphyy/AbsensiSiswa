@@ -45,8 +45,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <AppLayout>
-    <PageHeader title="Jadwal Pelajaran" :description="data?.kelas?.nama ? `Kelas ${data.kelas.nama}` : undefined" />
+  <StudentLayout>
+    <PageHeader title="Jadwal Pelajaran" :description="data?.kelas?.nama ? `Kelas ${data.kelas.nama}` : undefined" :show-back="false" />
 
     <LoadingSkeleton v-if="pending" type="text" :rows="8" />
 
@@ -100,5 +100,5 @@ onMounted(() => {
         <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Hubungi admin untuk mengatur jadwal kelas</p>
       </div>
     </div>
-  </AppLayout>
+  </StudentLayout>
 </template>

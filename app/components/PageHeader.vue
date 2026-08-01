@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { inject } from 'vue'
 
-withDefaults(defineProps<{
+const props = withDefaults(defineProps<{
   title: string
   description?: string
   showBack?: boolean
@@ -16,7 +16,7 @@ function goBack() {
   if (history.length > 1) {
     history.back()
   } else {
-    navigateTo('/admin')
+    navigateTo(props.backTo || '/admin')
   }
 }
 </script>

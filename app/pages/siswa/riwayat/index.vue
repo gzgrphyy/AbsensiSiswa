@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { statusLabels, statusBadgeVariant } from '~/utils/absensi'
+
 interface RiwayatItem {
   id: number
   tanggal: string
@@ -10,27 +12,11 @@ interface RiwayatItem {
 }
 
 const { data: riwayat, pending } = useFetch<RiwayatItem[]>('/api/siswa/riwayat', { immediate: true })
-
-const statusLabels: Record<string, string> = {
-  PENDING: 'Menunggu',
-  HADIR: 'Hadir',
-  SAKIT: 'Sakit',
-  IZIN: 'Izin',
-  ALPHA: 'Alpha'
-}
-
-const statusBadgeVariant: Record<string, string> = {
-  PENDING: 'amber',
-  HADIR: 'green',
-  SAKIT: 'red',
-  IZIN: 'blue',
-  ALPHA: 'gray'
-}
 </script>
 
 <template>
-  <AppLayout>
-    <PageHeader title="Riwayat Absensi" description="Riwayat absensi pribadi" />
+  <StudentLayout>
+    <PageHeader title="Riwayat Absensi" description="Riwayat absensi pribadi" :show-back="false" />
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="4" />
 
@@ -65,5 +51,5 @@ const statusBadgeVariant: Record<string, string> = {
         </table>
       </div>
     </div>
-  </AppLayout>
+  </StudentLayout>
 </template>

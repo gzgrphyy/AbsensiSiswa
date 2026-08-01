@@ -1,209 +1,287 @@
 <script setup lang="ts">
-interface TodayRequest {
-  id: number
-  status: string
-  scannedAt: string
-  sesi: {
+import { statusLabels, statusBadgeVariant, statusDotColor } from '~/utils/absensi'
+
+interface TodayStatus {
+  state: 'PRESENT' | 'PENDING' | 'ALPHA' | 'NOT_YET' | 'NO_SESSION'
+  status?: string
+  scannedAt?: string
+  mapel?: string
+  kelas?: string
+  ruangan?: string
+  jamMulai?: string
+  jamSelesai?: string
+}
+
+interface DashboardData {
+  siswa: { id: number; nama: string; kelas: { id: number; nama: string } }
+  todayStatus: TodayStatus
+  monthStats: { hadir: number; alpha: number }
+  recentHistory: {
     id: number
+    tanggal: string
+    mapel: string
+    kelas: string
     status: string
-    jadwal: {
-      mapel: string
-      jamMulai: string
-      jamSelesai: string
-      ruangan: { id: number; nama: string }
-      kelas: { id: number; nama: string }
-    }
-  }
+    keterangan: string | null
+    scannedAt: string
+  }[]
 }
 
-interface StatusData {
-  today: TodayRequest[]
-  counts: { hadir: number; pending: number; sakit: number; izin: number; alpha: number }
-  recentHistory: { id: number; tanggal: string; mapel: string; kelas: string; status: string; keterangan: string | null; scannedAt: string }[]
-  kelas: { id: number; nama: string }
-}
+const { user } = useUserSession()
 
-const { user, clear } = useUserSession()
+const { data, pending, error, refresh } = useFetch<DashboardData>('/api/siswa/dashboard')
 
-const data = ref<StatusData | null>(null)
-const loading = ref(true)
-const errorMsg = ref('')
-
-const statusLabels: Record<string, string> = {
-  PENDING: 'Menunggu',
-  HADIR: 'Hadir',
-  SAKIT: 'Sakit',
-  IZIN: 'Izin',
-  ALPHA: 'Alpha'
-}
-
-const statusBadgeVariant: Record<string, string> = {
-  PENDING: 'amber',
-  HADIR: 'green',
-  SAKIT: 'red',
-  IZIN: 'blue',
-  ALPHA: 'gray'
-}
-
-async function fetchStatus() {
-  try {
-    data.value = await $fetch<StatusData>('/api/siswa/status')
-  } catch (err: any) {
-    errorMsg.value = err?.data?.statusMessage || 'Gagal memuat data'
-  } finally {
-    loading.value = false
-  }
-}
-
-async function handleLogout() {
-  try { await clear() } catch {}
-  navigateTo('/login')
-}
-
-onMounted(fetchStatus)
-
-onMounted(() => {
-  const interval = setInterval(fetchStatus, 15000)
-  onUnmounted(() => clearInterval(interval))
+const greeting = computed(() => {
+  const h = new Date().getHours()
+  if (h >= 5 && h < 12) return 'Selamat pagi'
+  if (h >= 12 && h < 15) return 'Selamat siang'
+  if (h >= 15 && h < 18) return 'Selamat sore'
+  return 'Selamat malam'
 })
 
-const totalKehadiran = computed(() => {
-  if (!data.value) return 0
-  return data.value.counts.hadir + data.value.counts.sakit + data.value.counts.izin + data.value.counts.alpha
+const todayLabel = computed(() =>
+  new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+)
+
+function formatJam(iso: string) {
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return ''
+  return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+}
+
+function formatTanggal(iso: string) {
+  return new Date(iso).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' })
+}
+
+const errorMessage = computed(() => {
+  const e = error.value as { data?: { statusMessage?: string } } | null
+  return e?.data?.statusMessage || 'Gagal memuat data'
+})
+
+onMounted(() => {
+  refresh()
+  const { refresh: refreshSesiHariIni } = useSesiHariIni()
+  const interval = setInterval(() => {
+    refresh()
+    refreshSesiHariIni()
+  }, 30000)
+  onUnmounted(() => clearInterval(interval))
 })
 </script>
 
 <template>
-  <AppLayout>
-    <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
+  <StudentLayout>
+    <!-- Greeting -->
+    <header class="mb-5">
+      <p class="text-xs text-gray-400 dark:text-gray-500 capitalize">{{ todayLabel }}</p>
+      <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100 mt-0.5">
+        {{ greeting }}, {{ user?.nama || 'Murid' }}
+      </h1>
+      <p v-if="data" class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Kelas {{ data.siswa.kelas.nama }}</p>
+    </header>
 
-    <!-- Scan QR CTA -->
-    <NuxtLink to="/siswa/scan"
-      class="block mb-5 p-5 bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card hover:shadow-card-hover transition-shadow">
-      <div class="flex items-center gap-4">
-        <div class="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex-shrink-0">
-          <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-          </svg>
-        </div>
-        <div class="flex-1">
-          <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Scan QR Absensi</h2>
-          <p class="text-xs text-gray-500 dark:text-gray-400">Arahkan kamera ke QR Code di ruangan kelas</p>
-        </div>
-        <svg class="w-5 h-5 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
+    <Notification
+      type="error"
+      :message="errorMessage"
+      :show="!!error"
+      @dismiss="refresh()"
+    />
+
+    <!-- ===== Loading skeleton ===== -->
+    <template v-if="pending && !data">
+      <div class="h-32 rounded-2xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-5 animate-pulse">
+        <div class="h-4 bg-gray-100 dark:bg-slate-700 rounded w-1/3 mb-3"></div>
+        <div class="h-6 bg-gray-100 dark:bg-slate-700 rounded w-1/2 mb-2"></div>
+        <div class="h-3 bg-gray-100 dark:bg-slate-700 rounded w-2/3"></div>
       </div>
-    </NuxtLink>
+      <div class="h-12 rounded-xl bg-gray-100 dark:bg-slate-700 animate-pulse mt-4"></div>
+      <div class="grid grid-cols-2 gap-3 mt-4">
+        <div v-for="i in 2" :key="i" class="h-20 rounded-xl bg-gray-100 dark:bg-slate-700 animate-pulse"></div>
+      </div>
+      <div class="h-48 rounded-2xl bg-gray-100 dark:bg-slate-700 animate-pulse mt-4"></div>
+    </template>
 
-    <!-- Loading -->
-    <LoadingSkeleton v-if="loading" type="text" :rows="5" />
-
-    <template v-else>
-      <!-- Status Card -->
-      <BaseCard class="mb-5">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="p-2.5 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
-            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Status Absensi Hari Ini</h2>
-            <p v-if="data && data.today.length === 0" class="text-xs text-gray-500 dark:text-gray-400">Belum ada sesi absensi aktif</p>
-            <p v-else-if="data" class="text-xs text-gray-500 dark:text-gray-400">{{ data.kelas.nama }}</p>
-          </div>
-        </div>
-
-        <div v-if="data && data.today.length > 0" class="space-y-2">
-          <div v-for="req in data.today" :key="req.id"
-            class="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-100 dark:border-slate-600">
-            <div class="flex items-center gap-3">
-              <span class="w-2 h-2 rounded-full" :class="{
-                'bg-green-500': req.status === 'HADIR',
-                'bg-amber-400': req.status === 'PENDING',
-                'bg-red-500': req.status === 'SAKIT',
-                'bg-blue-500': req.status === 'IZIN',
-                'bg-gray-400': req.status === 'ALPHA',
-              }"></span>
-              <div>
-                <p class="font-medium text-gray-900 dark:text-gray-100 text-sm">{{ req.sesi.jadwal.mapel }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">{{ req.sesi.jadwal.ruangan.nama }} — {{ req.sesi.jadwal.jamMulai }} - {{ req.sesi.jadwal.jamSelesai }}</p>
-              </div>
+    <!-- ===== Data loaded ===== -->
+    <template v-else-if="data">
+      <!-- Status card -->
+      <section
+        class="rounded-2xl border p-5 shadow-card dark:shadow-dark-card"
+        :class="{
+          'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/40 dark:to-green-900/20 border-green-200 dark:border-green-800': data.todayStatus.state === 'PRESENT',
+          'bg-gradient-to-br from-accent-50 to-accent-100 dark:from-amber-900/40 dark:to-amber-900/20 border-accent-200 dark:border-amber-800': data.todayStatus.state === 'PENDING' || data.todayStatus.state === 'NOT_YET',
+          'bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/40 dark:to-red-900/20 border-red-200 dark:border-red-800': data.todayStatus.state === 'ALPHA',
+          'bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700': data.todayStatus.state === 'NO_SESSION'
+        }"
+      >
+        <!-- PRESENT (Hadir / Izin / Sakit) -->
+        <template v-if="data.todayStatus.state === 'PRESENT'">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="p-2.5 rounded-full bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
-            <BaseBadge :variant="statusBadgeVariant[req.status] || 'gray'" size="sm">
-              {{ statusLabels[req.status] || req.status }}
-            </BaseBadge>
+            <div>
+              <p class="text-sm font-medium text-green-800 dark:text-green-200">Status hari ini</p>
+              <p class="text-xl font-bold text-green-900 dark:text-green-100">{{ statusLabels[data.todayStatus.status || ''] || data.todayStatus.status }}</p>
+            </div>
           </div>
-        </div>
+          <dl class="space-y-1.5 text-sm">
+            <div class="flex items-center justify-between gap-3">
+              <dt class="text-green-700/80 dark:text-green-300/80">Jam absen</dt>
+              <dd class="font-semibold text-green-900 dark:text-green-100">{{ formatJam(data.todayStatus.scannedAt || '') }}</dd>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <dt class="text-green-700/80 dark:text-green-300/80">Kelas</dt>
+              <dd class="font-semibold text-green-900 dark:text-green-100">{{ data.todayStatus.kelas || data.siswa.kelas.nama }}</dd>
+            </div>
+            <div v-if="data.todayStatus.mapel" class="flex items-center justify-between gap-3">
+              <dt class="text-green-700/80 dark:text-green-300/80">Mata pelajaran</dt>
+              <dd class="font-semibold text-green-900 dark:text-green-100 truncate">{{ data.todayStatus.mapel }}</dd>
+            </div>
+          </dl>
+        </template>
 
-        <div v-else class="flex flex-col items-center py-6">
-          <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-          </svg>
-          <p class="text-gray-500 dark:text-gray-400 font-medium">Scan QR Ruangan untuk Absensi</p>
-          <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Arahkan kamera ke QR code yang ada di ruangan kelas</p>
-        </div>
-      </BaseCard>
+        <!-- PENDING -->
+        <template v-else-if="data.todayStatus.state === 'PENDING'">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="p-2.5 rounded-full bg-accent-200 dark:bg-amber-900/50 text-primary-800 dark:text-amber-200 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-amber-800 dark:text-amber-200">Menunggu konfirmasi guru</p>
+              <p v-if="data.todayStatus.scannedAt" class="text-xs text-amber-700/80 dark:text-amber-300/80">Absen pukul {{ formatJam(data.todayStatus.scannedAt) }}</p>
+            </div>
+          </div>
+          <p class="text-sm text-amber-800 dark:text-amber-200">
+            {{ data.todayStatus.mapel }} — {{ data.todayStatus.kelas }} {{ data.todayStatus.jamMulai ? `(${data.todayStatus.jamMulai}-${data.todayStatus.jamSelesai})` : '' }}
+          </p>
+        </template>
 
-      <!-- Quick Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-        <StatCard label="Hadir" :value="data?.counts.hadir || 0" variant="green">
+        <!-- ALPHA -->
+        <template v-else-if="data.todayStatus.state === 'ALPHA'">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="p-2.5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-red-800 dark:text-red-200">Status hari ini</p>
+              <p class="text-xl font-bold text-red-900 dark:text-red-100">Tidak hadir (Alpha)</p>
+            </div>
+          </div>
+          <p class="text-sm text-red-700 dark:text-red-300">Kamu tidak tercatat absen hari ini. Hubungi guru wali kelas jika ada kendala.</p>
+        </template>
+
+        <!-- NOT_YET -->
+        <template v-else-if="data.todayStatus.state === 'NOT_YET'">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="p-2.5 rounded-full bg-accent-200 dark:bg-amber-900/50 text-primary-800 dark:text-amber-200 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-xl font-bold text-primary-900 dark:text-amber-100">Kamu belum absen hari ini</p>
+              <p class="text-sm text-amber-800/80 dark:text-amber-200/80">Scan QR di ruangan kelas untuk absen</p>
+            </div>
+          </div>
+        </template>
+
+        <!-- NO_SESSION -->
+        <template v-else>
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 flex-shrink-0">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div>
+              <p class="font-semibold text-gray-800 dark:text-gray-200">Tidak ada sesi absensi hari ini</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Istirahat dulu, scan QR hanya saat ada sesi kelas</p>
+            </div>
+          </div>
+        </template>
+      </section>
+
+      <!-- Scan CTA -->
+      <NuxtLink
+        v-if="data.todayStatus.state !== 'NO_SESSION'"
+        to="/siswa/scan"
+        class="w-full mt-4 flex items-center justify-center gap-2 rounded-xl bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-semibold py-3.5 px-4 shadow-md shadow-primary-500/30 transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+        </svg>
+        Scan QR Absen
+      </NuxtLink>
+
+      <div
+        v-else
+        aria-disabled="true"
+        class="w-full mt-4 flex items-center justify-center gap-2 rounded-xl bg-gray-200 dark:bg-slate-700 text-gray-500 dark:text-gray-400 font-semibold py-3.5 px-4 cursor-not-allowed select-none"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+        </svg>
+        Belum ada sesi
+      </div>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 gap-3 mt-4">
+        <StatCard label="Hadir bulan ini" :value="data.monthStats.hadir" variant="green">
           <template #icon>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </template>
         </StatCard>
-
-        <StatCard label="Menunggu" :value="data?.counts.pending || 0" variant="amber">
+        <StatCard label="Alpha bulan ini" :value="data.monthStats.alpha" variant="red">
           <template #icon>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </template>
-        </StatCard>
-
-        <StatCard label="Total Kehadiran" :value="totalKehadiran" variant="blue">
-          <template #icon>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </template>
         </StatCard>
       </div>
 
-      <!-- Recent History -->
-      <BaseCard>
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Riwayat Absensi Terbaru</h3>
-          <NuxtLink to="/siswa/riwayat" class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">Lihat Semua</NuxtLink>
-        </div>
-        <div v-if="data && data.recentHistory.length > 0" class="divide-y divide-gray-100 dark:divide-slate-700">
-          <div v-for="item in data.recentHistory" :key="item.id"
-            class="py-2.5 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors -mx-5 px-5">
-            <div class="flex items-center gap-3">
-              <span class="w-2 h-2 rounded-full" :class="{
-                'bg-green-500': item.status === 'HADIR',
-                'bg-amber-400': item.status === 'PENDING',
-                'bg-red-500': item.status === 'SAKIT',
-                'bg-blue-500': item.status === 'IZIN',
-                'bg-gray-400': item.status === 'ALPHA',
-              }"></span>
-              <div>
-                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ item.mapel }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">{{ new Date(item.tanggal).toLocaleDateString('id-ID') }} — {{ item.kelas }}</p>
-              </div>
+      <!-- Recent history -->
+      <section class="mt-4 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
+        <header class="px-5 pt-4 pb-2 flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Riwayat Terakhir</h3>
+          <NuxtLink to="/siswa/riwayat" class="text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300">
+            Lihat Semua
+          </NuxtLink>
+        </header>
+
+        <div v-if="data.recentHistory.length > 0" class="divide-y divide-gray-50 dark:divide-slate-700/60">
+          <NuxtLink
+            v-for="item in data.recentHistory"
+            :key="item.id"
+            to="/siswa/riwayat"
+            class="flex items-center gap-3 px-5 py-3 active:bg-gray-50 dark:active:bg-slate-700/40 transition-colors"
+          >
+            <span class="w-2 h-2 rounded-full flex-shrink-0" :class="statusDotColor[item.status] || 'bg-gray-400'"></span>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ item.mapel }}</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatTanggal(item.tanggal) }} — {{ item.kelas }}</p>
             </div>
             <BaseBadge :variant="statusBadgeVariant[item.status] || 'gray'" size="sm">
               {{ statusLabels[item.status] || item.status }}
             </BaseBadge>
-          </div>
+          </NuxtLink>
         </div>
-        <div v-else class="py-6 text-center">
-          <p class="text-gray-500 dark:text-gray-400 font-medium text-sm">Belum ada riwayat absensi</p>
+        <div v-else class="py-10 px-5 text-center">
+          <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Belum ada riwayat absensi</p>
+          <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Scan QR saat sesi kelas untuk memulai</p>
         </div>
-      </BaseCard>
+      </section>
     </template>
-  </AppLayout>
+  </StudentLayout>
 </template>
