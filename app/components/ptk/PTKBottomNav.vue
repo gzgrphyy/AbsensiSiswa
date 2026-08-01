@@ -1,5 +1,8 @@
 <script setup lang="ts">
 const route = useRoute()
+const { adaJadwal } = useJadwalHariIni()
+
+const bukaDisabled = computed(() => adaJadwal.value === false)
 
 const items = [
   { label: 'Dasbor', to: '/absensi', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -19,6 +22,7 @@ function isActive(to: string) {
     <div class="relative max-w-lg mx-auto">
       <!-- FAB Buka Sesi -->
       <NuxtLink
+        v-if="!bukaDisabled"
         to="/absensi"
         title="Buka Sesi Kelas"
         aria-label="Buka Sesi Kelas"
@@ -34,6 +38,23 @@ function isActive(to: string) {
           <span class="text-[9px] font-bold leading-none">Buka Sesi</span>
         </span>
       </NuxtLink>
+
+      <span
+        v-else
+        title="Belum ada jadwal hari ini"
+        aria-label="Belum ada jadwal hari ini"
+        aria-disabled="true"
+        class="absolute left-1/2 -top-8 -translate-x-1/2 z-10 select-none"
+      >
+        <span
+          class="w-16 h-16 rounded-full bg-gray-200 dark:bg-slate-600 text-gray-400 dark:text-gray-300 flex flex-col items-center justify-center gap-0.5 ring-4 ring-gray-100 dark:ring-slate-800 cursor-not-allowed"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span class="text-[9px] font-bold leading-none">Buka Sesi</span>
+        </span>
+      </span>
 
       <!-- Bar -->
       <div class="grid grid-cols-5 bg-white/95 dark:bg-slate-800/95 backdrop-blur border-t border-gray-200 dark:border-slate-700 shadow-[0_-6px_20px_rgb(0_0_0_/_0.05)] dark:shadow-[0_-6px_20px_rgb(0_0_0_/_0.35)]">

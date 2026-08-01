@@ -28,6 +28,7 @@ interface ActiveSesi {
 }
 
 const { user } = useUserSession()
+const { adaJadwal } = useJadwalHariIni()
 
 const jadwal = ref<JadwalHariIni[]>([])
 const activeSesiList = ref<ActiveSesi[]>([])
@@ -108,7 +109,11 @@ async function tutupSesi(id: number) {
 
 onMounted(() => {
   fetchData()
-  const interval = setInterval(fetchData, 30000)
+  const { refresh: refreshJadwal } = useJadwalHariIni()
+  const interval = setInterval(() => {
+    fetchData()
+    refreshJadwal()
+  }, 30000)
   onUnmounted(() => clearInterval(interval))
 })
 
@@ -216,7 +221,9 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
           </div>
           <div>
             <p class="font-semibold text-gray-800 dark:text-gray-200">Tidak ada sesi aktif</p>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Buka sesi dari jadwal hari ini di bawah</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              {{ adaJadwal === false ? 'Belum ada jadwal hari ini, hubungi admin untuk mengatur jadwal kelas' : 'Buka sesi dari jadwal hari ini di bawah' }}
+            </p>
           </div>
         </div>
       </section>
