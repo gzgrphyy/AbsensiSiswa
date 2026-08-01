@@ -151,8 +151,8 @@ async function handleChangePassword() {
 </script>
 
 <template>
-  <AppLayout>
-    <PageHeader title="Profil Saya" description="Informasi akun PTK" />
+  <PTKLayout>
+    <PageHeader title="Profil Saya" description="Informasi akun PTK" :show-back="false" />
 
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
@@ -163,14 +163,14 @@ async function handleChangePassword() {
         <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-100 dark:border-slate-600">
           <div class="relative flex-shrink-0">
             <div v-if="fotoPreview || profile?.foto"
-              class="w-14 h-14 rounded-full overflow-hidden border-2 border-blue-200 dark:border-blue-800">
+              class="w-14 h-14 rounded-full overflow-hidden border-2 border-primary-200 dark:border-primary-800">
               <img :src="fotoPreview || profile?.foto" class="w-full h-full object-cover" />
             </div>
             <div v-else
-              class="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 text-xl font-bold">
+              class="w-14 h-14 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center text-primary-600 dark:text-primary-300 text-xl font-bold">
               {{ profile?.nama?.charAt(0)?.toUpperCase() || 'G' }}
             </div>
-            <label class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer shadow-sm border-2 border-white dark:border-slate-700">
+            <label class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary-500 hover:bg-primary-600 flex items-center justify-center cursor-pointer shadow-sm border-2 border-white dark:border-slate-700">
               <input type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" class="sr-only" @change="handleFotoSelect" />
               <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -259,5 +259,5 @@ async function handleChangePassword() {
         </div>
       </form>
     </BaseCard>
-  </AppLayout>
+  </PTKLayout>
 </template>

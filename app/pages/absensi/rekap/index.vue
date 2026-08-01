@@ -25,8 +25,20 @@ const rataPersentase = computed(() =>
 </script>
 
 <template>
-  <AppLayout>
-    <PageHeader title="Rekap Absensi" description="Rekapitulasi kehadiran berdasarkan jadwal" />
+  <PTKLayout>
+    <PageHeader title="Rekap Absensi" description="Rekapitulasi kehadiran berdasarkan jadwal" :show-back="false">
+      <template #actions>
+        <NuxtLink
+          to="/absensi/export"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-primary-500 rounded-xl hover:bg-primary-600 active:bg-primary-700 transition-colors shadow-md shadow-primary-500/30"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export
+        </NuxtLink>
+      </template>
+    </PageHeader>
 
     <LoadingSkeleton v-if="pending" type="table" :rows="4" :columns="7" />
 
@@ -41,7 +53,7 @@ const rataPersentase = computed(() =>
         <div class="overflow-x-auto scrollbar-thin">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700">
                 <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Mata Pelajaran</th>
                 <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Kelas</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Total</th>
@@ -69,5 +81,5 @@ const rataPersentase = computed(() =>
         </div>
       </BaseCard>
     </template>
-  </AppLayout>
+  </PTKLayout>
 </template>

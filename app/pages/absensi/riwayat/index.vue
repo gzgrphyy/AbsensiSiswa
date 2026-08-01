@@ -29,16 +29,16 @@ const displayData = computed(() => history.value || [])
 </script>
 
 <template>
-  <AppLayout>
-    <PageHeader title="Riwayat Absensi" description="Riwayat sesi absensi yang telah selesai" />
+  <PTKLayout>
+    <PageHeader title="Riwayat Absensi" description="Riwayat sesi absensi yang telah selesai" :show-back="false" />
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="7" />
 
-    <div v-else class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
+    <div v-else class="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
       <div class="overflow-x-auto scrollbar-thin">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+            <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700">
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Tanggal</th>
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Mapel</th>
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Kelas</th>
@@ -64,7 +64,7 @@ const displayData = computed(() => history.value || [])
               </td>
               <td class="px-4 py-3 text-center">
                 <NuxtLink :to="`/absensi/sesi/${item.id}`"
-                  class="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
+                  class="inline-flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">
                   Lihat
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -81,5 +81,5 @@ const displayData = computed(() => history.value || [])
         </table>
       </div>
     </div>
-  </AppLayout>
+  </PTKLayout>
 </template>
