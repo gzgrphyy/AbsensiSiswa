@@ -16,11 +16,13 @@ export default defineEventHandler(async (event) => {
       titelAplikasi: branding.titelAplikasi,
       iconPath: branding.iconPath,
       faviconPath: branding.faviconPath,
+      warnaUtama: branding.warnaUtama,
     } : {
       namaAplikasi: 'Aplikasi Skoria',
       titelAplikasi: 'Sistem Absensi',
       iconPath: null,
       faviconPath: null,
+      warnaUtama: '#0A66A0',
     },
     absensi: {
       batasScan: 10,

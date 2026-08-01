@@ -15,6 +15,7 @@ const pengaturanSchema = z.object({
     titelAplikasi: z.string().min(1).max(100),
     iconPath: z.string().nullable().optional(),
     faviconPath: z.string().nullable().optional(),
+    warnaUtama: z.string().regex(/^#[0-9a-fA-F]{3,8}$/).optional(),
   }).optional(),
   absensi: z.object({
     batasScan: z.number().int().min(1).max(60),
@@ -57,6 +58,9 @@ export default defineEventHandler(async (event) => {
     if (parsed.branding.faviconPath !== undefined) {
       data.faviconPath = parsed.branding.faviconPath
     }
+    if (parsed.branding.warnaUtama !== undefined) {
+      data.warnaUtama = parsed.branding.warnaUtama
+    }
   }
 
   if (existing) {
@@ -73,6 +77,7 @@ export default defineEventHandler(async (event) => {
         titelAplikasi: data.titelAplikasi || 'Sistem Absensi',
         iconPath: data.iconPath || null,
         faviconPath: data.faviconPath || null,
+        warnaUtama: data.warnaUtama || '#0A66A0',
       }
     })
   }

@@ -21,7 +21,23 @@ const formBranding = reactive({
   titelAplikasi: 'Sistem Absensi',
   iconPath: null as string | null,
   faviconPath: null as string | null,
+  warnaUtama: '#0A66A0',
 })
+
+const presetColors = [
+  { name: 'Biru', value: '#0A66A0' },
+  { name: 'Biru Muda', value: '#0284c7' },
+  { name: 'Hijau', value: '#059669' },
+  { name: 'Hijau Lumut', value: '#4d7c0f' },
+  { name: 'Merah', value: '#dc2626' },
+  { name: 'Merah Muda', value: '#db2777' },
+  { name: 'Ungu', value: '#7c3aed' },
+  { name: 'Indigo', value: '#4f46e5' },
+  { name: 'Teal', value: '#0d9488' },
+  { name: 'Oranye', value: '#ea580c' },
+  { name: 'Cokelat', value: '#92400e' },
+  { name: 'Biru Kelabu', value: '#475569' },
+]
 
 // Preview state for branding images
 const iconPreview = ref<string | null>(null)
@@ -81,6 +97,7 @@ onMounted(() => {
     formBranding.titelAplikasi = pengaturan.value.titelAplikasi
     formBranding.iconPath = pengaturan.value.iconPath
     formBranding.faviconPath = pengaturan.value.faviconPath
+    formBranding.warnaUtama = pengaturan.value.warnaUtama || '#0A66A0'
   }
 })
 
@@ -93,6 +110,7 @@ watch(pengaturan, (val) => {
     formBranding.titelAplikasi = val.titelAplikasi
     formBranding.iconPath = val.iconPath
     formBranding.faviconPath = val.faviconPath
+    formBranding.warnaUtama = val.warnaUtama || '#0A66A0'
   }
 })
 
@@ -209,6 +227,7 @@ async function handleSave() {
           titelAplikasi: formBranding.titelAplikasi,
           iconPath: formBranding.iconPath,
           faviconPath: formBranding.faviconPath,
+          warnaUtama: formBranding.warnaUtama,
         },
         absensi: formAbsensi,
         keamanan: formKeamanan,
@@ -287,6 +306,38 @@ async function handleSave() {
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     placeholder="Sistem Absensi" />
                 </BaseFormField>
+              </div>
+
+              <!-- Warna Utama -->
+              <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600 p-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <span class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                    Warna Utama
+                  </span>
+                </label>
+                <div class="flex flex-wrap items-center gap-3">
+                  <label class="relative cursor-pointer w-12 h-12 rounded-none border-2 border-white dark:border-gray-600 shadow-sm flex-shrink-0" :style="{ backgroundColor: formBranding.warnaUtama }" :title="formBranding.warnaUtama">
+                    <input type="color" v-model="formBranding.warnaUtama" class="sr-only" />
+                  </label>
+                  <input v-model="formBranding.warnaUtama" type="text"
+                    class="w-28 px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 uppercase"
+                    maxlength="7" />
+                </div>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button
+                    v-for="preset in presetColors"
+                    :key="preset.value"
+                    type="button"
+                    @click="formBranding.warnaUtama = preset.value"
+                    :class="['w-8 h-8 rounded-none border-2 transition-transform hover:scale-110', formBranding.warnaUtama.toLowerCase() === preset.value.toLowerCase() ? 'border-primary-500 ring-2 ring-primary-500/30' : 'border-gray-200 dark:border-gray-600']"
+                    :style="{ backgroundColor: preset.value }"
+                    :title="preset.name"
+                  ></button>
+                </div>
+                <p class="mt-3 text-[10px] text-gray-400 dark:text-gray-500">Warna utama website (tombol, navbar, sidebar, dsb).</p>
               </div>
 
               <!-- Logo & Favicon side by side -->

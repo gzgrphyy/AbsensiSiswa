@@ -1,6 +1,13 @@
 <script setup lang="ts">
 const { pengaturan } = usePengaturan()
 
+// Apply brand color (warna utama) from pengaturan
+watch(pengaturan, (val) => {
+  if (val?.warnaUtama) {
+    applyPrimaryColor(val.warnaUtama)
+  }
+}, { immediate: true })
+
 // Dynamic favicon based on pengaturan
 useHead({
   link: computed(() => {
