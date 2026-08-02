@@ -58,7 +58,7 @@ async function fetchSesi() {
       const isPending = s.request?.status === 'PENDING'
       map.set(s.id, {
         checked: isPending || s.request?.status === 'HADIR',
-        status: s.request?.status === 'HADIR' ? 'HADIR' : isPending ? 'HADIR' : s.request?.status || 'ALPHA',
+        status: s.request?.status === 'HADIR' ? 'HADIR' : isPending ? 'HADIR' : s.request?.status || 'BELUM',
         keterangan: s.request?.keterangan || ''
       })
     }
@@ -74,24 +74,23 @@ function toggleSiswa(siswaId: number) {
   const e = entries.value.get(siswaId)
   if (e) {
     e.checked = !e.checked
-    if (!e.checked && e.status === 'HADIR') {
+    if (e.checked) {
+      if (e.status === 'ALPHA' || e.status === 'BELUM') {
+        e.status = 'HADIR'
+      }
+    } else if (e.status === 'HADIR') {
       e.status = 'ALPHA'
-    } else if (e.checked && e.status === 'ALPHA') {
-      e.status = 'HADIR'
     }
   }
 }
 
-function setStatus(siswaId: number, status: string) {
+function onStatusChange(siswaId: number) {
   const e = entries.value.get(siswaId)
-  if (e) {
-    e.status = status
-    e.checked = status !== 'ALPHA'
-  }
+  if (e) e.checked = e.status !== 'ALPHA' && e.status !== 'BELUM'
 }
 
 const statusCount = computed(() => {
-  const counts: Record<string, number> = { HADIR: 0, SAKIT: 0, IZIN: 0, ALPHA: 0, PENDING: 0 }
+  const counts: Record<string, number> = { HADIR: 0, SAKIT: 0, IZIN: 0, ALPHA: 0, PENDING: 0, BELUM: 0 }
   for (const e of entries.value.values()) {
     counts[e.status] = (counts[e.status] || 0) + 1
   }
@@ -105,7 +104,7 @@ async function submitKonfirmasi() {
 
   const payload = {
     entries: Array.from(entries.value.entries())
-      .filter(([_, e]) => e.status !== 'PENDING')
+      .filter(([_, e]) => e.status !== 'PENDING' && e.status !== 'BELUM')
       .map(([siswaId, e]) => ({
         siswaId,
         status: e.status as 'HADIR' | 'SAKIT' | 'IZIN' | 'ALPHA',
@@ -194,6 +193,7 @@ onMounted(() => {
       <BaseBadge variant="blue">{{ statusCount.IZIN || 0 }} Izin</BaseBadge>
       <BaseBadge variant="gray">{{ statusCount.ALPHA || 0 }} Alpha</BaseBadge>
       <BaseBadge variant="amber">{{ statusCount.PENDING || 0 }} Menunggu</BaseBadge>
+      <BaseBadge variant="gray">{{ statusCount.BELUM || 0 }} Belum Absen</BaseBadge>
     </div>
 
     <!-- Loading -->
@@ -235,9 +235,10 @@ onMounted(() => {
               <td class="px-3 py-3 text-gray-500 dark:text-gray-400 hidden sm:table-cell">{{ s.nisn }}</td>
               <td class="px-3 py-3 text-center">
                 <select v-if="sesi.status === 'AKTIF'"
-                  :value="entries.get(s.id)?.status || 'ALPHA'"
-                  @change="(e) => setStatus(s.id, (e.target as HTMLSelectElement).value)"
+                  v-model="entries.get(s.id)!.status"
+                  @change="onStatusChange(s.id)"
                   class="text-xs border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1 focus:ring-2 focus:ring-primary-500 bg-white dark:bg-slate-700 dark:text-gray-100 cursor-pointer">
+                  <option value="BELUM">Belum Absen</option>
                   <option value="HADIR">Hadir</option>
                   <option value="SAKIT">Sakit</option>
                   <option value="IZIN">Izin</option>

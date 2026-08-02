@@ -95,8 +95,6 @@ export default defineEventHandler(async (event) => {
       jamMulai: latest.sesi.jadwal.jamMulai,
       jamSelesai: latest.sesi.jadwal.jamSelesai
     }
-  } else if (todaySesi.length > 0 && todaySesi.every(s => s.status === 'SELESAI')) {
-    todayStatus = { state: 'ALPHA', status: 'ALPHA' }
   } else {
     todayStatus = {
       state: todaySesi.length === 0 ? 'NO_SESSION' : 'NOT_YET',
