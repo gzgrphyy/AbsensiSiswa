@@ -23,10 +23,10 @@ onMounted(() => {
   <div class="h-screen overflow-hidden flex flex-col bg-[#FEFEFE] dark:bg-slate-900">
     <!-- Slim App Bar -->
     <header class="flex-shrink-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
-      <div class="h-0.5 bg-primary-500" />
+      <div class="h-0.5 bg-primary-500 dark:bg-primary-600" />
       <div class="max-w-lg mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
         <NuxtLink to="/absensi" class="flex items-center gap-2.5 min-w-0">
-          <div class="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center text-white text-xs font-bold overflow-hidden flex-shrink-0">
+          <div class="w-8 h-8 rounded-lg bg-primary-500 dark:bg-primary-600 flex items-center justify-center text-white text-xs font-bold overflow-hidden flex-shrink-0">
             <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
             <span v-else>{{ (pengaturan?.namaAplikasi || 'S').charAt(0) }}</span>
           </div>
