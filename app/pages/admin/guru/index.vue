@@ -343,8 +343,10 @@ function copyPassword() {
                     <svg class="w-12 h-12 text-gray-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada data PTK</p>
-                    <button @click="openCreate"
+                    <p class="text-gray-500 dark:text-gray-400 font-medium">
+                      {{ showInactive ? 'Belum ada PTK nonaktif' : 'Belum ada data PTK' }}
+                    </p>
+                    <button v-if="!showInactive" @click="openCreate"
                       class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-none hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />

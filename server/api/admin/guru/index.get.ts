@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   return await prisma.user.findMany({
     where: {
       role: 'GURU',
-      ...(!showInactive && { isActive: true }),
+      ...(showInactive ? { isActive: false } : { isActive: true }),
       ...(search && { nama: { contains: search } })
     },
     orderBy: [
