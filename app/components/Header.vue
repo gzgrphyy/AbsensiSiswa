@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { user, clear } = useUserSession()
+const { clear } = useUserSession()
 const { pengaturan } = usePengaturan()
 const colorMode = useColorMode()
 const isAdmin = inject('isAdmin', false)
@@ -16,12 +16,6 @@ const today = new Date().toLocaleDateString('id-ID', {
   month: 'long',
   year: 'numeric'
 })
-
-const roleLabel: Record<string, string> = {
-  ADMIN: 'Administrator',
-  GURU: 'PTK',
-  SISWA: 'Murid'
-}
 
 async function handleLogout() {
   try { await clear() } catch {}
@@ -69,15 +63,15 @@ async function handleLogout() {
         </button>
 
         <div class="flex items-center gap-2.5">
-          <div v-if="user?.foto" class="w-8 h-8 rounded-full overflow-hidden border border-primary-100 dark:border-primary-800">
-            <img :src="user.foto" class="w-full h-full object-cover" />
+          <div v-if="pengaturan?.iconPath" class="w-8 h-8 bg-primary-500 rounded-full overflow-hidden border border-primary-100 dark:border-primary-800 flex-shrink-0 flex items-center justify-center">
+            <img :src="pengaturan.iconPath" class="w-full h-full object-contain p-1" />
           </div>
-          <div v-else class="w-8 h-8 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs font-semibold text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800">
-            {{ user?.nama?.charAt(0)?.toUpperCase() || 'U' }}
+          <div v-else class="w-8 h-8 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs font-semibold text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800 flex-shrink-0">
+            {{ pengaturan?.namaAplikasi?.charAt(0)?.toUpperCase() || 'S' }}
           </div>
           <div class="hidden md:block">
-            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight">{{ user?.nama || 'Pengguna' }}</p>
-            <p class="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{{ roleLabel[user?.role] || user?.role }}</p>
+            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
           </div>
         </div>
 

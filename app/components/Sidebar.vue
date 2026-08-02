@@ -4,10 +4,15 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const { user } = useUserSession()
-const { pengaturan } = usePengaturan()
 const isAdmin = inject('isAdmin', false)
 const collapsed = useCookie('sidebarCollapsed', { default: () => false })
 const openGroups = ref<Record<string, boolean>>({})
+
+const roleLabel: Record<string, string> = {
+  ADMIN: 'Administrator',
+  GURU: 'PTK',
+  SISWA: 'Murid'
+}
 
 interface MenuItem {
   label: string
@@ -117,18 +122,20 @@ function renderIcon(icon: string) {
     <!-- Garis aksen atas (sama dengan Header) -->
     <div class="h-0.5 bg-primary-500" />
 
-    <!-- Logo Area -->
+    <!-- Profil Pengguna -->
     <div class="flex-shrink-0 border-b border-gray-200 dark:border-slate-700">
-      <NuxtLink to="/" :class="['flex items-center gap-2.5 py-2.5', collapsed ? 'justify-center px-0' : 'px-4']">
-        <div class="w-9 h-9 bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden rounded-lg">
-          <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
-          <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
+      <div :class="['flex items-center gap-2.5 py-2.5', collapsed ? 'justify-center px-0' : 'px-4']">
+        <div v-if="user?.foto" class="w-9 h-9 rounded-full overflow-hidden border border-primary-100 dark:border-primary-800 flex-shrink-0">
+          <img :src="user.foto" class="w-full h-full object-cover" />
+        </div>
+        <div v-else class="w-9 h-9 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs font-semibold text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800 flex-shrink-0">
+          {{ user?.nama?.charAt(0)?.toUpperCase() || 'U' }}
         </div>
         <div v-if="!collapsed" class="min-w-0">
-          <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
-          <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
+          <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight">{{ user?.nama || 'Pengguna' }}</p>
+          <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ roleLabel[user?.role] || user?.role }}</p>
         </div>
-      </NuxtLink>
+      </div>
     </div>
 
     <!-- Navigation -->
