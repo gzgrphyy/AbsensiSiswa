@@ -49,7 +49,7 @@ onUnmounted(() => {
     <div class="px-3 sm:px-4 flex items-center justify-between h-[26px]">
       <!-- Left: Logo & App Name -->
       <NuxtLink to="/admin" class="flex items-center gap-1.5 min-w-0">
-        <div :class="['w-4 h-4 bg-primary-500 flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0 overflow-hidden', isAdmin ? 'rounded-none' : 'rounded']">
+        <div class="w-4 h-4 bg-primary-500 flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0 overflow-hidden rounded">
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain" />
           <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
         </div>

@@ -119,8 +119,8 @@ function renderIcon(icon: string) {
 
     <!-- Logo Area -->
     <div class="flex-shrink-0 border-b border-gray-200 dark:border-slate-700">
-      <NuxtLink to="/" class="flex items-center gap-2.5 px-4 py-2.5">
-        <div :class="['w-9 h-9 bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden', isAdmin ? 'rounded-none' : 'rounded-lg']">
+      <NuxtLink to="/" :class="['flex items-center gap-2.5 py-2.5', collapsed ? 'justify-center px-0' : 'px-4']">
+        <div class="w-9 h-9 bg-primary-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0 overflow-hidden rounded-lg">
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
           <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
         </div>
@@ -132,14 +132,15 @@ function renderIcon(icon: string) {
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto scrollbar-thin px-2.5 py-3 space-y-0.5">
+    <nav :class="['flex-1 overflow-y-auto scrollbar-thin py-3 space-y-0.5', collapsed ? 'px-0' : 'px-2.5']">
       <template v-for="item in currentMenus" :key="item.label">
         <!-- Menu dengan children -->
         <div v-if="item.children">
           <button
             @click="toggleGroup(item.icon)"
             :class="[
-              'w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium transition-all duration-150',
+              'w-full flex items-center gap-2.5 py-2 text-sm font-medium transition-all duration-150',
+              collapsed ? 'justify-center px-0' : 'px-3',
               isChildActive(item.children)
                 ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
                 : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400',
@@ -178,7 +179,8 @@ function renderIcon(icon: string) {
           v-else
           :to="item.to"
           :class="[
-            'flex items-center gap-2.5 px-3 py-2 text-sm font-medium transition-all duration-150',
+            'w-full flex items-center gap-2.5 py-2 text-sm font-medium transition-all duration-150',
+            collapsed ? 'justify-center px-0' : 'px-3',
             isActive(item.to)
               ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
               : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400',
