@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
   return await prisma.sesiAbsensi.update({
     where: { id },
-    data: { status: 'SELESAI' },
+    data: { status: 'SELESAI', ditutupPada: new Date() },
     include: {
       jadwal: {
         include: {

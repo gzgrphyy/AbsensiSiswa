@@ -17,6 +17,8 @@ interface SesiDetail {
   id: number
   status: string
   tanggal: string
+  ditutupPada: string | null
+  updatedAt: string
   allSiswa: SiswaItem[]
   jadwal: {
     mapel: string
@@ -175,6 +177,12 @@ onMounted(() => {
         <div class="flex items-center justify-between gap-3">
           <dt class="text-gray-500 dark:text-gray-400">Waktu</dt>
           <dd class="font-semibold text-gray-900 dark:text-gray-100">{{ sesi.jadwal.jamMulai }} - {{ sesi.jadwal.jamSelesai }}</dd>
+        </div>
+        <div v-if="sesi.status === 'SELESAI'" class="flex items-center justify-between gap-3">
+          <dt class="text-gray-500 dark:text-gray-400">Ditutup</dt>
+          <dd class="font-semibold text-gray-900 dark:text-gray-100">
+            {{ new Date(sesi.ditutupPada || sesi.updatedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }}
+          </dd>
         </div>
         <div class="flex items-center justify-between gap-3">
           <dt class="text-gray-500 dark:text-gray-400">Guru</dt>

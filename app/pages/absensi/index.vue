@@ -265,12 +265,13 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
             v-for="j in jadwal"
             :key="j.id"
             class="flex items-center gap-3 px-4 py-3.5"
-            :class="j.isWithinTime && !j.activeSesi ? 'border-l-2 border-l-primary-500 bg-primary-50/40 dark:bg-primary-900/20' : (j.isWithinTime ? 'bg-primary-50/30 dark:bg-primary-900/10' : '')"
+            :class="!j.todaySesi && j.isWithinTime ? 'border-l-2 border-l-primary-500 bg-primary-50/40 dark:bg-primary-900/20' : (j.activeSesi ? 'bg-primary-50/30 dark:bg-primary-900/10' : '')"
           >
             <div class="w-14 flex-shrink-0 text-center">
               <p class="text-[13px] font-bold text-gray-900 dark:text-gray-100 leading-none">{{ j.jamMulai }}</p>
               <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-none">{{ j.jamSelesai }}</p>
-              <p v-if="j.isWithinTime && !j.activeSesi" class="text-[9px] font-bold uppercase tracking-wide text-primary-600 dark:text-primary-400 mt-1 leading-none animate-pulse">Buka</p>
+              <p v-if="j.isWithinTime && !j.todaySesi" class="text-[9px] font-bold uppercase tracking-wide text-primary-600 dark:text-primary-400 mt-1 leading-none animate-pulse">Buka</p>
+              <p v-else-if="j.todaySesi?.status === 'SELESAI'" class="text-[9px] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mt-1 leading-none">Selesai</p>
             </div>
 
             <div class="min-w-0 flex-1">
@@ -279,7 +280,7 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
             </div>
 
             <button
-              v-if="!j.todaySesi || (j.todaySesi.status === 'SELESAI')"
+              v-if="!j.todaySesi"
               @click="bukaSesi(j.id)"
               :disabled="openingSesi === j.id"
               class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 active:bg-primary-700 disabled:opacity-50 inline-flex items-center gap-1.5 transition-colors"
@@ -287,6 +288,12 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
               <svg v-if="openingSesi === j.id" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
               {{ openingSesi === j.id ? 'Membuka...' : 'Buka Sesi' }}
             </button>
+            <span
+              v-else-if="j.todaySesi.status === 'SELESAI'"
+              class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700/60 ring-1 ring-gray-200 dark:ring-slate-600"
+            >
+              Selesai
+            </span>
             <NuxtLink
               v-else-if="j.activeSesi"
               :to="`/absensi/sesi/${j.activeSesi.id}`"

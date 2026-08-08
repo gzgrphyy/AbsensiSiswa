@@ -34,6 +34,7 @@ export default defineEventHandler(async (event) => {
     kelas: s.jadwal.kelas.nama,
     ruangan: s.jadwal.ruangan.nama,
     status: s.status,
+    ditutupPada: (s.ditutupPada ?? s.updatedAt).toISOString(),
     totalSiswa: s.jadwal.kelas._count.siswa,
     hadir: s.requests.filter(r => r.status === 'HADIR').length,
     sakit: s.requests.filter(r => r.status === 'SAKIT').length,

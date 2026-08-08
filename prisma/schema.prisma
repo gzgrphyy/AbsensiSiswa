@@ -167,6 +167,7 @@ model SesiAbsensi {
   dibukaOleh Int        @map("dibuka_oleh")
   createdAt  DateTime   @default(now()) @map("created_at")
   updatedAt  DateTime   @updatedAt @map("updated_at")
+  ditutupPada DateTime? @map("ditutup_pada")
 
   jadwal   JadwalPelajaran @relation(fields: [jadwalId], references: [id])
   pembuka  User            @relation("SesiDibukaOleh", fields: [dibukaOleh], references: [id])
