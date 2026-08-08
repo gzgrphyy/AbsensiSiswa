@@ -165,9 +165,13 @@ async function handleResetPassword() {
   }
 }
 
-function copyPassword() {
-  navigator.clipboard.writeText(generatedPassword.value)
-  showSuccess('Password berhasil disalin!')
+async function copyPassword() {
+  const ok = await copyToClipboard(generatedPassword.value)
+  if (ok) {
+    showSuccess('Password berhasil disalin!')
+  } else {
+    showError('Gagal menyalin password. Silakan salin manual.')
+  }
 }
 </script>
 
