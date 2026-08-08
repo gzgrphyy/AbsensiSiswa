@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 const { pengaturan } = usePengaturan()
-const colorMode = useColorMode()
 const isAdmin = inject('isAdmin', false)
 
 const showProfile = ref(false)
 
-const isDark = computed(() => colorMode.value === 'dark')
+const now = ref(new Date())
+let clockTimer: ReturnType<typeof setInterval> | null = null
 
-function toggleColorMode() {
-  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-}
+const currentTime = computed(() =>
+  now.value.toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
+)
 
 const dev = {
   nama: 'Geza Nurhalim Irfansyah Putra',
@@ -36,10 +41,14 @@ function handleClickOutside(e: MouseEvent) {
 }
 
 onMounted(() => {
+  clockTimer = setInterval(() => {
+    now.value = new Date()
+  }, 1000)
   document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
+  if (clockTimer) clearInterval(clockTimer)
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
@@ -56,23 +65,14 @@ onUnmounted(() => {
         <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</span>
       </NuxtLink>
 
-      <!-- Right: Dark Mode Toggle + Developer Profile -->
+      <!-- Centered: Live Clock -->
+      <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <span class="text-[10px] font-medium text-gray-500 dark:text-gray-400 tabular-nums tracking-wide">{{ currentTime }}</span>
+      </div>
+
+      <!-- Right: Developer Profile -->
       <div class="flex items-center gap-1.5">
-        <!-- Theme Toggle -->
-        <button
-          @click="toggleColorMode"
-          :class="['w-4 h-4 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors', isAdmin ? 'rounded-none' : 'rounded']"
-          :title="isDark ? 'Mode Terang' : 'Mode Gelap'"
-        >
-          <!-- Sun icon (show in dark mode) -->
-          <svg v-if="isDark" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-          </svg>
-          <!-- Moon icon (show in light mode) -->
-          <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-          </svg>
-        </button>
+        <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400 truncate hidden sm:inline">TA {{ pengaturan?.tahunAjaran || '—' }}</span>
 
         <img src="/bendera_indonesia.png" class="w-4 h-3 object-contain flex-shrink-0" alt="Merdeka" />
 
