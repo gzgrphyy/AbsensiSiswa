@@ -9,5 +9,5 @@ export function useJadwalHariIni() {
     adaJadwal.value = Array.isArray(d) ? d.length > 0 : null
   }, { immediate: true })
 
-  return { adaJadwal, refresh }
+  return { adaJadwal, data, refresh }
 }

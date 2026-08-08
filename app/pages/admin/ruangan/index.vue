@@ -1,9 +1,11 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 interface Ruangan {
   id: number
   nama: string
   jenis: string
   qrCode: string
+  sesiAktif: boolean
+  jumlahSesiAktif: number
   createdAt: string
   _count: { jadwalPelajaran: number }
 }
@@ -13,6 +15,12 @@ const jenisOptions = ['KELAS', 'LAB', 'PERPUSTAKAAN', 'AULA', 'LAINNYA']
 const { data, pending, refresh } = useFetch<Ruangan[]>('/api/admin/ruangan', { immediate: true })
 const searchQuery = ref('')
 const filterJenis = ref('')
+
+// Auto-refresh tiap 15 detik agar status sesi selalu ter-update
+onMounted(() => {
+  const interval = setInterval(() => refresh(), 15000)
+  onUnmounted(() => clearInterval(interval))
+})
 
 const filteredData = computed(() => {
   if (!data.value) return []
@@ -213,6 +221,7 @@ function ruanganUrl(item: Ruangan) {
                 <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Nama Ruangan</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Jenis</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Jadwal</th>
+                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Status Sesi</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">QR Code</th>
                 <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Aksi</th>
               </tr>
@@ -227,6 +236,11 @@ function ruanganUrl(item: Ruangan) {
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
                   <span class="text-gray-600 dark:text-gray-300 font-medium">{{ item._count.jadwalPelajaran }}</span>
+                </td>
+                <td class="px-4 sm:px-6 py-4 text-center">
+                  <BaseBadge :variant="item.sesiAktif ? 'green' : 'gray'" size="sm" :dot="item.sesiAktif" :pulse="item.sesiAktif">
+                    {{ item.sesiAktif ? 'Sesi Aktif' : 'Tidak Ada Sesi' }}
+                  </BaseBadge>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
                   <button @click="openQR(item)"
@@ -253,7 +267,7 @@ function ruanganUrl(item: Ruangan) {
                 </td>
               </tr>
               <tr v-if="!filteredData || filteredData.length === 0">
-                <td colspan="5" class="px-4 sm:px-6 py-16 text-center">
+                <td colspan="6" class="px-4 sm:px-6 py-16 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <svg class="w-12 h-12 text-gray-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -404,7 +418,8 @@ function ruanganUrl(item: Ruangan) {
           </div>
         </div>
       </Transition>
-    </Teleport>
+
+      </Teleport>
   </AppLayout>
 </template>
 

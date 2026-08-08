@@ -130,6 +130,7 @@ model Ruangan {
   nama      String        @db.VarChar(100)
   jenis     JenisRuangan  @default(KELAS)
   qrCode    String        @unique @map("qr_code") @db.VarChar(50)
+  isActive  Boolean       @default(true) @map("is_active")
   createdAt DateTime      @default(now()) @map("created_at")
   updatedAt DateTime      @updatedAt @map("updated_at")
 
