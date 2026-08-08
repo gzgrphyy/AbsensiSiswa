@@ -57,7 +57,7 @@ function isActive(to: string) {
       </span>
 
       <!-- Bar -->
-      <div class="grid grid-cols-5 bg-white/95 dark:bg-slate-800/95 backdrop-blur border-t border-gray-200 dark:border-slate-700 shadow-[0_-6px_20px_rgb(0_0_0_/_0.05)] dark:shadow-[0_-6px_20px_rgb(0_0_0_/_0.35)]">
+      <div class="grid grid-cols-5 bg-white/95 dark:bg-slate-800/95 backdrop-blur border-t border-gray-200 dark:border-slate-700 shadow-[0_-6px_20px_rgb(0_0_0_/_0.05)] dark:shadow-[0_-6px_20px_rgb(0_0_0_/_0.35)] rounded-t-2xl overflow-hidden">
         <template v-for="item in items" :key="item.label">
           <div v-if="item.fab" class="h-[52px]" aria-hidden="true" />
           <NuxtLink

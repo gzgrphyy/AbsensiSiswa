@@ -27,11 +27,22 @@ interface ActiveSesi {
   }
 }
 
+interface MingguanJadwal {
+  id: number
+  hari: string
+  mapel: string
+  jamMulai: string
+  jamSelesai: string
+  kelas: { id: number; nama: string }
+  ruangan: { id: number; nama: string }
+}
+
 const { user } = useUserSession()
 const { adaJadwal } = useJadwalHariIni()
 
 const jadwal = ref<JadwalHariIni[]>([])
 const activeSesiList = ref<ActiveSesi[]>([])
+const jadwalMingguan = ref<Record<string, MingguanJadwal[]>>({})
 const loading = ref(true)
 const errorMsg = ref('')
 const successMsg = ref('')
@@ -41,6 +52,10 @@ const confirmClose = ref<ActiveSesi | null>(null)
 
 const dayNames = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU']
 const todayName = dayNames[new Date().getDay()]
+const hariLabels: Record<string, string> = {
+  SENIN: 'Senin', SELASA: 'Selasa', RABU: 'Rabu', KAMIS: 'Kamis', JUMAT: 'Jumat', SABTU: 'Sabtu', MINGGU: 'Minggu'
+}
+const mingguanHariOrder = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU']
 const todayLabel = computed(() =>
   new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 )
@@ -51,6 +66,21 @@ const greeting = computed(() => {
   if (h >= 12 && h < 15) return 'Selamat siang'
   if (h >= 15 && h < 18) return 'Selamat sore'
   return 'Selamat malam'
+})
+
+const isWeekend = computed(() => {
+  const d = new Date().getDay()
+  return d === 0 || d === 6
+})
+
+const emptyState = computed(() => {
+  if (jadwal.value.length === 0 && isWeekend.value) {
+    return { title: 'Hari ini libur.', cta: 'Lihat Rekap', to: '/absensi/rekap' }
+  }
+  if (jadwal.value.length === 0) {
+    return { title: 'Tidak ada kelas hari ini.', cta: 'Lihat Rekap', to: '/absensi/rekap' }
+  }
+  return null
 })
 
 function showError(msg: string) {
@@ -65,12 +95,14 @@ function showSuccess(msg: string) {
 
 async function fetchData() {
   try {
-    const [j, a] = await Promise.all([
+    const [j, a, m] = await Promise.all([
       $fetch<JadwalHariIni[]>('/api/absensi/jadwal-hari-ini'),
-      $fetch<ActiveSesi[]>('/api/absensi/sesi/aktif')
+      $fetch<ActiveSesi[]>('/api/absensi/sesi/aktif'),
+      $fetch<{ grouped: Record<string, MingguanJadwal[]> }>('/api/absensi/jadwal-mingguan')
     ])
     jadwal.value = j
     activeSesiList.value = a
+    jadwalMingguan.value = m?.grouped || {}
   } catch (err: any) {
     showError(err?.data?.statusMessage || 'Gagal memuat data')
   } finally {
@@ -107,6 +139,10 @@ async function tutupSesi(id: number) {
   }
 }
 
+function scrollToJadwal() {
+  document.getElementById('jadwal-hari-ini')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 onMounted(() => {
   fetchData()
   const { refresh: refreshJadwal } = useJadwalHariIni()
@@ -124,13 +160,10 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
   <PTKLayout>
     <!-- Greeting -->
     <header class="mb-5">
-      <p class="text-xs text-gray-400 dark:text-gray-500 capitalize">{{ todayLabel }}</p>
-      <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100 mt-0.5">
-        {{ greeting }}, {{ user?.nama || 'PTK' }}
+      <p class="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ todayLabel }}</p>
+      <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 mt-1">
+        {{ greeting }}, {{ user?.nama || 'Pak/Bu' }}
       </h1>
-      <p v-if="!loading" class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-        Anda memiliki {{ jadwal.length }} jadwal hari ini
-      </p>
     </header>
 
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
@@ -138,60 +171,55 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
 
     <!-- ===== Loading skeleton ===== -->
     <template v-if="loading">
-      <div class="h-36 rounded-2xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-5 animate-pulse">
-        <div class="h-4 bg-gray-100 dark:bg-slate-700 rounded w-1/3 mb-3"></div>
-        <div class="h-6 bg-gray-100 dark:bg-slate-700 rounded w-1/2 mb-3"></div>
-        <div class="h-3 bg-gray-100 dark:bg-slate-700 rounded w-2/3 mb-2"></div>
-        <div class="h-3 bg-gray-100 dark:bg-slate-700 rounded w-1/2"></div>
+      <div class="h-28 rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 animate-pulse">
+        <div class="h-3 bg-gray-100 dark:bg-slate-700 rounded w-16 mb-3"></div>
+        <div class="h-5 bg-gray-100 dark:bg-slate-700 rounded w-2/3 mb-2"></div>
+        <div class="h-4 bg-gray-100 dark:bg-slate-700 rounded w-1/2 mt-4"></div>
       </div>
-      <div class="grid grid-cols-2 gap-3 mt-4">
-        <div v-for="i in 2" :key="i" class="h-20 rounded-xl bg-gray-100 dark:bg-slate-700 animate-pulse"></div>
+      <div class="h-24 rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 animate-pulse mt-3">
+        <div class="h-4 bg-gray-100 dark:bg-slate-700 rounded w-24 mb-2"></div>
+        <div class="h-8 bg-gray-100 dark:bg-slate-700 rounded w-16"></div>
       </div>
-      <div class="h-44 rounded-2xl bg-gray-100 dark:bg-slate-700 animate-pulse mt-4"></div>
+      <div class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-hidden animate-pulse mt-3">
+        <div v-for="i in 2" :key="i" class="flex items-center gap-3 p-4">
+          <div class="w-12 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg"></div>
+          <div class="flex-1">
+            <div class="h-4 bg-gray-100 dark:bg-slate-700 rounded w-1/2 mb-2"></div>
+            <div class="h-3 bg-gray-100 dark:bg-slate-700 rounded w-1/3"></div>
+          </div>
+        </div>
+      </div>
     </template>
 
     <!-- ===== Data loaded ===== -->
     <template v-else>
-      <!-- Active sessions -->
+      <!-- Active session -->
       <template v-if="activeSesiList.length > 0">
         <section
           v-for="sesi in activeSesiList"
           :key="sesi.id"
-          class="rounded-2xl border p-5 shadow-card dark:shadow-dark-card mb-3 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/40 dark:to-green-900/20 border-green-200 dark:border-green-800"
+          class="rounded-2xl border border-gray-200 dark:border-slate-700 border-l-4 border-l-primary-500 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-5 mb-3"
         >
-          <div class="flex items-center gap-3 mb-3">
-            <div class="p-2.5 rounded-full bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 flex-shrink-0">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
+          <div class="flex items-start justify-between gap-4">
             <div class="min-w-0">
-              <p class="text-sm font-medium text-green-800 dark:text-green-200">Sesi aktif</p>
-              <p class="text-xl font-bold text-green-900 dark:text-green-100 truncate">{{ sesi.jadwal.mapel }}</p>
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-primary-600 dark:text-primary-400">
+                <span class="w-2 h-2 rounded-full bg-primary-500 animate-pulse"></span>
+                Sesi aktif
+              </span>
+              <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 truncate mt-1">{{ sesi.jadwal.mapel }}</h2>
             </div>
-            <BaseBadge variant="green" dot pulse class="ml-auto">AKTIF</BaseBadge>
+            <span class="flex-shrink-0 px-2.5 py-1 text-[11px] font-semibold rounded-full bg-primary-50 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 ring-1 ring-primary-200 dark:ring-primary-800">
+              {{ sesi._count.requests }} scan
+            </span>
           </div>
 
-          <dl class="space-y-1.5 text-sm">
-            <div class="flex items-center justify-between gap-3">
-              <dt class="text-green-700/80 dark:text-green-300/80">Kelas</dt>
-              <dd class="font-semibold text-green-900 dark:text-green-100">{{ sesi.jadwal.kelas.nama }}</dd>
-            </div>
-            <div class="flex items-center justify-between gap-3">
-              <dt class="text-green-700/80 dark:text-green-300/80">Ruangan</dt>
-              <dd class="font-semibold text-green-900 dark:text-green-100">{{ sesi.jadwal.ruangan.nama }}</dd>
-            </div>
-            <div class="flex items-center justify-between gap-3">
-              <dt class="text-green-700/80 dark:text-green-300/80">Waktu</dt>
-              <dd class="font-semibold text-green-900 dark:text-green-100">{{ sesi.jadwal.jamMulai }} - {{ sesi.jadwal.jamSelesai }}</dd>
-            </div>
-            <div class="flex items-center justify-between gap-3">
-              <dt class="text-green-700/80 dark:text-green-300/80">Scan masuk</dt>
-              <dd class="font-semibold text-green-900 dark:text-green-100">{{ sesi._count.requests }} murid</dd>
-            </div>
-          </dl>
+          <div class="flex items-center justify-between gap-3 text-sm mt-4">
+            <span class="text-gray-600 dark:text-gray-300 truncate">Kelas <b class="font-semibold text-gray-900 dark:text-gray-100">{{ sesi.jadwal.kelas.nama }}</b> · {{ sesi.jadwal.ruangan.nama }}</span>
+            <span class="font-semibold text-gray-900 dark:text-gray-100 flex-shrink-0">{{ sesi._count.requests }} scan</span>
+          </div>
+          <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">{{ sesi.jadwal.jamMulai }} – {{ sesi.jadwal.jamSelesai }}</p>
 
-          <div class="flex gap-2 mt-4">
+          <div class="flex gap-2.5 mt-4">
             <NuxtLink
               :to="`/absensi/sesi/${sesi.id}`"
               class="flex-1 text-center px-3 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-xl hover:bg-primary-600 active:bg-primary-700 transition-colors shadow-md shadow-primary-500/30"
@@ -200,7 +228,7 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
             </NuxtLink>
             <button
               @click="confirmClose = sesi"
-              class="px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl transition-colors"
+              class="px-3 py-2.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 border border-gray-200 dark:border-slate-700 rounded-xl transition-colors"
             >
               Tutup Sesi
             </button>
@@ -208,112 +236,140 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
         </section>
       </template>
 
-      <!-- No active session -->
+      <!-- Idle session card -->
       <section
-        v-else
-        class="rounded-2xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card p-5"
+        v-else-if="jadwal.length > 0"
+        class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-4 mb-3"
       >
         <div class="flex items-center gap-3">
-          <div class="p-2.5 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 flex-shrink-0">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+          <div class="w-1 self-stretch rounded-full bg-gray-200 dark:bg-slate-600 flex-shrink-0" />
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">Siap membuka sesi kehadiran</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Buka sesi dari jadwal di bawah saat kelas dimulai.</p>
           </div>
-          <div>
-            <p class="font-semibold text-gray-800 dark:text-gray-200">Tidak ada sesi aktif</p>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-              {{ adaJadwal === false ? 'Belum ada jadwal hari ini, hubungi admin untuk mengatur jadwal kelas' : 'Buka sesi dari jadwal hari ini di bawah' }}
-            </p>
+          <button
+            @click="scrollToJadwal"
+            class="flex-shrink-0 px-3.5 py-2 text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 rounded-xl hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+          >
+            Lihat jadwal
+          </button>
+        </div>
+      </section>
+
+      <!-- Asymmetric stats -->
+      <div class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-5 mt-3">
+        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Scan hari ini</p>
+        <p class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 mt-1 leading-none tracking-tight">{{ totalSiswaScan }}</p>
+      </div>
+
+      <!-- Today's schedule -->
+      <section id="jadwal-hari-ini" class="mt-5">
+        <div class="flex items-end justify-between mb-3">
+          <h2 class="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">Jadwal Hari Ini</h2>
+          <span class="text-xs font-semibold text-gray-400 dark:text-gray-500">{{ todayName }}</span>
+        </div>
+
+        <div
+          v-if="jadwal.length === 0"
+          class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card py-8 px-6 text-center"
+        >
+          <p class="text-base font-bold text-gray-900 dark:text-gray-100">{{ emptyState?.title }}</p>
+          <NuxtLink
+            :to="emptyState?.to || '/absensi/rekap'"
+            class="inline-flex items-center gap-1.5 mt-4 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 active:bg-primary-700 transition-colors shadow-md shadow-primary-500/30"
+          >
+            {{ emptyState?.cta }}
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+          </NuxtLink>
+        </div>
+
+        <div
+          v-else
+          class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card overflow-hidden divide-y divide-gray-100 dark:divide-slate-700"
+        >
+          <div
+            v-for="j in jadwal"
+            :key="j.id"
+            class="flex items-center gap-3 px-4 py-3.5"
+            :class="j.isWithinTime && !j.activeSesi ? 'border-l-2 border-l-primary-500 bg-primary-50/40 dark:bg-primary-900/20' : (j.isWithinTime ? 'bg-primary-50/30 dark:bg-primary-900/10' : '')"
+          >
+            <div class="w-14 flex-shrink-0 text-center">
+              <p class="text-[13px] font-bold text-gray-900 dark:text-gray-100 leading-none">{{ j.jamMulai }}</p>
+              <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-none">{{ j.jamSelesai }}</p>
+              <p v-if="j.isWithinTime && !j.activeSesi" class="text-[9px] font-bold uppercase tracking-wide text-primary-600 dark:text-primary-400 mt-1 leading-none animate-pulse">Buka</p>
+            </div>
+
+            <div class="min-w-0 flex-1">
+              <h3 class="font-semibold text-gray-900 dark:text-gray-100 truncate">{{ j.mapel }}</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ j.kelas.nama }} · {{ j.ruangan.nama }}</p>
+            </div>
+
+            <button
+              v-if="!j.todaySesi || (j.todaySesi.status === 'SELESAI')"
+              @click="bukaSesi(j.id)"
+              :disabled="openingSesi === j.id"
+              class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 active:bg-primary-700 disabled:opacity-50 inline-flex items-center gap-1.5 transition-colors"
+            >
+              <svg v-if="openingSesi === j.id" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+              {{ openingSesi === j.id ? 'Membuka...' : 'Buka Sesi' }}
+            </button>
+            <NuxtLink
+              v-else-if="j.activeSesi"
+              :to="`/absensi/sesi/${j.activeSesi.id}`"
+              class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 inline-flex items-center gap-1 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+            >
+              Lihat
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </NuxtLink>
           </div>
         </div>
       </section>
 
-      <!-- Stats -->
-      <div class="grid grid-cols-2 gap-3 mt-4">
-        <StatCard label="Sesi Aktif" :value="activeSesiList.length" variant="green">
-          <template #icon>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </template>
-        </StatCard>
-        <StatCard label="Total Scan" :value="totalSiswaScan" variant="amber">
-          <template #icon>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </template>
-        </StatCard>
-      </div>
-
-      <!-- Today's Jadwal -->
-      <section class="mt-4">
-        <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Jadwal Hari Ini
-          <span class="text-[11px] font-normal text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">{{ todayName }}</span>
-        </h2>
-
-        <div
-          v-if="jadwal.length === 0"
-          class="rounded-2xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card flex flex-col items-center py-10 px-6 text-center"
-        >
-          <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tidak ada jadwal untuk hari ini</p>
-          <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Hubungi admin untuk mengatur jadwal kelas</p>
+      <!-- Weekly schedule -->
+      <section class="mt-5">
+        <div class="flex items-end justify-between mb-3">
+          <h2 class="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">Jadwal Minggu Ini</h2>
         </div>
 
-        <div v-else class="space-y-3">
-          <div
-            v-for="j in jadwal"
-            :key="j.id"
-            class="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card p-5"
-            :class="{ 'ring-1 ring-blue-300 dark:ring-blue-600': j.isWithinTime && !j.activeSesi }"
-          >
-            <div class="flex items-center justify-between gap-3 mb-1">
-              <h3 class="font-semibold text-gray-900 dark:text-gray-100 truncate">{{ j.mapel }}</h3>
-              <span v-if="j.todaySesi">
-                <BaseBadge :variant="j.todaySesi.status === 'AKTIF' ? 'green' : 'gray'" size="sm">
-                  {{ j.todaySesi.status === 'AKTIF' ? 'Sedang Berlangsung' : 'Selesai' }}
-                </BaseBadge>
-              </span>
-            </div>
-            <p class="text-sm text-gray-500 dark:text-gray-400 truncate">{{ j.kelas.nama }} — {{ j.ruangan.nama }}</p>
+        <div
+          v-if="mingguanHariOrder.filter(h => jadwalMingguan[h]).length === 0"
+          class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card py-8 px-6 text-center"
+        >
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Belum ada jadwal untuk minggu ini.</p>
+        </div>
 
-            <div class="flex items-center justify-between gap-3 mt-3">
-              <div class="flex items-center gap-3 text-xs text-gray-400 dark:text-gray-500">
-                <span class="inline-flex items-center gap-1">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {{ j.jamMulai }} - {{ j.jamSelesai }}
+        <div
+          v-else
+          class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card overflow-hidden divide-y divide-gray-100 dark:divide-slate-700"
+        >
+          <template v-for="h in mingguanHariOrder" :key="h">
+            <div v-if="jadwalMingguan[h] && jadwalMingguan[h].length > 0">
+              <div
+                class="px-4 py-1.5 flex items-center gap-2"
+                :class="h === todayName ? 'bg-primary-50/60 dark:bg-primary-900/20' : 'bg-gray-50 dark:bg-slate-700/40'"
+              >
+                <span class="text-[10px] font-bold uppercase tracking-wider" :class="h === todayName ? 'text-primary-700 dark:text-primary-300' : 'text-gray-400 dark:text-gray-500'">
+                  {{ hariLabels[h] }}
                 </span>
-                <span v-if="j.isWithinTime" class="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400">
-                  <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                  Sekarang
-                </span>
+                <span v-if="h === todayName" class="text-[10px] font-semibold text-primary-600 dark:text-primary-400">Hari ini</span>
               </div>
-
-              <button
-                v-if="!j.todaySesi || (j.todaySesi.status === 'SELESAI')"
-                @click="bukaSesi(j.id)"
-                :disabled="openingSesi === j.id"
-                class="flex-shrink-0 px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-xl hover:bg-primary-600 active:bg-primary-700 disabled:opacity-50 inline-flex items-center gap-1.5 transition-colors"
+              <div
+                v-for="ij in jadwalMingguan[h]"
+                :key="ij.id"
+                class="flex items-center gap-3 px-4 py-3"
+                :class="h === todayName ? 'bg-primary-50/30 dark:bg-primary-900/10' : ''"
               >
-                <svg v-if="openingSesi === j.id" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                {{ openingSesi === j.id ? 'Membuka...' : 'Buka Sesi' }}
-              </button>
-              <NuxtLink
-                v-else-if="j.activeSesi"
-                :to="`/absensi/sesi/${j.activeSesi.id}`"
-                class="flex-shrink-0 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-xl inline-flex items-center gap-1.5"
-              >
-                Lihat
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-              </NuxtLink>
+                <div class="w-16 flex-shrink-0 text-center">
+                  <p class="text-xs font-semibold text-gray-900 dark:text-gray-100 leading-none">{{ ij.jamMulai }}</p>
+                  <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-none">{{ ij.jamSelesai }}</p>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ ij.mapel }}</h3>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ ij.kelas.nama }} · {{ ij.ruangan.nama }}</p>
+                </div>
+              </div>
             </div>
-          </div>
+          </template>
         </div>
       </section>
     </template>
