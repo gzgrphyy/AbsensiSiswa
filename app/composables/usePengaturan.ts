@@ -2,6 +2,13 @@ interface PengaturanData {
   id: number
   namaSekolah: string
   logoSekolahPath: string | null
+  alamat: string
+  telp: string
+  email: string
+  tahunAjaran: string
+  semester: string
+  kepalaSekolah: string
+  nipKepsek: string
   warnaUtama: string
   titelAplikasi: string
   namaAplikasi: string

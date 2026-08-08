@@ -7,6 +7,8 @@ const pengaturanSchema = z.object({
     alamat: z.string().max(500).optional().default(''),
     telp: z.string().max(20).optional().default(''),
     email: z.string().email().max(150).optional().default(''),
+    tahunAjaran: z.string().max(20).optional().default(''),
+    semester: z.string().max(20).optional().default(''),
     kepalaSekolah: z.string().max(100).optional().default(''),
     nipKepsek: z.string().max(30).optional().default(''),
   }),
@@ -44,6 +46,13 @@ export default defineEventHandler(async (event) => {
 
   if (parsed.umum) {
     data.namaSekolah = parsed.umum.namaSekolah
+    data.alamat = parsed.umum.alamat
+    data.telp = parsed.umum.telp
+    data.email = parsed.umum.email
+    data.tahunAjaran = parsed.umum.tahunAjaran
+    data.semester = parsed.umum.semester
+    data.kepalaSekolah = parsed.umum.kepalaSekolah
+    data.nipKepsek = parsed.umum.nipKepsek
     if (parsed.umum.logoSekolahPath !== undefined) {
       data.logoSekolahPath = parsed.umum.logoSekolahPath
     }
@@ -73,6 +82,13 @@ export default defineEventHandler(async (event) => {
       data: {
         namaSekolah: data.namaSekolah || 'SMK Negeri 1 Bandung',
         logoSekolahPath: data.logoSekolahPath || null,
+        alamat: data.alamat || '',
+        telp: data.telp || '',
+        email: data.email || '',
+        tahunAjaran: data.tahunAjaran || '',
+        semester: data.semester || '',
+        kepalaSekolah: data.kepalaSekolah || '',
+        nipKepsek: data.nipKepsek || '',
         namaAplikasi: data.namaAplikasi || 'Aplikasi Skoria',
         titelAplikasi: data.titelAplikasi || 'Sistem Absensi',
         iconPath: data.iconPath || null,

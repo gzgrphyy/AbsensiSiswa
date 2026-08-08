@@ -93,6 +93,13 @@ onMounted(() => {
   if (pengaturan.value) {
     formUmum.namaSekolah = pengaturan.value.namaSekolah
     formUmum.logoSekolahPath = pengaturan.value.logoSekolahPath
+    formUmum.alamat = pengaturan.value.alamat || ''
+    formUmum.telp = pengaturan.value.telp || ''
+    formUmum.email = pengaturan.value.email || ''
+    formUmum.tahunAjaran = pengaturan.value.tahunAjaran || ''
+    formUmum.semester = pengaturan.value.semester || 'Ganjil'
+    formUmum.kepalaSekolah = pengaturan.value.kepalaSekolah || ''
+    formUmum.nipKepsek = pengaturan.value.nipKepsek || ''
     formBranding.namaAplikasi = pengaturan.value.namaAplikasi
     formBranding.titelAplikasi = pengaturan.value.titelAplikasi
     formBranding.iconPath = pengaturan.value.iconPath
@@ -106,6 +113,13 @@ watch(pengaturan, (val) => {
   if (val) {
     formUmum.namaSekolah = val.namaSekolah
     formUmum.logoSekolahPath = val.logoSekolahPath
+    formUmum.alamat = val.alamat || ''
+    formUmum.telp = val.telp || ''
+    formUmum.email = val.email || ''
+    formUmum.tahunAjaran = val.tahunAjaran || ''
+    formUmum.semester = val.semester || 'Ganjil'
+    formUmum.kepalaSekolah = val.kepalaSekolah || ''
+    formUmum.nipKepsek = val.nipKepsek || ''
     formBranding.namaAplikasi = val.namaAplikasi
     formBranding.titelAplikasi = val.titelAplikasi
     formBranding.iconPath = val.iconPath
