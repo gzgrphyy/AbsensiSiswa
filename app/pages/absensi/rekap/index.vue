@@ -10,12 +10,47 @@ interface RekapItem {
   persentase: number
 }
 
+interface MingguanJadwal {
+  id: number
+  hari: string
+  mapel: string
+  jamMulai: string
+  jamSelesai: string
+  kelas: { id: number; nama: string }
+  ruangan: { id: number; nama: string }
+}
+
 const { data, pending } = useFetch<RekapItem[]>('/api/absensi/rekap', {
   immediate: true,
   transform: (res: any) => res || []
 })
 
+const { data: jadwalMingguan, pending: pendingMingguan } = useFetch<{ hariOrder: string[]; grouped: Record<string, MingguanJadwal[]> }>('/api/absensi/jadwal-mingguan', {
+  immediate: true
+})
+
+const route = useRoute()
+
+watch([pending, pendingMingguan], ([p1, p2]) => {
+  if (!p1 && !p2 && route.hash === '#jadwal-minggu') {
+    nextTick(() => {
+      document.getElementById('jadwal-minggu')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+})
+
 const displayData = computed(() => data.value || [])
+
+const hariLabels: Record<string, string> = {
+  SENIN: 'Senin', SELASA: 'Selasa', RABU: 'Rabu', KAMIS: 'Kamis', JUMAT: 'Jumat', SABTU: 'Sabtu', MINGGU: 'Minggu'
+}
+const dayNames = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU']
+const todayName = dayNames[new Date().getDay()]
+const hariOrder = computed(() => jadwalMingguan.value?.hariOrder || [])
+const hasWeeklyJadwal = computed(() =>
+  Object.values(jadwalMingguan.value?.grouped || {}).some(arr => arr.length > 0)
+)
+const groupedJadwal = computed(() => jadwalMingguan.value?.grouped || {})
 
 const totalHadir = computed(() => displayData.value.reduce((a, b) => a + b.hadir, 0))
 const totalSiswa = computed(() => displayData.value.reduce((a, b) => a + b.totalSiswa, 0))
@@ -78,6 +113,53 @@ const rataPersentase = computed(() =>
               </tr>
             </tbody>
           </table>
+        </div>
+      </BaseCard>
+
+      <BaseCard id="jadwal-minggu" class="mt-5 scroll-mt-24">
+        <div class="flex items-end justify-between mb-3">
+          <h2 class="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">Jadwal Minggu Ini</h2>
+        </div>
+
+        <div
+          v-if="!hasWeeklyJadwal"
+          class="py-8 px-6 text-center"
+        >
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Belum ada jadwal untuk minggu ini.</p>
+        </div>
+
+        <div
+          v-else
+          class="divide-y divide-gray-100 dark:divide-slate-700"
+        >
+          <template v-for="h in hariOrder" :key="h">
+            <div v-if="groupedJadwal[h] && groupedJadwal[h].length > 0">
+              <div
+                class="px-4 py-1.5 flex items-center gap-2"
+                :class="h === todayName ? 'bg-primary-50/60 dark:bg-primary-900/20' : 'bg-gray-50 dark:bg-slate-700/40'"
+              >
+                <span class="text-[10px] font-bold uppercase tracking-wider" :class="h === todayName ? 'text-primary-700 dark:text-primary-300' : 'text-gray-400 dark:text-gray-500'">
+                  {{ hariLabels[h] }}
+                </span>
+                <span v-if="h === todayName" class="text-[10px] font-semibold text-primary-600 dark:text-primary-400">Hari ini</span>
+              </div>
+              <div
+                v-for="ij in groupedJadwal[h]"
+                :key="ij.id"
+                class="flex items-center gap-3 px-4 py-3"
+                :class="h === todayName ? 'bg-primary-50/30 dark:bg-primary-900/10' : ''"
+              >
+                <div class="w-16 flex-shrink-0 text-center">
+                  <p class="text-xs font-semibold text-gray-900 dark:text-gray-100 leading-none">{{ ij.jamMulai }}</p>
+                  <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-none">{{ ij.jamSelesai }}</p>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ ij.mapel }}</h3>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ ij.kelas.nama }} · {{ ij.ruangan.nama }}</p>
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
       </BaseCard>
     </template>
