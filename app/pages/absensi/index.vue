@@ -27,6 +27,16 @@ interface ActiveSesi {
   }
 }
 
+interface MingguanJadwal {
+  id: number
+  hari: string
+  mapel: string
+  jamMulai: string
+  jamSelesai: string
+  kelas: { id: number; nama: string }
+  ruangan: { id: number; nama: string }
+}
+
 const { user } = useUserSession()
 const { adaJadwal } = useJadwalHariIni()
 
@@ -38,6 +48,17 @@ const successMsg = ref('')
 const openingSesi = ref<number | null>(null)
 const closingSesi = ref<number | null>(null)
 const confirmClose = ref<ActiveSesi | null>(null)
+
+const { data: jadwalMingguan } = useFetch<{ hariOrder: string[]; grouped: Record<string, MingguanJadwal[]> }>('/api/absensi/jadwal-mingguan', {
+  immediate: true
+})
+
+const totalJadwalMinggu = computed(() =>
+  Object.values(jadwalMingguan.value?.grouped || {}).reduce((a, arr) => a + arr.length, 0)
+)
+const jumlahHariMinggu = computed(() =>
+  Object.keys(jadwalMingguan.value?.grouped || {}).length
+)
 
 const todayLabel = computed(() =>
   new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
@@ -238,6 +259,24 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
         <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Scan hari ini</p>
         <p class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 mt-1 leading-none tracking-tight">{{ totalSiswaScan }}</p>
       </div>
+
+      <!-- Weekly schedule shortcut -->
+      <section class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-5 mt-3">
+        <div class="flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Jadwal Minggu Ini</p>
+            <p class="text-sm font-bold text-gray-900 dark:text-gray-100 mt-1 truncate">
+              {{ totalJadwalMinggu > 0 ? `${totalJadwalMinggu} sesi · ${jumlahHariMinggu} hari` : 'Belum ada jadwal untuk minggu ini.' }}
+            </p>
+          </div>
+          <NuxtLink
+            to="/absensi/rekap#jadwal-minggu"
+            class="flex-shrink-0 px-3.5 py-2 text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 rounded-xl hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+          >
+            Lihat di Rekap
+          </NuxtLink>
+        </div>
+      </section>
 
       <!-- Today's schedule -->
       <section id="jadwal-hari-ini" class="mt-5">
