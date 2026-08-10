@@ -49,6 +49,24 @@ const hariLabels: Record<string, string> = {
 }
 const dayNames = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU']
 const todayName = dayNames[new Date().getDay()]
+
+function dateOfHari(h: string): Date {
+  const now = new Date()
+  const dow = now.getDay()
+  const diffToMonday = (dow === 0 ? 7 : dow) - 1
+  const monday = new Date(now)
+  monday.setHours(0, 0, 0, 0)
+  monday.setDate(now.getDate() - diffToMonday)
+  const idx = dayNames.indexOf(h)
+  const offset = idx === 0 ? 6 : idx - 1
+  const d = new Date(monday)
+  d.setDate(monday.getDate() + offset)
+  return d
+}
+
+function hariDateLabel(h: string): string {
+  return dateOfHari(h).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })
+}
 const hariOrder = computed(() => jadwalMingguan.value?.hariOrder || [])
 const hasWeeklyJadwal = computed(() =>
   Object.values(jadwalMingguan.value?.grouped || {}).some(arr => arr.length > 0)
@@ -145,35 +163,46 @@ const rataPersentase = computed(() =>
 
         <div
           v-else
-          class="divide-y divide-gray-100 dark:divide-slate-700"
+          class="space-y-5"
         >
           <template v-for="h in hariOrder" :key="h">
-            <div v-if="groupedJadwal[h] && groupedJadwal[h].length > 0">
-              <div
-                class="px-4 py-1.5 flex items-center gap-2"
-                :class="h === todayName ? 'bg-primary-50/60 dark:bg-primary-900/20' : 'bg-gray-50 dark:bg-slate-700/40'"
-              >
-                <span class="text-[10px] font-bold uppercase tracking-wider" :class="h === todayName ? 'text-primary-700 dark:text-primary-300' : 'text-gray-400 dark:text-gray-500'">
+            <section v-if="groupedJadwal[h] && groupedJadwal[h].length > 0" class="flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <h3
+                  class="text-sm font-bold"
+                  :class="h === todayName ? 'text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300'"
+                >
                   {{ hariLabels[h] }}
+                </h3>
+                <span class="text-xs font-medium text-gray-400 dark:text-gray-500">{{ hariDateLabel(h) }}</span>
+                <span
+                  v-if="h === todayName"
+                  class="text-[10px] font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 px-1.5 py-0.5 rounded-full"
+                >
+                  Hari ini
                 </span>
-                <span v-if="h === todayName" class="text-[10px] font-semibold text-primary-600 dark:text-primary-400">Hari ini</span>
               </div>
+
               <div
-                v-for="ij in groupedJadwal[h]"
-                :key="ij.id"
-                class="flex items-center gap-3 px-4 py-3"
+                class="rounded-xl divide-y divide-gray-100 dark:divide-slate-700"
                 :class="h === todayName ? 'bg-primary-50/30 dark:bg-primary-900/10' : ''"
               >
-                <div class="w-16 flex-shrink-0 text-center">
-                  <p class="text-xs font-semibold text-gray-900 dark:text-gray-100 leading-none">{{ ij.jamMulai }}</p>
-                  <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-none">{{ ij.jamSelesai }}</p>
-                </div>
-                <div class="min-w-0 flex-1">
-                  <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ ij.mapel }}</h3>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ ij.kelas.nama }} · {{ ij.ruangan.nama }}</p>
+                <div
+                  v-for="ij in groupedJadwal[h]"
+                  :key="ij.id"
+                  class="flex items-center gap-3 px-3.5 py-2.5"
+                >
+                  <div class="w-16 flex-shrink-0 text-center">
+                    <p class="text-xs font-semibold text-gray-900 dark:text-gray-100 leading-none">{{ ij.jamMulai }}</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-none">{{ ij.jamSelesai }}</p>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ ij.mapel }}</h4>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ ij.kelas.nama }} · {{ ij.ruangan.nama }}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </section>
           </template>
         </div>
       </BaseCard>
