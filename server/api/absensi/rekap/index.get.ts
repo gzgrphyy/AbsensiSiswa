@@ -35,8 +35,11 @@ export default defineEventHandler(async (event) => {
     const persentase = totalSiswa > 0 ? Number(((hadir / totalSiswa) * 100).toFixed(1)) : 0
 
     return {
+      id: s.id,
+      tanggal: s.tanggal.toISOString().split('T')[0],
       mapel: s.jadwal.mapel,
       kelas: s.jadwal.kelas.nama,
+      ruangan: s.jadwal.ruangan.nama,
       totalSiswa,
       hadir,
       sakit,

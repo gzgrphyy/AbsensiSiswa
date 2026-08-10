@@ -1,7 +1,10 @@
 <script setup lang="ts">
 interface RekapItem {
+  id: number
+  tanggal: string
   mapel: string
   kelas: string
+  ruangan: string
   totalSiswa: number
   hadir: number
   sakit: number
@@ -89,25 +92,37 @@ const rataPersentase = computed(() =>
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700">
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Tanggal</th>
                 <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Mata Pelajaran</th>
                 <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Kelas</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Total</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Hadir</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">S/I/A</th>
                 <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">%</th>
+                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Detail</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-              <tr v-for="item in displayData" :key="item.mapel + item.kelas" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+              <tr v-for="item in displayData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+                <td class="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ new Date(item.tanggal).toLocaleDateString('id-ID') }}</td>
                 <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
                 <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.kelas }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.totalSiswa }}</td>
                 <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 font-medium">{{ item.hadir }}</td>
                 <td class="px-4 py-3 text-center text-gray-500 dark:text-gray-400 text-xs hidden md:table-cell">{{ item.sakit }}/{{ item.izin }}/{{ item.alpha }}</td>
                 <td class="px-4 py-3 text-center font-semibold" :class="item.persentase >= 90 ? 'text-green-600' : item.persentase >= 75 ? 'text-amber-600' : 'text-red-600'">{{ item.persentase }}%</td>
+                <td class="px-4 py-3 text-center">
+                  <NuxtLink :to="`/absensi/sesi/${item.id}`"
+                    class="inline-flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">
+                    Lihat
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </NuxtLink>
+                </td>
               </tr>
               <tr v-if="displayData.length === 0">
-                <td colspan="6" class="px-4 py-16 text-center">
+                <td colspan="8" class="px-4 py-16 text-center">
                   <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada data rekap</p>
                 </td>
               </tr>

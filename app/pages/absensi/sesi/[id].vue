@@ -233,12 +233,7 @@ onMounted(() => {
                   class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-primary-600 dark:bg-slate-700 focus:ring-primary-500 cursor-pointer disabled:cursor-not-allowed" />
               </td>
               <td class="px-3 py-3">
-                <div class="flex items-center gap-2">
-                  <div class="w-7 h-7 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center text-gray-600 dark:text-gray-300 text-xs font-semibold">
-                    {{ s.nama.charAt(0).toUpperCase() }}
-                  </div>
-                  <span class="font-medium text-gray-900 dark:text-gray-100">{{ s.nama }}</span>
-                </div>
+                <span class="font-medium text-gray-900 dark:text-gray-100">{{ s.nama }}</span>
               </td>
               <td class="px-3 py-3 text-gray-500 dark:text-gray-400 hidden sm:table-cell">{{ s.nisn }}</td>
               <td class="px-3 py-3 text-center">
