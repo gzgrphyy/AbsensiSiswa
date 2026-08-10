@@ -20,7 +20,17 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
 
 <template>
   <AppLayout>
-    <PageHeader title="Beranda Admin" description="Ikhtisar sistem absensi sekolah" :show-back="false" />
+    <PageHeader title="Beranda Admin" description="Ikhtisar sistem absensi sekolah" :show-back="false">
+      <template #actions>
+        <div class="flex items-center gap-3 text-xs text-gray-500 self-end pb-0.5">
+          <div class="flex items-center gap-1">
+            <span class="w-2 h-2 rounded-none bg-green-500 animate-pulse"></span>
+            Langsung
+          </div>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-none bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-semibold">Hari ini</span>
+        </div>
+      </template>
+    </PageHeader>
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="5" />
 
@@ -152,17 +162,8 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
         <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
           <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
-              <div class="flex items-center gap-2">
-                <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Pemantauan Ruangan</h3>
-                <div class="flex items-center gap-1 text-[10px] text-green-600 dark:text-green-400 font-medium">
-                  <span class="w-1.5 h-1.5 rounded-none bg-green-500 animate-pulse"></span>
-                  Langsung
-                </div>
-              </div>
-              <div class="flex items-center gap-2 mt-0.5">
-                <p class="text-xs text-gray-400 dark:text-gray-500">Status ruangan terkini</p>
-                <span class="text-[10px] px-1.5 py-0.5 rounded-none bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-semibold">Hari ini</span>
-              </div>
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Pemantauan Ruangan</h3>
+              <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Status ruangan terkini</p>
             </div>
             <BaseBadge variant="green" dot size="sm">{{ data.monitoring.filter(r => r.status === 'Aktif').length }} Aktif</BaseBadge>
           </div>
@@ -201,7 +202,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
       <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
         <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Aktivitas Terbaru</h3>
-          <span class="text-xs text-gray-400 dark:text-gray-500">Hari ini</span>
+          <span class="text-xs text-gray-400 dark:text-gray-200 font-medium bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.aktivitasTerbaru.length }} aktivitas</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
