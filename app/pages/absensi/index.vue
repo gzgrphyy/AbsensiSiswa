@@ -158,7 +158,7 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
   <PTKLayout>
     <!-- Greeting -->
     <header class="mb-5">
-      <p class="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{{ todayLabel }}</p>
+      <p class="text-xs font-medium text-gray-400 dark:text-gray-500">{{ todayLabel }}</p>
       <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 mt-1">
         {{ greeting }}, {{ user?.nama || 'Pak/Bu' }}
       </h1>
@@ -200,7 +200,7 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
         >
           <div class="flex items-start justify-between gap-4">
             <div class="min-w-0">
-              <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-primary-600 dark:text-primary-400">
+              <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-600 dark:text-primary-400">
                 <span class="w-2 h-2 rounded-full bg-primary-500 animate-pulse"></span>
                 Sesi aktif
               </span>
@@ -211,9 +211,8 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
             </span>
           </div>
 
-          <div class="flex items-center justify-between gap-3 text-sm mt-4">
+          <div class="flex items-center gap-3 text-sm mt-4">
             <span class="text-gray-600 dark:text-gray-300 truncate">Kelas <b class="font-semibold text-gray-900 dark:text-gray-100">{{ sesi.jadwal.kelas.nama }}</b> · {{ sesi.jadwal.ruangan.nama }}</span>
-            <span class="font-semibold text-gray-900 dark:text-gray-100 flex-shrink-0">{{ sesi._count.requests }} scan</span>
           </div>
           <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">{{ sesi.jadwal.jamMulai }} – {{ sesi.jadwal.jamSelesai }}</p>
 
@@ -234,49 +233,26 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
         </section>
       </template>
 
-      <!-- Idle session card -->
-      <section
-        v-else-if="jadwal.length > 0"
-        class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-4 mb-3"
-      >
-        <div class="flex items-center gap-3">
-          <div class="w-1 self-stretch rounded-full bg-gray-200 dark:bg-slate-600 flex-shrink-0" />
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200">Siap membuka sesi kehadiran</p>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Buka sesi dari jadwal di bawah saat kelas dimulai.</p>
-          </div>
+      <!-- Stats & weekly schedule shortcut -->
+      <div class="grid grid-cols-2 gap-3 mt-3">
+        <div class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-4">
+          <p class="text-xs font-medium text-gray-400 dark:text-gray-500">Scan Hari Ini</p>
+          <p class="text-3xl font-extrabold text-gray-900 dark:text-gray-100 mt-1 leading-none tracking-tight">{{ totalSiswaScan }}</p>
+        </div>
+
+        <div class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-4 flex flex-col">
+          <p class="text-xs font-medium text-gray-400 dark:text-gray-500">Jadwal Minggu Ini</p>
+          <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-1 truncate">
+            {{ totalJadwalMinggu > 0 ? `${totalJadwalMinggu} sesi · ${jumlahHariMinggu} hari` : 'Belum ada' }}
+          </p>
           <NuxtLink
             to="/absensi/rekap#jadwal-minggu"
-            class="flex-shrink-0 px-3.5 py-2 text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 rounded-xl hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+            class="mt-2 self-start text-xs font-semibold text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors"
           >
-            Lihat jadwal
+            Lihat
           </NuxtLink>
         </div>
-      </section>
-
-      <!-- Asymmetric stats -->
-      <div class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-5 mt-3">
-        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Scan hari ini</p>
-        <p class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 mt-1 leading-none tracking-tight">{{ totalSiswaScan }}</p>
       </div>
-
-      <!-- Weekly schedule shortcut -->
-      <section class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-5 mt-3">
-        <div class="flex items-center justify-between gap-3">
-          <div class="min-w-0">
-            <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Jadwal Minggu Ini</p>
-            <p class="text-sm font-bold text-gray-900 dark:text-gray-100 mt-1 truncate">
-              {{ totalJadwalMinggu > 0 ? `${totalJadwalMinggu} sesi · ${jumlahHariMinggu} hari` : 'Belum ada jadwal untuk minggu ini.' }}
-            </p>
-          </div>
-          <NuxtLink
-            to="/absensi/rekap#jadwal-minggu"
-            class="flex-shrink-0 px-3.5 py-2 text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 rounded-xl hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
-          >
-            Lihat di Rekap
-          </NuxtLink>
-        </div>
-      </section>
 
       <!-- Today's schedule -->
       <section id="jadwal-hari-ini" class="mt-5">
@@ -309,8 +285,8 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
             <div class="w-14 flex-shrink-0 text-center">
               <p class="text-[13px] font-bold text-gray-900 dark:text-gray-100 leading-none">{{ j.jamMulai }}</p>
               <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-none">{{ j.jamSelesai }}</p>
-              <p v-if="j.isWithinTime && !j.todaySesi" class="text-[9px] font-bold uppercase tracking-wide text-primary-600 dark:text-primary-400 mt-1 leading-none animate-pulse">Buka</p>
-              <p v-else-if="j.todaySesi?.status === 'SELESAI'" class="text-[9px] font-bold uppercase tracking-wide text-gray-400 dark:text-gray-500 mt-1 leading-none">Selesai</p>
+              <p v-if="j.isWithinTime && !j.todaySesi" class="text-[9px] font-bold text-primary-600 dark:text-primary-400 mt-1 leading-none animate-pulse">Buka</p>
+              <p v-else-if="j.todaySesi?.status === 'SELESAI'" class="text-[9px] font-bold text-gray-400 dark:text-gray-500 mt-1 leading-none">Selesai</p>
             </div>
 
             <div class="min-w-0 flex-1">

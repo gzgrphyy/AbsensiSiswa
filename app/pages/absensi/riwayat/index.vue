@@ -68,7 +68,7 @@ const displayData = computed(() => history.value || [])
                 </span>
               </td>
               <td class="px-4 py-3 text-center">
-                <NuxtLink :to="`/absensi/sesi/${item.id}`"
+                <NuxtLink :to="`/absensi/detail/${item.id}`"
                   class="inline-flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">
                   Lihat
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
