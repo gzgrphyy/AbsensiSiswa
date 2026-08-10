@@ -178,7 +178,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                <tr v-for="(item, idx) in data.monitoring" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
+                <tr v-for="(item, idx) in data.monitoring.slice(0, 5)" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
                   <td class="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">{{ item.ruangan }}</td>
                   <td class="px-4 py-3 text-center">
                     <BaseBadge
@@ -192,8 +192,25 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
                   <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ item.sesi }}</td>
                   <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.ptk }}</td>
                 </tr>
+                <tr v-if="data.monitoring.length === 0">
+                  <td colspan="4" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">Belum ada data</td>
+                </tr>
               </tbody>
             </table>
+          </div>
+          <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3">
+            <p v-if="data.monitoring.length > 5" class="text-xs text-gray-400 dark:text-gray-500">
+              dan {{ data.monitoring.length - 5 }} ruangan lainnya
+            </p>
+            <NuxtLink
+              to="/admin/monitoring"
+              class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+            >
+              Lihat Selengkapnya
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </NuxtLink>
           </div>
         </div>
       </div>
