@@ -35,7 +35,7 @@ onMounted(() => {
             <span class="w-2 h-2 rounded-none bg-green-500 animate-pulse"></span>
             Langsung
           </div>
-          <span class="text-[10px] px-1.5 py-0.5 rounded-none bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-semibold">Hari ini</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-none bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 ">Hari ini</span>
         </div>
       </template>
     </PageHeader>
@@ -54,30 +54,30 @@ onMounted(() => {
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Ruangan</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Sesi Aktif</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Total Murid</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Sudah Absen</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Belum Absen</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Status</th>
+                <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Ruangan</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Sesi Aktif</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Total Murid</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Sudah Absen</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Belum Absen</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Status</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
               <tr v-for="item in displayData" :key="item.ruangan" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
-                <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.ruangan }}</td>
+                <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.ruangan }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.sesiAktif }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.totalSiswa }}</td>
-                <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 font-medium">{{ item.sudahAbsen }}</td>
-                <td class="px-4 py-3 text-center text-amber-600 dark:text-amber-400 font-medium">{{ item.belumAbsen }}</td>
+                <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 ">{{ item.sudahAbsen }}</td>
+                <td class="px-4 py-3 text-center text-amber-600 dark:text-amber-400 ">{{ item.belumAbsen }}</td>
                 <td class="px-4 py-3 text-center">
                   <BaseBadge :variant="item.status === 'AKTIF' ? 'green' : 'gray'" :dot="item.status === 'AKTIF'" :pulse="item.status === 'AKTIF'">
-                    {{ item.status }}
+                    {{ capitalize(item.status) }}
                   </BaseBadge>
                 </td>
               </tr>
               <tr v-if="displayData.length === 0">
                 <td colspan="6" class="px-4 py-16 text-center">
-                  <p class="text-gray-500 font-medium">Belum ada data pemantauan</p>
+                  <p class="text-gray-500 ">Belum ada data pemantauan</p>
                 </td>
               </tr>
             </tbody>

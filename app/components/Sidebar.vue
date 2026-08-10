@@ -128,11 +128,11 @@ function renderIcon(icon: string) {
         <div v-if="user?.foto" class="w-9 h-9 rounded-full overflow-hidden border border-primary-100 dark:border-primary-800 flex-shrink-0">
           <img :src="user.foto" class="w-full h-full object-cover" />
         </div>
-        <div v-else class="w-9 h-9 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs font-semibold text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800 flex-shrink-0">
+        <div v-else class="w-9 h-9 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs  text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800 flex-shrink-0">
           {{ user?.nama?.charAt(0)?.toUpperCase() || 'U' }}
         </div>
         <div v-if="!collapsed" class="min-w-0">
-          <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight">{{ user?.nama || 'Pengguna' }}</p>
+          <p class="text-sm  text-gray-900 dark:text-gray-100 truncate leading-tight">{{ user?.nama || 'Pengguna' }}</p>
           <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ roleLabel[user?.role] || user?.role }}</p>
         </div>
       </div>
@@ -146,7 +146,7 @@ function renderIcon(icon: string) {
           <button
             @click="toggleGroup(item.icon)"
             :class="[
-              'w-full flex items-center gap-2.5 py-2 text-sm font-medium transition-all duration-150',
+              'w-full flex items-center gap-2.5 py-2 text-sm  transition-all duration-150',
               collapsed ? 'justify-center px-0' : 'px-3',
               isChildActive(item.children)
                 ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
@@ -170,7 +170,7 @@ function renderIcon(icon: string) {
               :class="[
                 'flex items-center gap-2 px-3 py-1.5 text-sm transition-all duration-150',
                 route.path === child.to
-                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-medium'
+                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 '
                   : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400',
                 isAdmin ? '' : 'rounded-lg'
               ]"
@@ -186,7 +186,7 @@ function renderIcon(icon: string) {
           v-else
           :to="item.to"
           :class="[
-            'w-full flex items-center gap-2.5 py-2 text-sm font-medium transition-all duration-150',
+            'w-full flex items-center gap-2.5 py-2 text-sm  transition-all duration-150',
             collapsed ? 'justify-center px-0' : 'px-3',
             isActive(item.to)
               ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'

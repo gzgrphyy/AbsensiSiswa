@@ -64,7 +64,7 @@ async function handleExport(id: string) {
 
     <div v-for="section in exportOptions" :key="section.title" class="mb-6">
       <div class="mb-2">
-        <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ section.title }}</h2>
+        <h2 class="text-sm  text-gray-900 dark:text-gray-100">{{ section.title }}</h2>
         <p class="text-xs text-gray-400 dark:text-gray-500">{{ section.description }}</p>
       </div>
       <div :class="section.items.length >= 3 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'grid grid-cols-1 sm:grid-cols-2 gap-4'">
@@ -79,7 +79,7 @@ async function handleExport(id: string) {
               </svg>
             </div>
             <div class="flex-1">
-              <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ opt.label }}</h3>
+              <h3 class="text-sm  text-gray-900 dark:text-gray-100">{{ opt.label }}</h3>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ opt.description }}</p>
             </div>
             <svg v-if="exporting === opt.id" class="w-5 h-5 text-blue-600 animate-spin flex-shrink-0" fill="none" viewBox="0 0 24 24">

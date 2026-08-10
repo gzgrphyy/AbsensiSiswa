@@ -38,13 +38,13 @@ const cardStyle = {
 <template>
   <div v-if="isAdmin" class="rounded-none border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 p-3">
     <div class="flex items-center gap-3">
-      <div v-if="$slots.icon" class="p-2 rounded-none bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 flex-shrink-0">
+      <div v-if="$slots.icon" class="p-2 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 flex-shrink-0">
         <slot name="icon" />
       </div>
       <div class="min-w-0">
-        <p class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold truncate">{{ label }}</p>
-        <p class="text-base font-bold text-gray-900 dark:text-gray-100 mt-0.5">{{ value }}</p>
-        <p v-if="trendLabel" class="text-[10px] mt-0.5 font-medium text-gray-400 dark:text-gray-500">{{ trendLabel }}</p>
+        <p class="text-[10px] text-gray-500 dark:text-gray-400 tracking-wider  truncate">{{ label }}</p>
+        <p class="text-base  text-gray-900 dark:text-gray-100 mt-0.5">{{ value }}</p>
+        <p v-if="trendLabel" class="text-[10px] mt-0.5  text-gray-400 dark:text-gray-500">{{ trendLabel }}</p>
       </div>
     </div>
   </div>
@@ -54,9 +54,9 @@ const cardStyle = {
         <slot name="icon" />
       </div>
       <div class="min-w-0">
-        <p class="text-[11px] text-gray-400 dark:text-gray-500 uppercase tracking-wider font-semibold truncate">{{ label }}</p>
-        <p class="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-0.5">{{ value }}</p>
-        <p v-if="trendLabel" class="text-xs mt-0.5 font-medium" :class="trend === 'up' ? 'text-green-600 dark:text-green-400' : trend === 'down' ? 'text-red-600 dark:text-red-400' : 'text-gray-400 dark:text-gray-500'">{{ trendLabel }}</p>
+        <p class="text-[11px] text-gray-400 dark:text-gray-500 tracking-wider  truncate">{{ label }}</p>
+        <p class="text-2xl  text-gray-900 dark:text-gray-100 mt-0.5">{{ value }}</p>
+        <p v-if="trendLabel" class="text-xs mt-0.5 " :class="trend === 'up' ? 'text-green-600 dark:text-green-400' : trend === 'down' ? 'text-red-600 dark:text-red-400' : 'text-gray-400 dark:text-gray-500'">{{ trendLabel }}</p>
       </div>
     </div>
   </div>

@@ -156,7 +156,7 @@ async function handleDelete() {
     <PageHeader title="Jadwal Pelajaran" description="Kelola jadwal pelajaran">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm font-medium">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm ">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -172,7 +172,7 @@ async function handleDelete() {
     <div class="mb-4 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-none">
       <div class="flex flex-wrap items-end gap-3">
         <div>
-          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Hari</label>
+          <label class="block text-xs  text-gray-500 dark:text-gray-400 mb-1">Hari</label>
           <select v-model="filterHari"
             class="px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 min-w-[130px]">
             <option :value="undefined">Semua Hari</option>
@@ -181,7 +181,7 @@ async function handleDelete() {
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Kelas</label>
+          <label class="block text-xs  text-gray-500 dark:text-gray-400 mb-1">Kelas</label>
           <select v-model="filterKelasId"
             class="px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 min-w-[150px]">
             <option :value="undefined">Semua Kelas</option>
@@ -190,7 +190,7 @@ async function handleDelete() {
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">PTK</label>
+          <label class="block text-xs  text-gray-500 dark:text-gray-400 mb-1">PTK</label>
           <select v-model="filterGuruId"
             class="px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 min-w-[180px]">
             <option :value="undefined">Semua PTK</option>
@@ -199,19 +199,19 @@ async function handleDelete() {
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-transparent mb-1">Aksi</label>
+          <label class="block text-xs  text-transparent mb-1">Aksi</label>
           <div class="flex items-center gap-2">
             <button @click="applyFilter"
-              class="px-4 py-2.5 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm font-medium inline-flex items-center gap-1.5">
+              class="px-4 py-2.5 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm  inline-flex items-center gap-1.5">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
               Penyaring
             </button>
             <button v-if="activeFilterCount > 0" @click="resetFilter"
-              class="px-4 py-2.5 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-none hover:bg-gray-200 dark:hover:bg-slate-600 text-sm font-medium inline-flex items-center gap-1.5">
+              class="px-4 py-2.5 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-none hover:bg-gray-200 dark:hover:bg-slate-600 text-sm  inline-flex items-center gap-1.5">
               Atur Ulang
-              <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-blue-600 text-white rounded-none">{{ activeFilterCount }}</span>
+              <span class="inline-flex items-center justify-center w-5 h-5 text-xs  bg-blue-600 text-white rounded-none">{{ activeFilterCount }}</span>
             </button>
           </div>
         </div>
@@ -225,18 +225,18 @@ async function handleDelete() {
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Mata Pelajaran</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Hari</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Jam</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Kelas</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">Ruangan</th>
-                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden lg:table-cell">PTK</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Aksi</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Mata Pelajaran</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Hari</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Jam</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">Kelas</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">Ruangan</th>
+                <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">PTK</th>
+              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
             <tr v-for="item in jadwalList" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
-              <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
+              <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
               <td class="px-4 py-3">
                 <BaseBadge variant="blue" size="sm">{{ hariLabel[item.hari] || item.hari }}</BaseBadge>
               </td>
@@ -264,7 +264,7 @@ async function handleDelete() {
                 <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada jadwal pelajaran</p>
+                <p class="text-gray-500 dark:text-gray-400 ">Belum ada jadwal pelajaran</p>
               </td>
             </tr>
           </tbody>
@@ -329,9 +329,9 @@ async function handleDelete() {
         </div>
       </form>
       <template #footer>
-        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none">Batal</button>
+        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none">Batal</button>
         <button type="submit" @click="handleSave" :disabled="saving"
-          class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-none hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
+          class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-none hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
           <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           {{ saving ? 'Menyimpan...' : 'Simpan' }}
         </button>

@@ -31,12 +31,12 @@ async function handleLogout() {
     <div class="px-6 py-2.5 flex items-center justify-between">
       <!-- Left: Logo & School Name (Admin only) -->
       <NuxtLink v-if="isAdmin" to="/admin" class="flex items-center gap-2.5 min-w-0 flex-shrink-0">
-        <div class="w-9 h-9 bg-primary-500 flex items-center justify-center text-white text-sm font-bold overflow-hidden flex-shrink-0 rounded-full">
+        <div class="w-9 h-9 bg-primary-500 flex items-center justify-center text-white text-sm  overflow-hidden flex-shrink-0 rounded-full">
           <img v-if="pengaturan?.logoSekolahPath" :src="pengaturan.logoSekolahPath" class="w-full h-full object-contain p-1" />
-          <span v-else class="text-[10px] font-bold text-center leading-tight px-1">SMK</span>
+          <span v-else class="text-[10px]  text-center leading-tight px-1">SMK</span>
         </div>
         <div class="min-w-0 hidden md:block">
-          <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight">{{ pengaturan?.namaSekolah || 'SMK Negeri 1 Bandung' }}</p>
+          <p class="text-sm  text-gray-900 dark:text-gray-100 truncate leading-tight">{{ pengaturan?.namaSekolah || 'SMK Negeri 1 Bandung' }}</p>
           <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
         </div>
       </NuxtLink>
@@ -66,18 +66,18 @@ async function handleLogout() {
           <div v-if="pengaturan?.iconPath" class="w-8 h-8 bg-primary-500 rounded-full overflow-hidden border border-primary-100 dark:border-primary-800 flex-shrink-0 flex items-center justify-center">
             <img :src="pengaturan.iconPath" class="w-full h-full object-contain p-1" />
           </div>
-          <div v-else class="w-8 h-8 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs font-semibold text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800 flex-shrink-0">
+          <div v-else class="w-8 h-8 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs  text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800 flex-shrink-0">
             {{ pengaturan?.namaAplikasi?.charAt(0)?.toUpperCase() || 'S' }}
           </div>
           <div class="hidden md:block">
-            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
+            <p class="text-sm  text-gray-900 dark:text-gray-100 leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
             <p class="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
           </div>
         </div>
 
         <button
           @click="handleLogout"
-          :class="['inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-150', isAdmin ? 'rounded-none' : 'rounded-lg']"
+          :class="['inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs  text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-150', isAdmin ? 'rounded-none' : 'rounded-lg']"
           title="Keluar"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

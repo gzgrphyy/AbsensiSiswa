@@ -58,21 +58,21 @@ onUnmounted(() => {
     <div class="px-3 sm:px-4 flex items-center justify-between h-[26px]">
       <!-- Left: Logo & App Name -->
       <NuxtLink to="/admin" class="flex items-center gap-1.5 min-w-0">
-        <div class="w-4 h-4 bg-primary-500 flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0 overflow-hidden rounded">
+        <div class="w-4 h-4 bg-primary-500 flex items-center justify-center text-white text-[9px]  flex-shrink-0 overflow-hidden rounded">
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain" />
           <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
         </div>
-        <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</span>
+        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</span>
       </NuxtLink>
 
       <!-- Centered: Live Clock -->
       <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span class="text-[10px] font-medium text-gray-500 dark:text-gray-400 tabular-nums tracking-wide">{{ currentTime }}</span>
+        <span class="text-[10px]  text-gray-500 dark:text-gray-400 tabular-nums tracking-wide">{{ currentTime }}</span>
       </div>
 
       <!-- Right: Developer Profile -->
       <div class="flex items-center gap-1.5">
-        <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400 truncate hidden sm:inline">TA {{ pengaturan?.tahunAjaran || '—' }}</span>
+        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">TA {{ pengaturan?.tahunAjaran || '—' }}</span>
 
         <img src="/bendera_indonesia.png" class="w-4 h-3 object-contain flex-shrink-0" alt="Merdeka" />
 
@@ -96,11 +96,11 @@ onUnmounted(() => {
           <div v-if="dev.foto" class="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden">
             <img :src="dev.foto" class="w-full h-full object-cover" />
           </div>
-          <div v-else :class="['w-10 h-10 bg-primary-500 flex items-center justify-center text-white font-bold flex-shrink-0', isAdmin ? 'rounded-none' : 'rounded-full']">
+          <div v-else :class="['w-10 h-10 bg-primary-500 flex items-center justify-center text-white  flex-shrink-0', isAdmin ? 'rounded-none' : 'rounded-full']">
             {{ dev.nama.charAt(0) }}
           </div>
           <div>
-        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ dev.nama }}</p>
+        <p class="text-sm  text-gray-900 dark:text-gray-100">{{ dev.nama }}</p>
         <p class="text-xs text-gray-500 dark:text-gray-400">{{ dev.role }}</p>
           </div>
         </div>

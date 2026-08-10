@@ -24,10 +24,10 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
       <template #actions>
         <div class="flex items-center gap-3 text-xs text-gray-500 self-end pb-0.5">
           <div class="flex items-center gap-1">
-            <span class="w-2 h-2 rounded-none bg-green-500 animate-pulse"></span>
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             Langsung
           </div>
-          <span class="text-[10px] px-1.5 py-0.5 rounded-none bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-semibold">Hari ini</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-none bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 ">Hari ini</span>
         </div>
       </template>
     </PageHeader>
@@ -128,26 +128,26 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
         <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
           <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
-              <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Murid Alpha Terbanyak</h3>
+              <h3 class="text-sm font text-gray-900 dark:text-gray-100">Murid Alpha Terbanyak</h3>
               <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Periode bulan ini</p>
             </div>
-            <span class="text-xs text-gray-400 dark:text-gray-200 font-medium bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.topAlpha.length }} murid</span>
+            <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.topAlpha.length }} murid</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
                 <tr class="bg-gray-50 dark:bg-slate-700/50">
-                  <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Nama</th>
-                  <th class="text-center px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Kelas</th>
-                  <th class="text-center px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Total Alpha</th>
+                  <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">Nama</th>
+                  <th class="text-center px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">Kelas</th>
+                  <th class="text-center px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">Total Alpha</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                 <tr v-for="(item, idx) in data.topAlpha" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
-                  <td class="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">{{ item.nama }}</td>
+                  <td class="px-4 py-3 text-gray-900 dark:text-gray-100 ">{{ item.nama }}</td>
                   <td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-center">{{ item.kelas }}</td>
                   <td class="px-4 py-3 text-center">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 ring-1 ring-red-200 dark:ring-red-800">{{ item.totalAlpha }}x</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs  bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 ring-1 ring-red-200 dark:ring-red-800">{{ item.totalAlpha }}x</span>
                   </td>
                 </tr>
                 <tr v-if="data.topAlpha.length === 0">
@@ -162,7 +162,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
         <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
           <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
-              <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Pemantauan Ruangan</h3>
+              <h3 class="text-sm font text-gray-900 dark:text-gray-100">Pemantauan Ruangan</h3>
               <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Status ruangan terkini</p>
             </div>
             <BaseBadge variant="green" dot size="sm">{{ data.monitoring.filter(r => r.status === 'Aktif').length }} Aktif</BaseBadge>
@@ -171,22 +171,22 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
             <table class="w-full text-sm">
               <thead>
                 <tr class="bg-gray-50 dark:bg-slate-700/50">
-                  <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Ruangan</th>
-                  <th class="text-center px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Status</th>
-                  <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Sesi</th>
-                  <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider hidden md:table-cell">PTK</th>
+                  <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">Ruangan</th>
+                  <th class="text-center px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">Status</th>
+                  <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">Sesi</th>
+                  <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider hidden md:table-cell">PTK</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                 <tr v-for="(item, idx) in data.monitoring.slice(0, 5)" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
-                  <td class="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">{{ item.ruangan }}</td>
+                  <td class="px-4 py-3 text-gray-900 dark:text-gray-100 ">{{ item.ruangan }}</td>
                   <td class="px-4 py-3 text-center">
                     <BaseBadge
                       :variant="item.status === 'Aktif' ? 'green' : 'gray'"
                       :dot="item.status === 'Aktif'"
                       :pulse="item.status === 'Aktif'"
                     >
-                      {{ item.status }}
+                      {{ capitalize(item.status) }}
                     </BaseBadge>
                   </td>
                   <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ item.sesi }}</td>
@@ -204,7 +204,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
             </p>
             <NuxtLink
               to="/admin/monitoring"
-              class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+              class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
             >
               Lihat Selengkapnya
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,16 +218,16 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
       <!-- Aktivitas Terbaru -->
       <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
         <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Aktivitas Terbaru</h3>
-          <span class="text-xs text-gray-400 dark:text-gray-200 font-medium bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.aktivitasTerbaru.length }} aktivitas</span>
+          <h3 class="text-sm font text-gray-900 dark:text-gray-100">Aktivitas Terbaru</h3>
+          <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.aktivitasTerbaru.length }} aktivitas</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50">
-                <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider w-20">Waktu</th>
-                <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Aksi</th>
-                <th class="text-left px-4 py-3 font-semibold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">Detail</th>
+                <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider w-20">Waktu</th>
+                <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">Aksi</th>
+                <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">Detail</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">

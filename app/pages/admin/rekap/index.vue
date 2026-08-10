@@ -76,7 +76,7 @@ const rataPersentase = computed(() =>
     <div class="flex flex-wrap items-end gap-3 mb-5">
       <!-- Filter: Tahun Ajaran -->
       <div class="flex flex-col gap-1 min-w-[180px]">
-        <label class="text-xs font-medium text-gray-500">Tahun Ajaran</label>
+        <label class="text-xs  text-gray-500">Tahun Ajaran</label>
         <select v-model="selectedTa"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="''">Semua Tahun Ajaran</option>
@@ -86,7 +86,7 @@ const rataPersentase = computed(() =>
 
       <!-- Filter: Kelas -->
       <div class="flex flex-col gap-1 min-w-[160px]">
-        <label class="text-xs font-medium text-gray-500">Kelas</label>
+        <label class="text-xs  text-gray-500">Kelas</label>
         <select v-model="selectedKelas"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="''">Semua Kelas</option>
@@ -96,7 +96,7 @@ const rataPersentase = computed(() =>
 
       <!-- Filter: Periode Bulan -->
       <div class="flex flex-col gap-1 min-w-[180px]">
-        <label class="text-xs font-medium text-gray-500">Periode</label>
+        <label class="text-xs  text-gray-500">Periode</label>
         <select v-model="selectedBulan"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="">Semua Periode</option>
@@ -106,7 +106,7 @@ const rataPersentase = computed(() =>
 
       <!-- Tombol Reset -->
       <button @click="selectedTa = ''; selectedKelas = ''"
-        class="px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none border border-gray-300 dark:border-slate-600 transition-colors">
+        class="px-3 py-2 text-sm  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none border border-gray-300 dark:border-slate-600 transition-colors">
         Atur Ulang
       </button>
     </div>
@@ -129,26 +129,26 @@ const rataPersentase = computed(() =>
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Kelas</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Total Murid</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Hadir</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Pending</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Sakit</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Izin</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Alpha</th>
-                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">% Kehadiran</th>
+                <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Kelas</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Total Murid</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Hadir</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Pending</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Sakit</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Izin</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Alpha</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">% Kehadiran</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
               <tr v-for="item in displayData" :key="item.kelas" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
-                <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.kelas }}</td>
+                <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.kelas }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.totalSiswa }}</td>
-                <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 font-medium">{{ item.hadir }}</td>
+                <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 ">{{ item.hadir }}</td>
                 <td class="px-4 py-3 text-center text-gray-500 dark:text-gray-400">{{ item.pending }}</td>
                 <td class="px-4 py-3 text-center text-amber-600 dark:text-amber-400">{{ item.sakit }}</td>
                 <td class="px-4 py-3 text-center text-blue-600 dark:text-blue-400">{{ item.izin }}</td>
                 <td class="px-4 py-3 text-center text-red-600 dark:text-red-400">{{ item.alpha }}</td>
-                <td class="px-4 py-3 text-center font-semibold" :class="item.persentase >= 90 ? 'text-green-600 dark:text-green-400' : item.persentase >= 75 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'">{{ item.persentase }}%</td>
+                <td class="px-4 py-3 text-center " :class="item.persentase >= 90 ? 'text-green-600 dark:text-green-400' : item.persentase >= 75 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'">{{ item.persentase }}%</td>
               </tr>
             </tbody>
           </table>

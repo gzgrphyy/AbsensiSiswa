@@ -30,7 +30,7 @@ function goBack() {
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
       </button>
       <div>
-        <h1 :class="[isAdmin ? 'text-base font-bold' : 'text-xl font-bold tracking-tight', 'text-gray-900 dark:text-gray-100']">{{ title }}</h1>
+        <h1 :class="[isAdmin ? 'text-base ' : 'text-xl  tracking-tight', 'text-gray-900 dark:text-gray-100']">{{ title }}</h1>
         <p v-if="description" :class="[isAdmin ? 'text-xs' : 'text-sm', 'text-gray-400 dark:text-gray-500 mt-0.5']">{{ description }}</p>
       </div>
     </div>

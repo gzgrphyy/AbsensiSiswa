@@ -169,7 +169,7 @@ function promptDelete(item: TahunAjaran) {
     <PageHeader title="Tahun Ajaran" description="Kelola tahun ajaran dan semester aktif">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 active:bg-blue-800 text-sm font-medium">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 active:bg-blue-800 text-sm ">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -200,11 +200,11 @@ function promptDelete(item: TahunAjaran) {
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Tahun Ajaran</th>
-                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Semester</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Kelas</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Status</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Aksi</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Tahun Ajaran</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">Semester</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Kelas</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Status</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Aksi</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
@@ -215,15 +215,15 @@ function promptDelete(item: TahunAjaran) {
                   : 'hover:bg-gray-50 dark:hover:bg-gray-700/30'">
                 <td class="px-4 sm:px-6 py-4">
                   <div class="flex items-center gap-2">
-                    <span class="font-medium text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
-                    <span class="sm:hidden text-xs font-medium"
+                    <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
+                    <span class="sm:hidden text-xs "
                       :class="item.semester === 'GANJIL' ? 'text-purple-600' : 'text-cyan-600'">
                       {{ semesterLabel(item.semester) }}
                     </span>
                   </div>
                 </td>
                 <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium"
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs "
                     :class="item.semester === 'GANJIL'
                       ? 'bg-purple-100 text-purple-700 ring-1 ring-purple-200'
                       : 'bg-cyan-100 text-cyan-700 ring-1 ring-cyan-200'">
@@ -235,7 +235,7 @@ function promptDelete(item: TahunAjaran) {
                   </span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
-                  <span class="text-gray-600 font-medium">{{ item._count.kelas }}</span>
+                  <span class="text-gray-600 ">{{ item._count.kelas }}</span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
                   <BaseBadge :variant="item.isActive ? 'green' : 'gray'" size="sm" :dot="item.isActive" :pulse="item.isActive">
@@ -288,7 +288,7 @@ function promptDelete(item: TahunAjaran) {
                     <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p class="text-gray-500 font-medium">Belum ada data tahun ajaran</p>
+                    <p class="text-gray-500 ">Belum ada data tahun ajaran</p>
                     <button @click="openCreate"
                       class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 bg-gray-100 rounded-none hover:bg-gray-200 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -314,7 +314,7 @@ function promptDelete(item: TahunAjaran) {
           <div class="relative bg-white dark:bg-gray-800 rounded-none w-full max-w-md mx-auto overflow-hidden border border-gray-300 dark:border-gray-600">
             <!-- Modal header -->
             <div class="flex items-center justify-between px-4 pt-4 pb-2">
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h2 class="text-lg  text-gray-900 dark:text-gray-100">
                 {{ editing ? 'Edit Tahun Ajaran' : 'Tambah Tahun Ajaran' }}
               </h2>
               <button @click="handleCloseClick"
@@ -328,7 +328,7 @@ function promptDelete(item: TahunAjaran) {
             <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <!-- Nama -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Nama Tahun Ajaran</label>
+                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">Nama Tahun Ajaran</label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
                   placeholder="contoh: 2026/2027"
                   :disabled="!!editing && editing._count.kelas > 0"
@@ -345,7 +345,7 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Semester -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Semester</label>
+                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">Semester</label>
                 <select v-model="form.semester" @change="onFormChange"
                   :disabled="!!editing && editing._count.kelas > 0"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
@@ -359,7 +359,7 @@ function promptDelete(item: TahunAjaran) {
                 <input id="setActive" v-model="form.setActive" type="checkbox" @change="onFormChange"
                   class="mt-0.5 w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-primary-500 transition-shadow" />
                 <div class="flex flex-col">
-                  <label for="setActive" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <label for="setActive" class="text-sm  text-gray-700 dark:text-gray-300 cursor-pointer">
                     {{ editing ? 'Set sebagai tahun ajaran aktif' : 'Jadikan aktif sekarang' }}
                   </label>
                   <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -391,11 +391,11 @@ function promptDelete(item: TahunAjaran) {
               <!-- Actions -->
               <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-slate-700">
                 <button type="button" @click="handleCloseClick"
-                  class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
+                  class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
                   Batal
                 </button>
                 <button type="submit" :disabled="saving"
-                  class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-none hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
+                  class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-none hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
                   <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -413,15 +413,15 @@ function promptDelete(item: TahunAjaran) {
         <div v-if="confirmClose" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmClose = false"></div>
           <div class="relative bg-white dark:bg-gray-800 rounded-none w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Batalkan perubahan?</h2>
+            <h2 class="text-lg  text-gray-900 dark:text-gray-100 mb-2">Batalkan perubahan?</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Perubahan yang belum disimpan akan hilang.</p>
             <div class="flex justify-end gap-3">
               <button @click="confirmClose = false"
-                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
                 Lanjutkan Edit
               </button>
               <button @click="showModal = false; confirmClose = false"
-                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-none hover:bg-red-700 transition-colors">
+                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-none hover:bg-red-700 transition-colors">
                 Ya, Batalkan
               </button>
             </div>
@@ -440,21 +440,21 @@ function promptDelete(item: TahunAjaran) {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Aktifkan Tahun Ajaran</h2>
+              <h2 class="text-lg  text-gray-900 dark:text-gray-100">Aktifkan Tahun Ajaran</h2>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-              Tahun ajaran <strong class="text-gray-900 dark:text-gray-100">{{ confirmToggle.nama }}</strong> akan diaktifkan.
+              Tahun ajaran <span class="text-gray-900 dark:text-gray-100">{{ confirmToggle.nama }}</span> akan diaktifkan.
             </p>
             <p class="text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-none p-3 mb-4">
               Tahun ajaran lain yang aktif akan otomatis dinonaktifkan.
             </p>
             <div class="flex justify-end gap-3">
               <button @click="confirmToggle = null"
-                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
                 Batal
               </button>
               <button @click="handleToggle"
-                class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-none hover:bg-green-700 active:bg-green-800">
+                class="px-4 py-2 text-sm  text-white bg-green-600 rounded-none hover:bg-green-700 active:bg-green-800">
                 Ya, Aktifkan
               </button>
             </div>
@@ -474,12 +474,12 @@ function promptDelete(item: TahunAjaran) {
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Hapus Tahun Ajaran</h2>
+                <h2 class="text-lg  text-gray-900 dark:text-gray-100">Hapus Tahun Ajaran</h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Tindakan ini tidak bisa dibatalkan</p>
               </div>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-              Yakin ingin menghapus <strong class="text-gray-900 dark:text-gray-100">{{ confirmDelete.nama }}</strong>?
+              Yakin ingin menghapus <span class="text-gray-900 dark:text-gray-100">{{ confirmDelete.nama }}</span>?
             </p>
             <div v-if="confirmDelete.kelasCount > 0"
               class="mt-3 p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-none text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
@@ -487,7 +487,7 @@ function promptDelete(item: TahunAjaran) {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <span>
-                Tahun ajaran ini masih memiliki <strong>{{ confirmDelete.kelasCount }} kelas</strong> terkait. Data murid/absensi tidak akan hilang, tetapi tahun ajaran tidak akan muncul di pilihan baru.
+                Tahun ajaran ini masih memiliki <span>{{ confirmDelete.kelasCount }} kelas</span> terkait. Data murid/absensi tidak akan hilang, tetapi tahun ajaran tidak akan muncul di pilihan baru.
               </span>
             </div>
             <p v-else class="mt-3 text-sm text-gray-500 dark:text-gray-400">
@@ -495,11 +495,11 @@ function promptDelete(item: TahunAjaran) {
             </p>
             <div class="flex justify-end gap-3 mt-5 pt-4 border-t border-gray-100 dark:border-slate-700">
               <button @click="confirmDelete = null"
-                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
                 Batal
               </button>
               <button @click="handleDelete"
-                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-none hover:bg-red-700 active:bg-red-800">
+                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-none hover:bg-red-700 active:bg-red-800">
                 Ya, Hapus
               </button>
             </div>

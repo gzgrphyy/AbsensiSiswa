@@ -164,7 +164,7 @@ async function handleChangePassword() {
               <img :src="fotoPreview || profile?.foto" class="w-full h-full object-cover" />
             </div>
             <div v-else
-              class="w-14 h-14 rounded-none bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 text-xl font-bold">
+              class="w-14 h-14 rounded-none bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 text-xl ">
               {{ profile?.nama?.charAt(0)?.toUpperCase() || 'A' }}
             </div>
             <label class="absolute -bottom-1 -right-1 w-5 h-5 rounded-none bg-blue-500 hover:bg-blue-600 flex items-center justify-center cursor-pointer shadow-sm border-2 border-white dark:border-slate-700">
@@ -175,7 +175,7 @@ async function handleChangePassword() {
             </label>
           </div>
           <div>
-            <h2 class="font-semibold text-gray-900 dark:text-gray-100">{{ profile?.nama || '-' }}</h2>
+            <h2 class=" text-gray-900 dark:text-gray-100">{{ profile?.nama || '-' }}</h2>
             <p class="text-sm text-gray-500 dark:text-gray-400">Administrator</p>
             <button v-if="fotoPreview || form.foto" type="button" @click="removeFoto"
               class="mt-1 text-[11px] text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
@@ -203,7 +203,7 @@ async function handleChangePassword() {
 
         <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-slate-700">
           <button type="submit" :disabled="saving"
-            class="px-6 py-2.5 bg-primary-500 text-sm font-medium text-white rounded-none hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
+            class="px-6 py-2.5 bg-primary-500 text-sm  text-white rounded-none hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             Simpan Perubahan
           </button>
@@ -216,7 +216,7 @@ async function handleChangePassword() {
         <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
-        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Ubah Password</h3>
+        <h3 class="text-base  text-gray-900 dark:text-gray-100">Ubah Password</h3>
       </div>
 
       <Notification type="success" :message="pwSuccessMsg" :show="!!pwSuccessMsg" @dismiss="pwSuccessMsg = ''" />
@@ -238,7 +238,7 @@ async function handleChangePassword() {
 
         <div class="flex justify-end pt-2">
           <button type="submit" :disabled="savingPw"
-            class="px-6 py-2.5 bg-orange-500 text-sm font-medium text-white rounded-none hover:bg-orange-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
+            class="px-6 py-2.5 bg-orange-500 text-sm  text-white rounded-none hover:bg-orange-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="savingPw" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             Ubah Password
           </button>

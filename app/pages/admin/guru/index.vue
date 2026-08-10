@@ -15,6 +15,16 @@ interface Guru {
 
 const showInactive = ref(false)
 const searchQuery = ref('')
+const page = ref(1)
+const pageSize = 5
+
+const totalPages = computed(() => Math.max(1, Math.ceil((data.value || []).length / pageSize)))
+const visibleData = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return (data.value || []).slice(start, start + pageSize)
+})
+
+watch([showInactive, searchQuery], () => { page.value = 1 })
 
 const { data, pending, refresh } = useFetch<Guru[]>(() => {
   const params = new URLSearchParams()
@@ -201,7 +211,7 @@ async function copyPassword() {
     <PageHeader title="Data PTK" description="Kelola akun PTK dan hak akses">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 active:bg-blue-800 text-sm font-medium">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 active:bg-blue-800 text-sm ">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -263,22 +273,22 @@ async function copyPassword() {
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Nama</th>
-                <th class="text-left px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Email</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">NIP</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden lg:table-cell">No. HP</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Status</th>
-                <th class="text-center px-4 sm:px-6 py-3.5 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Aksi</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Nama</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">Email</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">NIP</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">No. HP</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Status</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Aksi</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-              <tr v-for="item in data" :key="item.id"
+              <tr v-for="item in visibleData" :key="item.id"
                 class="transition-all duration-150"
                 :class="item.isActive
                   ? 'hover:bg-gray-50 dark:hover:bg-gray-700/30'
                   : 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 border-l-2 border-l-gray-300 dark:border-l-gray-600'">
                 <td class="px-4 sm:px-6 py-4">
-                  <span class="font-medium text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.isActive }">
+                  <span class=" text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.isActive }">
                     {{ item.nama }}
                   </span>
                   <div class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ item.email }}</div>
@@ -347,7 +357,7 @@ async function copyPassword() {
                     <svg class="w-12 h-12 text-gray-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium">
+                    <p class="text-gray-500 dark:text-gray-400 ">
                       {{ showInactive ? 'Belum ada PTK nonaktif' : 'Belum ada data PTK' }}
                     </p>
                     <button v-if="!showInactive" @click="openCreate"
@@ -363,6 +373,34 @@ async function copyPassword() {
             </tbody>
           </table>
         </div>
+        <div v-if="(data || []).length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            Menampilkan {{ ((page - 1) * pageSize) + 1 }}-{{ Math.min(page * pageSize, (data || []).length) }} dari {{ (data || []).length }} PTK
+          </p>
+          <div class="ml-auto flex items-center gap-2">
+            <button
+              @click="page--"
+              :disabled="page <= 1"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              Sebelumnya
+            </button>
+            <span class="text-xs text-gray-400 dark:text-gray-500">Halaman {{ page }} dari {{ totalPages }}</span>
+            <button
+              @click="page++"
+              :disabled="page >= totalPages"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Selanjutnya
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
 
     <!-- Modal Create/Edit -->
@@ -373,7 +411,7 @@ async function copyPassword() {
 
           <div class="relative bg-white dark:bg-gray-800 rounded-none w-full max-w-md mx-auto overflow-hidden border border-gray-300 dark:border-gray-600">
             <div class="flex items-center justify-between px-4 pt-4 pb-2">
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h2 class="text-lg  text-gray-900 dark:text-gray-100">
                 {{ editing ? 'Edit Data PTK' : 'Tambah PTK Baru' }}
               </h2>
               <button @click="handleCloseClick"
@@ -387,7 +425,7 @@ async function copyPassword() {
             <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <!-- Nama Lengkap -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">
                   Nama Lengkap <span class="text-red-500">*</span>
                 </label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
@@ -397,7 +435,7 @@ async function copyPassword() {
 
               <!-- Email -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">
                   Email <span class="text-red-500">*</span>
                 </label>
                 <input v-model="form.email" type="email" @input="onFormChange"
@@ -407,7 +445,7 @@ async function copyPassword() {
 
               <!-- NIP -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">NIP (opsional)</label>
+                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">NIP (opsional)</label>
                 <input v-model="form.nip" type="text" @input="onFormChange"
                   placeholder="Nomor Induk Pegawai"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
@@ -416,13 +454,13 @@ async function copyPassword() {
               <!-- Nomor HP -->
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">No. HP 1 (opsional)</label>
+                  <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">No. HP 1 (opsional)</label>
                   <input v-model="form.nomorHp1" type="text" @input="onFormChange"
                     placeholder="Nomor HP"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">No. HP 2 (opsional)</label>
+                  <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">No. HP 2 (opsional)</label>
                   <input v-model="form.nomorHp2" type="text" @input="onFormChange"
                     placeholder="Nomor HP cadangan"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
@@ -452,11 +490,11 @@ async function copyPassword() {
               <!-- Actions -->
               <div class="flex justify-end gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                 <button type="button" @click="handleCloseClick"
-                  class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
+                  class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
                   Batal
                 </button>
                 <button type="submit" :disabled="saving"
-                  class="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-none hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
+                  class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-none hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
                   <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -474,15 +512,15 @@ async function copyPassword() {
         <div v-if="confirmClose" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmClose = false"></div>
           <div class="relative bg-white dark:bg-gray-800 rounded-none w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Batalkan perubahan?</h2>
+            <h2 class="text-lg  text-gray-900 dark:text-gray-100 mb-2">Batalkan perubahan?</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Perubahan yang belum disimpan akan hilang.</p>
             <div class="flex justify-end gap-3">
               <button @click="confirmClose = false"
-                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
                 Lanjutkan Edit
               </button>
               <button @click="showModal = false; confirmClose = false"
-                class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-none hover:bg-red-700 transition-colors">
+                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-none hover:bg-red-700 transition-colors">
                 Ya, Batalkan
               </button>
             </div>
@@ -501,7 +539,7 @@ async function copyPassword() {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                 </svg>
               </div>
-              <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Password Generated</h2>
+              <h2 class="text-lg  text-gray-900 dark:text-gray-100">Password Generated</h2>
             </div>
 
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
@@ -509,18 +547,18 @@ async function copyPassword() {
             </p>
 
             <div class="flex items-center gap-2 p-4 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-none mb-4">
-              <code class="flex-1 text-lg font-mono font-bold text-center text-gray-900 dark:text-gray-100 tracking-wider select-all">
+              <code class="flex-1 text-lg font-mono  text-center text-gray-900 dark:text-gray-100 tracking-wider select-all">
                 {{ generatedPassword }}
               </code>
             </div>
 
             <div class="flex justify-end gap-3">
               <button @click="showPasswordModal = false"
-                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
                 Tutup
               </button>
               <button @click="copyPassword"
-                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-none hover:bg-blue-700 active:bg-blue-800 inline-flex items-center gap-1.5">
+                class="px-4 py-2 text-sm  text-white bg-blue-600 rounded-none hover:bg-blue-700 active:bg-blue-800 inline-flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
@@ -546,7 +584,7 @@ async function copyPassword() {
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <h2 class="text-lg  text-gray-900 dark:text-gray-100">
                   {{ confirmToggle.active ? 'Nonaktifkan Akun' : 'Aktifkan Akun' }}
                 </h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ confirmToggle.nama }}</p>
@@ -562,13 +600,13 @@ async function copyPassword() {
 
             <div class="flex justify-end gap-3">
               <button @click="confirmToggle = null"
-                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
                 Batal
               </button>
               <button @click="handleToggleActive"
                 :class="confirmToggle.active
-                  ? 'px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-none hover:bg-red-700'
-                  : 'px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-none hover:bg-green-700'">
+                  ? 'px-4 py-2 text-sm  text-white bg-red-600 rounded-none hover:bg-red-700'
+                  : 'px-4 py-2 text-sm  text-white bg-green-600 rounded-none hover:bg-green-700'">
                 {{ confirmToggle.active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan' }}
               </button>
             </div>
@@ -588,7 +626,7 @@ async function copyPassword() {
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Reset Password</h2>
+                <h2 class="text-lg  text-gray-900 dark:text-gray-100">Reset Password</h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ resetPasswordFor.nama }}</p>
               </div>
             </div>
@@ -599,11 +637,11 @@ async function copyPassword() {
 
             <div class="flex justify-end gap-3">
               <button @click="resetPasswordFor = null"
-                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none transition-colors">
                 Batal
               </button>
               <button @click="handleResetPassword"
-                class="px-4 py-2 text-sm font-medium text-white bg-amber-600 rounded-none hover:bg-amber-700 active:bg-amber-800">
+                class="px-4 py-2 text-sm  text-white bg-amber-600 rounded-none hover:bg-amber-700 active:bg-amber-800">
                 Ya, Reset
               </button>
             </div>
