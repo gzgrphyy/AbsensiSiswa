@@ -24,3 +24,20 @@ export const statusDotColor: Record<string, string> = {
   IZIN: 'bg-blue-500',
   ALPHA: 'bg-red-500'
 }
+
+export const jenisIzinLabels: Record<string, string> = {
+  SAKIT: 'Sakit',
+  IZIN: 'Izin'
+}
+
+export const statusIzinLabels: Record<string, string> = {
+  PENDING: 'Menunggu',
+  DISETUJUI: 'Disetujui',
+  DITOLAK: 'Ditolak'
+}
+
+export const statusIzinBadgeVariant: Record<string, string> = {
+  PENDING: 'amber',
+  DISETUJUI: 'green',
+  DITOLAK: 'red'
+}

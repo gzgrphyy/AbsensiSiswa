@@ -31,6 +31,17 @@ enum StatusSesi {
   SELESAI
 }
 
+enum JenisIzin {
+  SAKIT
+  IZIN
+}
+
+enum StatusIzin {
+  PENDING
+  DISETUJUI
+  DITOLAK
+}
+
 enum Hari {
   SENIN
   SELASA
@@ -68,6 +79,7 @@ model User {
   jadwalPelajaran JadwalPelajaran[] @relation("GuruPengampu")
   sesiDibuka      SesiAbsensi[]     @relation("SesiDibukaOleh")
   approvedRequests AbsensiRequest[] @relation("ApprovedOleh")
+  tanggapanIzin   Izin[]            @relation("PenanggapIzin")
   siswa           Siswa?
 
   @@map("users")
@@ -121,6 +133,7 @@ model Siswa {
   user           User?             @relation(fields: [userId], references: [id])
   kelas          Kelas             @relation(fields: [kelasId], references: [id])
   absensiRequests AbsensiRequest[]
+  izins           Izin[]
 
   @@map("siswa")
 }
@@ -220,4 +233,24 @@ model AbsensiRequest {
 
   @@unique([sesiId, siswaId])
   @@map("absensi_request")
+}
+
+model Izin {
+  id           Int        @id @default(autoincrement())
+  siswaId      Int        @map("siswa_id")
+  tanggal      DateTime   @db.Date
+  jenis        JenisIzin
+  keterangan   String?    @db.VarChar(255)
+  bukti        String?    @db.VarChar(255)
+  status       StatusIzin @default(PENDING)
+  diresponOleh Int?       @map("direspon_oleh")
+  diresponPada DateTime?  @map("direspon_pada")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  siswa     Siswa @relation(fields: [siswaId], references: [id])
+  penanggap User? @relation("PenanggapIzin", fields: [diresponOleh], references: [id])
+
+  @@unique([siswaId, tanggal])
+  @@map("izin")
 }

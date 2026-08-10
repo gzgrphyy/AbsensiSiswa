@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const today = new Date(now.toISOString().split('T')[0])
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
 
-  const [todayRequests, monthHadir, monthAlpha, recentHistory, todaySesi] = await Promise.all([
+  const [todayRequests, monthHadir, monthSakit, monthIzin, monthAlpha, recentHistory, todaySesi] = await Promise.all([
     prisma.absensiRequest.findMany({
       where: { siswaId: siswa.id, sesi: { tanggal: today } },
       include: {
@@ -38,6 +38,20 @@ export default defineEventHandler(async (event) => {
       where: {
         siswaId: siswa.id,
         status: 'HADIR',
+        sesi: { tanggal: { gte: monthStart } }
+      }
+    }),
+    prisma.absensiRequest.count({
+      where: {
+        siswaId: siswa.id,
+        status: 'SAKIT',
+        sesi: { tanggal: { gte: monthStart } }
+      }
+    }),
+    prisma.absensiRequest.count({
+      where: {
+        siswaId: siswa.id,
+        status: 'IZIN',
         sesi: { tanggal: { gte: monthStart } }
       }
     }),
@@ -111,6 +125,8 @@ export default defineEventHandler(async (event) => {
     todayStatus,
     monthStats: {
       hadir: monthHadir,
+      sakit: monthSakit,
+      izin: monthIzin,
       alpha: monthAlpha
     },
     recentHistory: recentHistory.map(h => ({
