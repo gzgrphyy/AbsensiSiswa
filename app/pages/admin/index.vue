@@ -131,7 +131,18 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
               <h3 class="text-sm font text-gray-900 dark:text-gray-100">Murid Alpha Terbanyak</h3>
               <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Periode bulan ini</p>
             </div>
-            <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.topAlpha.length }} murid</span>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.topAlpha.length }} murid</span>
+              <NuxtLink
+                to="/admin/alpha"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-none text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+              >
+                Lihat Selengkapnya
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </NuxtLink>
+            </div>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -204,7 +215,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
             </p>
             <NuxtLink
               to="/admin/monitoring"
-              class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+              class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-none text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
             >
               Lihat Selengkapnya
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
