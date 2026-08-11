@@ -27,7 +27,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
             <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             Langsung 
           </div>
-          <span class="text-[10px] px-1.5 py-0.5 rounded-none bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 ">Hari ini</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 ">Hari ini</span>
         </div>
       </template>
     </PageHeader>
@@ -125,14 +125,14 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
       <!-- Tables Section -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
         <!-- Top Alpha Siswa -->
-        <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600">
           <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
               <h3 class="text-sm font text-gray-900 dark:text-gray-100">Murid Alpha Terbanyak</h3>
               <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Periode bulan ini</p>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.topAlpha.length }} murid</span>
+              <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-lg">{{ data.topAlpha.length }} murid</span>
             </div>
           </div>
           <div class="overflow-x-auto">
@@ -149,7 +149,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
                   <td class="px-4 py-3 text-gray-900 dark:text-gray-100 ">{{ item.nama }}</td>
                   <td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-center">{{ item.kelas }}</td>
                   <td class="px-4 py-3 text-center">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs  bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 ring-1 ring-red-200 dark:ring-red-800">{{ item.totalAlpha }}x</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs  bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 ring-1 ring-red-200 dark:ring-red-800">{{ item.totalAlpha }}x</span>
                   </td>
                 </tr>
                 <tr v-if="data.topAlpha.length === 0">
@@ -161,7 +161,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
           <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3">
             <NuxtLink
               to="/admin/alpha"
-              class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-none text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+              class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
             >
               Lihat Selengkapnya
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +172,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
         </div>
 
         <!-- Monitoring Ruangan -->
-        <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
+        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600">
           <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
             <div>
               <h3 class="text-sm font text-gray-900 dark:text-gray-100">Pemantauan Ruangan</h3>
@@ -217,7 +217,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
             </p>
             <NuxtLink
               to="/admin/monitoring"
-              class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-none text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+              class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
             >
               Lihat Selengkapnya
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,10 +229,10 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
       </div>
 
       <!-- Aktivitas Terbaru -->
-      <div class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600">
+      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600">
         <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
           <h3 class="text-sm font text-gray-900 dark:text-gray-100">Aktivitas Terbaru</h3>
-          <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.aktivitasTerbaru.length }} aktivitas</span>
+          <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-lg">{{ data.aktivitasTerbaru.length }} aktivitas</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">

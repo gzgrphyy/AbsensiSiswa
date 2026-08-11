@@ -52,7 +52,7 @@ async function handleLogout() {
         <!-- Theme Toggle -->
         <button
           @click="toggleColorMode"
-          :class="['p-1.5 text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-150', isAdmin ? 'rounded-none' : 'rounded-lg']"
+          :class="['p-1.5 text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-150', isAdmin ? 'rounded-lg' : 'rounded-lg']"
           :title="isDark ? 'Mode Terang' : 'Mode Gelap'"
         >
           <!-- Sun icon (show in dark mode) -->
@@ -80,7 +80,7 @@ async function handleLogout() {
 
         <button
           @click="handleLogout"
-          :class="['inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs  text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-150', isAdmin ? 'rounded-none' : 'rounded-lg']"
+          :class="['inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs  text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-150', isAdmin ? 'rounded-lg' : 'rounded-lg']"
           title="Keluar"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

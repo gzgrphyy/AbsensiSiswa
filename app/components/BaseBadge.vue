@@ -66,7 +66,7 @@ const sizes = {
 </script>
 
 <template>
-  <span v-if="isAdmin" :class="['inline-flex items-center gap-1  rounded-none', adminVariants[variant] || adminVariants.gray, size === 'sm' ? 'px-1.5 py-0.5 text-xs' : 'px-2 py-0.5 text-xs']">
+  <span v-if="isAdmin" :class="['inline-flex items-center gap-1  rounded-lg', adminVariants[variant] || adminVariants.gray, size === 'sm' ? 'px-1.5 py-0.5 text-xs' : 'px-2 py-0.5 text-xs']">
     <span v-if="dot" :class="['w-1.5 h-1.5 rounded-full', adminDotColors[variant], { 'animate-pulse': pulse }]" />
     <slot />
   </span>
