@@ -9,23 +9,65 @@ interface Kelas {
   _count: { siswa: number; jadwalPelajaran: number }
 }
 
-const filterTa = ref(0)
+const draftSearch = ref('')
+const draftTa = ref(0)
+const draftJenjang = ref('')
+
+const appliedSearch = ref('')
+const appliedTa = ref(0)
+const appliedJenjang = ref('')
+
 const page = ref(1)
 const pageSize = 5
 
-const totalPages = computed(() => Math.max(1, Math.ceil((kelasList.value || []).length / pageSize)))
-const visibleData = computed(() => {
-  const start = (page.value - 1) * pageSize
-  return (kelasList.value || []).slice(start, start + pageSize)
-})
-
-watch(filterTa, () => { page.value = 1 })
+function jenjangOf(nama: string) {
+  return (nama.match(/^[IVXLCDM]+/)?.[0] || '').toUpperCase()
+}
 
 const { data: kelasList, pending, refresh } = useFetch<Kelas[]>(() => {
   const params = new URLSearchParams()
-  if (filterTa.value) params.set('tahunAjaranId', String(filterTa.value))
+  if (appliedTa.value) params.set('tahunAjaranId', String(appliedTa.value))
+  if (appliedSearch.value) params.set('search', appliedSearch.value)
   return `/api/admin/kelas?${params.toString()}`
 }, { immediate: true })
+
+const jenjangList = computed(() => {
+  const set = new Set<string>()
+  for (const k of kelasList.value || []) {
+    const j = jenjangOf(k.nama)
+    if (j) set.add(j)
+  }
+  return [...set].sort()
+})
+
+const filteredData = computed(() => {
+  const list = kelasList.value || []
+  if (!appliedJenjang.value) return list
+  return list.filter(k => jenjangOf(k.nama) === appliedJenjang.value)
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredData.value.length / pageSize)))
+const visibleData = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return filteredData.value.slice(start, start + pageSize)
+})
+
+watch([appliedSearch, appliedTa, appliedJenjang], () => { page.value = 1 })
+
+function applyFilter() {
+  appliedSearch.value = draftSearch.value.trim()
+  appliedTa.value = draftTa.value
+  appliedJenjang.value = draftJenjang.value
+}
+
+function resetFilter() {
+  draftSearch.value = ''
+  draftTa.value = 0
+  draftJenjang.value = ''
+  appliedSearch.value = ''
+  appliedTa.value = 0
+  appliedJenjang.value = ''
+}
 const { data: guruList } = useFetch<{ id: number; nama: string }[]>('/api/admin/guru', { immediate: true })
 const { data: taList } = useFetch<{ id: number; nama: string; semester: string; isActive: boolean }[]>('/api/admin/tahun-ajaran', { immediate: true })
 
@@ -132,11 +174,31 @@ async function handleDelete() {
 
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <div class="flex flex-wrap items-center gap-3">
-        <select v-model="filterTa"
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input v-model="draftSearch" type="text" placeholder="Cari kelas..."
+            class="pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+        </div>
+        <select v-model="draftJenjang"
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Semua Jenjang</option>
+          <option v-for="j in jenjangList" :key="j" :value="j">{{ j }}</option>
+        </select>
+        <select v-model="draftTa"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="0">Semua Tahun Ajaran</option>
           <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ t.semester }})</option>
         </select>
+        <button @click="applyFilter"
+          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-none border border-blue-600 transition-colors">
+          Terapkan
+        </button>
+        <button @click="resetFilter"
+          class="px-3 py-2 text-sm  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none border border-gray-300 dark:border-slate-600 transition-colors">
+          Atur Ulang
+        </button>
       </div>
       <button @click="openCreate"
         class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm ">
@@ -187,7 +249,7 @@ async function handleDelete() {
                 </div>
               </td>
             </tr>
-            <tr v-if="!kelasList || kelasList.length === 0">
+            <tr v-if="filteredData.length === 0">
               <td colspan="5" class="px-4 py-16 text-center">
                 <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -198,9 +260,9 @@ async function handleDelete() {
           </tbody>
         </table>
       </div>
-      <div v-if="(kelasList || []).length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
+      <div v-if="filteredData.length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
         <p class="text-xs text-gray-400 dark:text-gray-500">
-          Menampilkan {{ ((page - 1) * pageSize) + 1 }}-{{ Math.min(page * pageSize, (kelasList || []).length) }} dari {{ (kelasList || []).length }} kelas
+          Menampilkan {{ ((page - 1) * pageSize) + 1 }}-{{ Math.min(page * pageSize, filteredData.length) }} dari {{ filteredData.length }} kelas
         </p>
         <div class="ml-auto flex items-center gap-2">
           <button

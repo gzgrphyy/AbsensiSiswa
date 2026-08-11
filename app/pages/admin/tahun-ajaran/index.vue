@@ -169,7 +169,7 @@ function promptDelete(item: TahunAjaran) {
     <PageHeader title="Tahun Ajaran" description="Kelola tahun ajaran dan semester aktif">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 active:bg-blue-800 text-sm ">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white rounded-none hover:bg-primary-700 active:bg-primary-800 text-sm ">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -211,26 +211,18 @@ function promptDelete(item: TahunAjaran) {
               <tr v-for="item in data" :key="item.id"
                 class="transition-all duration-150"
                 :class="item.isActive
-                  ? 'bg-green-50/60 dark:bg-green-900/20 hover:bg-green-100/60 dark:hover:bg-green-900/30 border-l-2 border-l-green-500'
+                  ? 'border-l-2 border-l-green-500 hover:bg-gray-50 dark:hover:bg-gray-700/30'
                   : 'hover:bg-gray-50 dark:hover:bg-gray-700/30'">
                 <td class="px-4 sm:px-6 py-4">
                   <div class="flex items-center gap-2">
                     <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
-                    <span class="sm:hidden text-xs "
-                      :class="item.semester === 'GANJIL' ? 'text-purple-600' : 'text-cyan-600'">
+                    <span class="sm:hidden text-xs text-gray-500 dark:text-gray-400">
                       {{ semesterLabel(item.semester) }}
                     </span>
                   </div>
                 </td>
                 <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs "
-                    :class="item.semester === 'GANJIL'
-                      ? 'bg-purple-100 text-purple-700 ring-1 ring-purple-200'
-                      : 'bg-cyan-100 text-cyan-700 ring-1 ring-cyan-200'">
-                    <span
-                      class="w-1.5 h-1.5 rounded-none inline-block mr-1.5"
-                      :style="{ backgroundColor: item.semester === 'GANJIL' ? '#8b5cf6' : '#06b6d4' }">
-                    </span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-slate-600">
                     {{ semesterLabel(item.semester) }}
                   </span>
                 </td>
@@ -246,7 +238,7 @@ function promptDelete(item: TahunAjaran) {
                   <div class="flex items-center justify-center gap-1">
                     <!-- Edit -->
                     <button @click="openEdit(item)"
-                      class="p-2 text-gray-400 hover:text-blue-600 hover:bg-gray-100 rounded-none transition-all duration-150"
+                      class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-none transition-all duration-150"
                       :title="`Edit ${fullLabel(item)}`">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -255,7 +247,7 @@ function promptDelete(item: TahunAjaran) {
 
                     <!-- Activate (only if not active) -->
                     <button v-if="!item.isActive" @click="promptToggle(item)"
-                      class="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-none transition-all duration-150"
+                      class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-none transition-all duration-150"
                       :title="`Aktifkan ${fullLabel(item)}`">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -290,7 +282,7 @@ function promptDelete(item: TahunAjaran) {
                     </svg>
                     <p class="text-gray-500 ">Belum ada data tahun ajaran</p>
                     <button @click="openCreate"
-                      class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 bg-gray-100 rounded-none hover:bg-gray-200 transition-colors">
+                      class="inline-flex items-center gap-1 px-4 py-2 text-sm text-primary-600 bg-gray-100 rounded-none hover:bg-gray-200 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                       </svg>
@@ -332,7 +324,7 @@ function promptDelete(item: TahunAjaran) {
                 <input v-model="form.nama" type="text" @input="onFormChange"
                   placeholder="contoh: 2026/2027"
                   :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 <Transition name="fade">
                   <p v-if="editing && editing._count.kelas > 0" class="flex items-center gap-1 text-xs text-amber-600 mt-1.5">
                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -348,7 +340,7 @@ function promptDelete(item: TahunAjaran) {
                 <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">Semester</label>
                 <select v-model="form.semester" @change="onFormChange"
                   :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
                   <option value="GANJIL">Ganjil</option>
                   <option value="GENAP">Genap</option>
                 </select>
@@ -357,7 +349,7 @@ function promptDelete(item: TahunAjaran) {
               <!-- Set Active -->
               <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-none border border-gray-100 dark:border-slate-600">
                 <input id="setActive" v-model="form.setActive" type="checkbox" @change="onFormChange"
-                  class="mt-0.5 w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-primary-500 transition-shadow" />
+                  class="mt-0.5 w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-primary-600 focus:ring-primary-500 transition-shadow" />
                 <div class="flex flex-col">
                   <label for="setActive" class="text-sm  text-gray-700 dark:text-gray-300 cursor-pointer">
                     {{ editing ? 'Set sebagai tahun ajaran aktif' : 'Jadikan aktif sekarang' }}
@@ -370,7 +362,7 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Edit mode info -->
               <Transition name="fade">
-                <div v-if="editing && editing.isActive" class="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-none text-sm text-blue-700">
+                <div v-if="editing && editing.isActive" class="flex items-center gap-2 p-3 bg-primary-50 border border-primary-200 rounded-none text-sm text-primary-700">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -395,7 +387,7 @@ function promptDelete(item: TahunAjaran) {
                   Batal
                 </button>
                 <button type="submit" :disabled="saving"
-                  class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-none hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
+                  class="px-5 py-2 text-sm  text-white bg-primary-600 rounded-none hover:bg-primary-700 active:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
                   <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
