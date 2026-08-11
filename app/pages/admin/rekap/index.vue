@@ -10,11 +10,39 @@ interface RekapItem {
   persentase: number
 }
 
-const selectedBulan = ref('')
+const currentBulan = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+
+const selectedBulan = ref(currentBulan())
 const selectedTa = ref<number | ''>('')
 const selectedKelas = ref<number | ''>('')
 
-const { data: taList } = useFetch<{ id: number; nama: string; semester: string }[]>('/api/admin/tahun-ajaran', { immediate: true })
+const appliedBulan = ref(currentBulan())
+const appliedTa = ref<number | ''>('')
+const appliedKelas = ref<number | ''>('')
+
+const { data: taList } = useFetch<{ id: number; nama: string; semester: string; isActive: boolean }[]>('/api/admin/tahun-ajaran', { immediate: true })
+
+function activeTaId() {
+  return taList.value?.find(t => t.isActive)?.id ?? ''
+}
+
+// Default tahun ajaran = tahun ajaran yang aktif (isActive).
+// Kelas default-nya nanti dipilih lewat watcher kelasList.
+watch(
+  taList,
+  (list) => {
+    if (!list?.some(t => t.isActive)) return
+    if (appliedTa.value !== '') return
+    selectedTa.value = activeTaId()
+    appliedTa.value = activeTaId()
+    selectedKelas.value = ''
+    appliedKelas.value = ''
+  },
+  { immediate: true }
+)
 
 const kelasQuery = computed(() => ({
   ...(selectedTa.value ? { tahunAjaranId: selectedTa.value } : {})
@@ -25,24 +53,53 @@ const { data: kelasList, refresh: refreshKelas } = useFetch<{ id: number; nama: 
   immediate: true
 })
 
-// Reset selected kelas when tahun ajaran changes
-watch(selectedTa, () => {
-  selectedKelas.value = ''
-})
+// Default kelas = kelas pertama dari daftar yang sedang aktif.
+// Saat tahun ajaran berubah, draft kelas ikut di-reset ke kelas pertama daftar barunya.
+watch(
+  kelasList,
+  (list) => {
+    if (!list?.length) return
+    selectedKelas.value = list[0].id
+    // Terapkan default kelas hanya jika daftar ini sesuai tahun ajaran yang dipakai
+    if (!appliedKelas.value && (!appliedTa.value || list[0].tahunAjaranId === appliedTa.value)) {
+      appliedKelas.value = list[0].id
+    }
+  },
+  { immediate: true }
+)
 
 const queryParams = computed(() => ({
-  ...(selectedBulan.value ? { bulan: selectedBulan.value } : {}),
-  ...(selectedTa.value ? { tahunAjaranId: selectedTa.value } : {}),
-  ...(selectedKelas.value ? { kelasId: selectedKelas.value } : {}),
+  ...(appliedBulan.value ? { bulan: appliedBulan.value } : {}),
+  ...(appliedTa.value ? { tahunAjaranId: appliedTa.value } : {}),
+  ...(appliedKelas.value ? { kelasId: appliedKelas.value } : {}),
 }))
 
-const { data, pending, refresh } = useFetch<RekapItem[]>('/api/admin/rekap', {
+const { data, pending } = useFetch<RekapItem[]>('/api/admin/rekap', {
   query: queryParams,
   immediate: true,
   transform: (res: any) => Array.isArray(res) ? res : []
 })
 
-watch([selectedBulan, selectedTa, selectedKelas], () => refresh())
+// Terapkan filter: salin nilai draft ke nilai applied (useFetch otomatis refetch)
+function applyFilter() {
+  appliedBulan.value = selectedBulan.value
+  appliedTa.value = selectedTa.value
+  appliedKelas.value = selectedKelas.value
+}
+
+// Atur Ulang: kembalikan ke default (tahun ajaran aktif, bulan berjalan, kelas pertama) lalu terapkan langsung
+// refreshKelas() memastikan watcher kelasList dijalankan dan kelas pertama dipakai sebagai default.
+async function resetFilter() {
+  const defaultTa = activeTaId()
+  selectedBulan.value = currentBulan()
+  selectedTa.value = defaultTa
+  selectedKelas.value = ''
+  appliedBulan.value = currentBulan()
+  appliedTa.value = defaultTa
+  appliedKelas.value = ''
+
+  await refreshKelas()
+}
 
 const displayData = computed(() => (Array.isArray(data.value) ? data.value : []))
 
@@ -104,8 +161,14 @@ const rataPersentase = computed(() =>
         </select>
       </div>
 
+      <!-- Tombol Terapkan -->
+      <button @click="applyFilter()"
+        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-none border border-blue-600 transition-colors">
+        Terapkan
+      </button>
+
       <!-- Tombol Reset -->
-      <button @click="selectedTa = ''; selectedKelas = ''"
+      <button @click="resetFilter()"
         class="px-3 py-2 text-sm  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-none border border-gray-300 dark:border-slate-600 transition-colors">
         Atur Ulang
       </button>

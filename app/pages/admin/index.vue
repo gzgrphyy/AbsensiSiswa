@@ -25,7 +25,7 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
         <div class="flex items-center gap-3 text-xs text-gray-500 self-end pb-0.5">
           <div class="flex items-center gap-1">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            Langsung
+            Langsung 
           </div>
           <span class="text-[10px] px-1.5 py-0.5 rounded-none bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 ">Hari ini</span>
         </div>
