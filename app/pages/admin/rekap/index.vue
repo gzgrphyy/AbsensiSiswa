@@ -10,6 +10,8 @@ interface RekapItem {
   persentase: number
 }
 
+const { t } = useI18n()
+
 const currentBulan = () => {
   const d = new Date()
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
@@ -24,6 +26,8 @@ const appliedTa = ref<number | ''>('')
 const appliedKelas = ref<number | ''>('')
 
 const { data: taList } = useFetch<{ id: number; nama: string; semester: string; isActive: boolean }[]>('/api/admin/tahun-ajaran', { immediate: true })
+
+const semesterLabel = (s: string) => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
 
 function activeTaId() {
   return taList.value?.find(t => t.isActive)?.id ?? ''
@@ -128,35 +132,35 @@ const rataPersentase = computed(() =>
 
 <template>
   <AppLayout>
-    <PageHeader title="Rekap Absensi" description="Rekapitulasi kehadiran per kelas" />
+    <PageHeader :title="t('admin.rekap.title')" :description="t('admin.rekap.desc')" />
 
     <div class="flex flex-wrap items-end gap-3 mb-5">
       <!-- Filter: Tahun Ajaran -->
       <div class="flex flex-col gap-1 min-w-[180px]">
-        <label class="text-xs  text-gray-500">Tahun Ajaran</label>
+        <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelTa') }}</label>
         <select v-model="selectedTa"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option :value="''">Semua Tahun Ajaran</option>
-          <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ t.semester }})</option>
+          <option :value="''">{{ t('admin.kelas.semuaTa') }}</option>
+          <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})</option>
         </select>
       </div>
 
       <!-- Filter: Kelas -->
       <div class="flex flex-col gap-1 min-w-[160px]">
-        <label class="text-xs  text-gray-500">Kelas</label>
+        <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelKelas') }}</label>
         <select v-model="selectedKelas"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option :value="''">Semua Kelas</option>
+          <option :value="''">{{ t('admin.jadwal.semuaKelas') }}</option>
           <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
       </div>
 
       <!-- Filter: Periode Bulan -->
       <div class="flex flex-col gap-1 min-w-[180px]">
-        <label class="text-xs  text-gray-500">Periode</label>
+        <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelPeriode') }}</label>
         <select v-model="selectedBulan"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option value="">Semua Periode</option>
+          <option value="">{{ t('admin.rekap.semuaPeriode') }}</option>
           <option v-for="o in bulanOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
       </div>
@@ -164,13 +168,13 @@ const rataPersentase = computed(() =>
       <!-- Tombol Terapkan -->
       <button @click="applyFilter()"
         class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg border border-blue-600 transition-colors">
-        Terapkan
+        {{ t('common.terapkan') }}
       </button>
 
       <!-- Tombol Reset -->
       <button @click="resetFilter()"
         class="px-3 py-2 text-sm  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg border border-gray-300 dark:border-slate-600 transition-colors">
-        Atur Ulang
+        {{ t('common.aturUlang') }}
       </button>
     </div>
 
@@ -178,13 +182,13 @@ const rataPersentase = computed(() =>
 
     <template v-else>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-5">
-        <StatCard label="Total Murid" :value="totalSiswa" variant="blue" />
-        <StatCard label="Hadir" :value="totalHadir" variant="green" />
-        <StatCard label="Pending" :value="totalPending" variant="gray" />
-        <StatCard label="Sakit" :value="totalSakit" variant="amber" />
-        <StatCard label="Izin" :value="totalIzin" variant="blue" />
-        <StatCard label="Alpha" :value="totalAlpha" variant="red" />
-        <StatCard label="Rata-rata %" :value="rataPersentase + '%'" variant="green" />
+        <StatCard :label="t('admin.rekap.statTotalMurid')" :value="totalSiswa" variant="blue" />
+        <StatCard :label="t('admin.rekap.statHadir')" :value="totalHadir" variant="green" />
+        <StatCard :label="t('admin.rekap.statPending')" :value="totalPending" variant="gray" />
+        <StatCard :label="t('admin.rekap.statSakit')" :value="totalSakit" variant="amber" />
+        <StatCard :label="t('admin.rekap.statIzin')" :value="totalIzin" variant="blue" />
+        <StatCard :label="t('admin.rekap.statAlpha')" :value="totalAlpha" variant="red" />
+        <StatCard :label="t('admin.rekap.statRata')" :value="rataPersentase + '%'" variant="green" />
       </div>
 
       <BaseCard>
@@ -192,14 +196,14 @@ const rataPersentase = computed(() =>
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-                <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Kelas</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Total Murid</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Hadir</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Pending</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Sakit</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Izin</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Alpha</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">% Kehadiran</th>
+                <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colKelas') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colTotalMurid') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colHadir') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colPending') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colSakit') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colIzin') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colAlpha') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colPersentase') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">

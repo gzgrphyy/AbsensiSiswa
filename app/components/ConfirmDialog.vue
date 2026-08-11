@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useI18n()
+
 withDefaults(defineProps<{
   show: boolean
   title: string
@@ -8,8 +10,8 @@ withDefaults(defineProps<{
   variant?: 'danger' | 'warning' | 'success' | 'primary'
   loading?: boolean
 }>(), {
-  confirmLabel: 'Ya',
-  cancelLabel: 'Batal',
+  confirmLabel: '',
+  cancelLabel: '',
   variant: 'danger',
   loading: false,
 })
@@ -70,7 +72,7 @@ const iconVariants = {
               @click="emit('cancel')"
               :class="['px-4 py-2 text-sm  text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-150', isAdmin ? '' : 'rounded-lg']"
             >
-              {{ cancelLabel }}
+              {{ cancelLabel || t('common.batal') }}
             </button>
             <button
               @click="emit('confirm')"
@@ -81,7 +83,7 @@ const iconVariants = {
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              {{ loading ? 'Memproses...' : confirmLabel }}
+              {{ loading ? t('common.memproses') : (confirmLabel || t('common.ya')) }}
             </button>
           </div>
         </div>

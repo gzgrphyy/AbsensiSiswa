@@ -11,6 +11,8 @@ interface TahunAjaran {
   _count: { kelas: number }
 }
 
+const { t } = useI18n()
+
 const { data, pending, refresh } = useFetch<TahunAjaran[]>('/api/admin/tahun-ajaran', {
   immediate: true
 })
@@ -26,7 +28,7 @@ const errorMsg = ref('')
 const successMsg = ref('')
 const dirtyForm = ref(false)
 
-const semesterLabel = (s: 'GANJIL' | 'GENAP') => s === 'GANJIL' ? 'Ganjil' : 'Genap'
+const semesterLabel = (s: 'GANJIL' | 'GENAP') => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
 const fullLabel = (item: { nama: string; semester: 'GANJIL' | 'GENAP' }) =>
   `${item.nama} ${semesterLabel(item.semester)}`
 
@@ -102,7 +104,7 @@ async function handleSave() {
         showError(error.value.statusMessage || 'Gagal menyimpan')
         return
       }
-      showSuccess('Tahun ajaran berhasil diperbarui')
+      showSuccess(t('admin.tahunAjaran.msgBerhasilEdit'))
       confirmClose.value = false
     } else {
       const { error } = await useFetch('/api/admin/tahun-ajaran', {
@@ -113,7 +115,7 @@ async function handleSave() {
         showError(error.value.statusMessage || 'Gagal menyimpan')
         return
       }
-      showSuccess('Tahun ajaran berhasil ditambahkan')
+      showSuccess(t('admin.tahunAjaran.msgBerhasilTambah'))
     }
     showModal.value = false
     await refresh()
@@ -135,7 +137,7 @@ async function handleToggle() {
     showError(error.value.statusMessage || 'Gagal mengubah status')
     return
   }
-  showSuccess('Status aktif berhasil dipindahkan')
+  showSuccess(t('admin.tahunAjaran.msgBerhasilPindahAktif'))
   await refresh()
 }
 
@@ -151,7 +153,7 @@ async function handleDelete() {
     showError(error.value.statusMessage || 'Gagal menghapus')
     return
   }
-  showSuccess('Tahun ajaran berhasil dihapus')
+  showSuccess(t('admin.tahunAjaran.msgBerhasilHapus'))
   await refresh()
 }
 
@@ -166,14 +168,14 @@ function promptDelete(item: TahunAjaran) {
 
 <template>
   <AppLayout>
-    <PageHeader title="Tahun Ajaran" description="Kelola tahun ajaran dan semester aktif">
+    <PageHeader :title="t('admin.tahunAjaran.title')" :description="t('admin.tahunAjaran.desc')">
       <template #actions>
         <button @click="openCreate"
           class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 text-sm ">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="hidden sm:inline">Tambah</span>
+          <span class="hidden sm:inline">{{ t('common.tambah') }}</span>
         </button>
       </template>
     </PageHeader>
@@ -200,11 +202,11 @@ function promptDelete(item: TahunAjaran) {
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Tahun Ajaran</th>
-                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">Semester</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Kelas</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Status</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Aksi</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colTahunAjaran') }}</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.tahunAjaran.colSemester') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colKelas') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colStatus') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
@@ -231,7 +233,7 @@ function promptDelete(item: TahunAjaran) {
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
                   <BaseBadge :variant="item.isActive ? 'green' : 'gray'" size="sm" :dot="item.isActive" :pulse="item.isActive">
-                    {{ item.isActive ? 'Aktif' : 'Tidak Aktif' }}
+                    {{ item.isActive ? t('admin.tahunAjaran.aktif') : t('admin.tahunAjaran.tidakAktif') }}
                   </BaseBadge>
                 </td>
                 <td class="px-4 sm:px-6 py-4">
@@ -239,7 +241,7 @@ function promptDelete(item: TahunAjaran) {
                     <!-- Edit -->
                     <button @click="openEdit(item)"
                       class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all duration-150"
-                      :title="`Edit ${fullLabel(item)}`">
+                      :title="t('admin.tahunAjaran.editTitle', { name: fullLabel(item) })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
@@ -248,14 +250,14 @@ function promptDelete(item: TahunAjaran) {
                     <!-- Activate (only if not active) -->
                     <button v-if="!item.isActive" @click="promptToggle(item)"
                       class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all duration-150"
-                      :title="`Aktifkan ${fullLabel(item)}`">
+                      :title="t('admin.tahunAjaran.aktifkanTitle', { name: fullLabel(item) })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </button>
 
                     <!-- Active indicator icon -->
-                    <span v-else class="p-2 text-green-500 cursor-default" title="Sedang aktif">
+                    <span v-else class="p-2 text-green-500 cursor-default" :title="t('admin.tahunAjaran.sedangAktif')">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
@@ -264,7 +266,7 @@ function promptDelete(item: TahunAjaran) {
                     <!-- Delete (only if not active) -->
                     <button v-if="!item.isActive" @click="promptDelete(item)"
                       class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-150"
-                      :title="`Hapus ${fullLabel(item)}`">
+                      :title="t('admin.tahunAjaran.hapusTitle', { name: fullLabel(item) })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
@@ -280,13 +282,13 @@ function promptDelete(item: TahunAjaran) {
                     <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p class="text-gray-500 ">Belum ada data tahun ajaran</p>
+                    <p class="text-gray-500 ">{{ t('admin.tahunAjaran.empty') }}</p>
                     <button @click="openCreate"
                       class="inline-flex items-center gap-1 px-4 py-2 text-sm text-primary-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                       </svg>
-                      Tambah sekarang
+                      {{ t('admin.tahunAjaran.emptyAction') }}
                     </button>
                   </div>
                 </td>
@@ -307,7 +309,7 @@ function promptDelete(item: TahunAjaran) {
             <!-- Modal header -->
             <div class="flex items-center justify-between px-4 pt-4 pb-2">
               <h2 class="text-lg  text-gray-900 dark:text-gray-100">
-                {{ editing ? 'Edit Tahun Ajaran' : 'Tambah Tahun Ajaran' }}
+                {{ editing ? t('admin.tahunAjaran.modalEdit') : t('admin.tahunAjaran.modalCreate') }}
               </h2>
               <button @click="handleCloseClick"
                 class="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
@@ -320,9 +322,9 @@ function promptDelete(item: TahunAjaran) {
             <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <!-- Nama -->
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">Nama Tahun Ajaran</label>
+                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.tahunAjaran.labelNama') }}</label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
-                  placeholder="contoh: 2026/2027"
+                  :placeholder="t('admin.tahunAjaran.placeholderNama')"
                   :disabled="!!editing && editing._count.kelas > 0"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 <Transition name="fade">
@@ -330,19 +332,19 @@ function promptDelete(item: TahunAjaran) {
                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
-                    Nama tidak bisa diubah karena sudah memiliki {{ editing._count.kelas }} kelas terkait
+                    {{ t('admin.tahunAjaran.infoNamaTerkunci', { count: editing._count.kelas }) }}
                   </p>
                 </Transition>
               </div>
 
               <!-- Semester -->
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">Semester</label>
+                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.tahunAjaran.labelSemester') }}</label>
                 <select v-model="form.semester" @change="onFormChange"
                   :disabled="!!editing && editing._count.kelas > 0"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
-                  <option value="GANJIL">Ganjil</option>
-                  <option value="GENAP">Genap</option>
+                  <option value="GANJIL">{{ t('semester.ganjil') }}</option>
+                  <option value="GENAP">{{ t('semester.genap') }}</option>
                 </select>
               </div>
 
@@ -352,10 +354,10 @@ function promptDelete(item: TahunAjaran) {
                   class="mt-0.5 w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-primary-600 focus:ring-primary-500 transition-shadow" />
                 <div class="flex flex-col">
                   <label for="setActive" class="text-sm  text-gray-700 dark:text-gray-300 cursor-pointer">
-                    {{ editing ? 'Set sebagai tahun ajaran aktif' : 'Jadikan aktif sekarang' }}
+                    {{ editing ? t('admin.tahunAjaran.setAktifEdit') : t('admin.tahunAjaran.setAktifCreate') }}
                   </label>
                   <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    Tahun ajaran lain yang aktif akan otomatis dinonaktifkan
+                    {{ t('admin.tahunAjaran.infoAutoNonaktif') }}
                   </p>
                 </div>
               </div>
@@ -366,7 +368,7 @@ function promptDelete(item: TahunAjaran) {
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span>Tahun ajaran ini sedang aktif. Untuk menonaktifkan, aktifkan tahun ajaran lain.</span>
+                  <span>{{ t('admin.tahunAjaran.infoEditAktif') }}</span>
                 </div>
               </Transition>
 
@@ -384,7 +386,7 @@ function promptDelete(item: TahunAjaran) {
               <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-slate-700">
                 <button type="button" @click="handleCloseClick"
                   class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                  Batal
+                  {{ t('common.batal') }}
                 </button>
                 <button type="submit" :disabled="saving"
                   class="px-5 py-2 text-sm  text-white bg-primary-600 rounded-lg hover:bg-primary-700 active:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
@@ -392,7 +394,7 @@ function promptDelete(item: TahunAjaran) {
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  {{ saving ? 'Menyimpan...' : 'Simpan' }}
+                  {{ saving ? t('common.menyimpan') : t('common.simpan') }}
                 </button>
               </div>
             </form>
@@ -405,16 +407,16 @@ function promptDelete(item: TahunAjaran) {
         <div v-if="confirmClose" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmClose = false"></div>
           <div class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
-            <h2 class="text-lg  text-gray-900 dark:text-gray-100 mb-2">Batalkan perubahan?</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Perubahan yang belum disimpan akan hilang.</p>
+            <h2 class="text-lg  text-gray-900 dark:text-gray-100 mb-2">{{ t('admin.tahunAjaran.confirmCloseTitle') }}</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">{{ t('admin.tahunAjaran.confirmCloseMsg') }}</p>
             <div class="flex justify-end gap-3">
               <button @click="confirmClose = false"
                 class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                Lanjutkan Edit
+                {{ t('admin.tahunAjaran.lanjutkanEdit') }}
               </button>
               <button @click="showModal = false; confirmClose = false"
                 class="px-4 py-2 text-sm  text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
-                Ya, Batalkan
+                {{ t('admin.tahunAjaran.yaBatalkan') }}
               </button>
             </div>
           </div>
@@ -432,22 +434,22 @@ function promptDelete(item: TahunAjaran) {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h2 class="text-lg  text-gray-900 dark:text-gray-100">Aktifkan Tahun Ajaran</h2>
+              <h2 class="text-lg  text-gray-900 dark:text-gray-100">{{ t('admin.tahunAjaran.confirmToggleTitle') }}</h2>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-              Tahun ajaran <span class="text-gray-900 dark:text-gray-100">{{ confirmToggle.nama }}</span> akan diaktifkan.
+              {{ t('admin.tahunAjaran.confirmToggleMsg', { name: confirmToggle.nama }) }}
             </p>
             <p class="text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-lg p-3 mb-4">
-              Tahun ajaran lain yang aktif akan otomatis dinonaktifkan.
+              {{ t('admin.tahunAjaran.confirmToggleInfo') }}
             </p>
             <div class="flex justify-end gap-3">
               <button @click="confirmToggle = null"
                 class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                Batal
+                {{ t('common.batal') }}
               </button>
               <button @click="handleToggle"
                 class="px-4 py-2 text-sm  text-white bg-green-600 rounded-lg hover:bg-green-700 active:bg-green-800">
-                Ya, Aktifkan
+                {{ t('common.yaAktifkan') }}
               </button>
             </div>
           </div>
@@ -466,12 +468,12 @@ function promptDelete(item: TahunAjaran) {
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg  text-gray-900 dark:text-gray-100">Hapus Tahun Ajaran</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Tindakan ini tidak bisa dibatalkan</p>
+                <h2 class="text-lg  text-gray-900 dark:text-gray-100">{{ t('admin.tahunAjaran.confirmDeleteTitle') }}</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('admin.tahunAjaran.confirmDeleteSub') }}</p>
               </div>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
-              Yakin ingin menghapus <span class="text-gray-900 dark:text-gray-100">{{ confirmDelete.nama }}</span>?
+              {{ t('admin.tahunAjaran.confirmDeleteMsg', { name: confirmDelete.nama }) }}
             </p>
             <div v-if="confirmDelete.kelasCount > 0"
               class="mt-3 p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-lg text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
@@ -479,20 +481,20 @@ function promptDelete(item: TahunAjaran) {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <span>
-                Tahun ajaran ini masih memiliki <span>{{ confirmDelete.kelasCount }} kelas</span> terkait. Data murid/absensi tidak akan hilang, tetapi tahun ajaran tidak akan muncul di pilihan baru.
+                {{ t('admin.tahunAjaran.confirmDeleteKelas', { count: confirmDelete.kelasCount }) }}
               </span>
             </div>
             <p v-else class="mt-3 text-sm text-gray-500 dark:text-gray-400">
-              Data akan dihapus secara permanen dari tampilan.
+              {{ t('admin.tahunAjaran.confirmDeleteTanpaKelas') }}
             </p>
             <div class="flex justify-end gap-3 mt-5 pt-4 border-t border-gray-100 dark:border-slate-700">
               <button @click="confirmDelete = null"
                 class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                Batal
+                {{ t('common.batal') }}
               </button>
               <button @click="handleDelete"
                 class="px-4 py-2 text-sm  text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800">
-                Ya, Hapus
+                {{ t('common.yaHapus') }}
               </button>
             </div>
           </div>

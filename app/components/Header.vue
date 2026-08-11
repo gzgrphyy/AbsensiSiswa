@@ -2,6 +2,7 @@
 const { clear } = useUserSession()
 const { pengaturan } = usePengaturan()
 const colorMode = useColorMode()
+const { t, locale } = useI18n()
 const isAdmin = inject('isAdmin', false)
 
 const isDark = computed(() => colorMode.value === 'dark')
@@ -10,12 +11,12 @@ function toggleColorMode() {
   colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
 }
 
-const today = new Date().toLocaleDateString('id-ID', {
+const today = computed(() => new Date().toLocaleDateString(locale.value === 'en' ? 'en-GB' : 'id-ID', {
   weekday: 'long',
   day: 'numeric',
   month: 'long',
   year: 'numeric'
-})
+}))
 
 async function handleLogout() {
   try { await clear() } catch {}
@@ -40,7 +41,7 @@ async function handleLogout() {
         </div>
         <div class="min-w-0 hidden md:block">
           <p class="text-sm  text-gray-900 dark:text-gray-100 truncate leading-tight">{{ pengaturan?.namaSekolah || 'SMK Negeri 1 Bandung' }}</p>
-          <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
+          <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ pengaturan?.titelAplikasi || t('app.sistemAbsensi') }}</p>
         </div>
       </NuxtLink>
 
@@ -53,7 +54,7 @@ async function handleLogout() {
         <button
           @click="toggleColorMode"
           :class="['p-1.5 text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-150', isAdmin ? 'rounded-lg' : 'rounded-lg']"
-          :title="isDark ? 'Mode Terang' : 'Mode Gelap'"
+          :title="isDark ? t('header.modeTerang') : t('header.modeGelap')"
         >
           <!-- Sun icon (show in dark mode) -->
           <svg v-if="isDark" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,8 +74,8 @@ async function handleLogout() {
             {{ pengaturan?.namaAplikasi?.charAt(0)?.toUpperCase() || 'S' }}
           </div>
           <div class="hidden md:block">
-            <p class="text-sm  text-gray-900 dark:text-gray-100 leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
-            <p class="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
+            <p class="text-sm  text-gray-900 dark:text-gray-100 leading-tight">{{ pengaturan?.namaAplikasi || t('app.aplikasiSkoria') }}</p>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{{ pengaturan?.titelAplikasi || t('app.sistemAbsensi') }}</p>
           </div>
         </div>
 
@@ -86,7 +87,7 @@ async function handleLogout() {
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          <span class="hidden sm:inline">Keluar</span>
+          <span class="hidden sm:inline">{{ t('common.keluar') }}</span>
         </button>
       </div>
     </div>

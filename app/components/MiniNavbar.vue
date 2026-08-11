@@ -2,15 +2,29 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 const { pengaturan } = usePengaturan()
+const { t, locale, setLocale } = useI18n()
 const isAdmin = inject('isAdmin', false)
 
 const showProfile = ref(false)
+const showLang = ref(false)
+
+const langOptions = [
+  { code: 'id', name: 'Indonesia', short: 'ID' },
+  { code: 'en', name: 'English', short: 'EN' }
+]
+
+const currentLang = computed(() => langOptions.find(l => l.code === locale.value) || langOptions[0])
+
+function selectLocale(code: string) {
+  setLocale(code)
+  showLang.value = false
+}
 
 const now = ref(new Date())
 let clockTimer: ReturnType<typeof setInterval> | null = null
 
 const currentTime = computed(() =>
-  now.value.toLocaleTimeString('id-ID', {
+  now.value.toLocaleTimeString(locale.value === 'en' ? 'en-GB' : 'id-ID', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
@@ -35,8 +49,9 @@ function toggleProfile() {
 
 function handleClickOutside(e: MouseEvent) {
   const target = e.target as HTMLElement
-  if (!target.closest('#profile-dropdown')) {
+  if (!target.closest('#profile-dropdown') && !target.closest('#lang-dropdown')) {
     showProfile.value = false
+    showLang.value = false
   }
 }
 
@@ -62,7 +77,7 @@ onUnmounted(() => {
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain" />
           <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
         </div>
-        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</span>
+        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ pengaturan?.namaAplikasi || t('app.aplikasiSkoria') }}</span>
       </NuxtLink>
 
       <!-- Centered: Live Clock -->
@@ -70,18 +85,44 @@ onUnmounted(() => {
         <span class="text-[10px]  text-gray-500 dark:text-gray-400 tabular-nums tracking-wide">{{ currentTime }}</span>
       </div>
 
-      <!-- Right: Developer Profile -->
+      <!-- Right: Language & Developer Profile -->
       <div class="flex items-center gap-1.5">
-        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">TA {{ pengaturan?.tahunAjaran || '—' }}</span>
+        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ t('miniNavbar.ta') }} {{ pengaturan?.tahunAjaran || '—' }}</span>
 
-        <img src="/bendera_indonesia.png" class="w-4 h-3 object-contain flex-shrink-0" alt="Merdeka" />
+        <!-- Language Switcher -->
+        <div id="lang-dropdown" class="relative">
+          <button
+            @click.stop="showLang = !showLang"
+            class="h-5 px-1.5 inline-flex items-center gap-1 text-[10px]  text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 rounded hover:bg-gray-300/60 dark:hover:bg-slate-700 transition-colors"
+            :title="t('miniNavbar.gantiBahasa')"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+            </svg>
+            <span class="font-medium">{{ currentLang.short }}</span>
+          </button>
+
+          <div v-if="showLang" class="fixed top-8 right-16 sm:right-24 w-36 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow z-[100] py-1">
+            <button
+              v-for="opt in langOptions"
+              :key="opt.code"
+              @click="selectLocale(opt.code)"
+              class="w-full px-3 py-1.5 text-xs text-left flex items-center justify-between gap-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-100"
+            >
+              <span>{{ opt.name }}</span>
+              <svg v-if="locale === opt.code" class="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
 
         <!-- Developer Profile -->
         <button
           id="profile-dropdown"
           @click.stop="toggleProfile"
           class="w-5 h-5 rounded-full bg-primary-500 flex items-center justify-center"
-          title="Pengembang"
+          :title="t('miniNavbar.pengembang')"
         >
           <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

@@ -3,11 +3,51 @@ import { hashPassword } from '../server/utils/password'
 
 const prisma = new PrismaClient()
 
+const NAMA_DEPAN_PRI = ['Agus', 'Bambang', 'Catur', 'Dedi', 'Eko', 'Fajar', 'Guntur', 'Hendra', 'Imam', 'Joko', 'Kurnia', 'Lukman', 'Maman', 'Nanda', 'Oka', 'Puji', 'Rahmat', 'Surya', 'Taufik', 'Ujang', 'Wahyu', 'Yudi', 'Zainal', 'Arif', 'Bayu', 'Dimas', 'Farhan', 'Galih', 'Ilham', 'Rizky']
+const NAMA_DEPAN_WANITA = ['Ayu', 'Dewi', 'Eka', 'Fitri', 'Gita', 'Hesti', 'Intan', 'Juwita', 'Kartika', 'Lestari', 'Maya', 'Nia', 'Ovi', 'Putri', 'Ratna', 'Sari', 'Tika', 'Umi', 'Vina', 'Wulan', 'Yuni', 'Zulaikha', 'Annisa', 'Citra', 'Dinda', 'Farah', 'Nabila', 'Salsabila', 'Zahra', 'Rahma']
+const NAMA_BELAKANG = ['Pratama', 'Santoso', 'Wijaya', 'Nugroho', 'Saputra', 'Hidayat', 'Kurniawan', 'Susanto', 'Setiawan', 'Ramadhan', 'Firdaus', 'Maulana', 'Purnama', 'Utami', 'Permata', 'Anggraini', 'Wulandari', 'Saputri', 'Gunawan', 'Haryanto', 'Subekti', 'Prasetyo']
+const GELAR_PTK = ['S.Pd.', 'M.Pd.', 'S.Kom.', 'S.Si.', 'S.E.', 'S.Pd.I.', 'M.T.']
+
+function rand<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
+
+function slugify(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^\.|\.$/g, '')
+}
+
+function generatePtk(i: number) {
+  const pria = Math.random() < 0.5
+  const namaDepan = pria ? rand(NAMA_DEPAN_PRI) : rand(NAMA_DEPAN_WANITA)
+  const namaBelakang = rand(NAMA_BELAKANG)
+  return {
+    nama: `${namaDepan} ${namaBelakang}, ${rand(GELAR_PTK)}`,
+    nip: String(197501010000000000n + BigInt(i)),
+    email: `${slugify(namaDepan)}.${slugify(namaBelakang)}-${i}@sekolah.sch.id`,
+    nomorHp1: `0812${String(10000000 + i).padStart(8, '0')}`,
+    nomorHp2: Math.random() < 0.3 ? `0857${String(50000000 + i).padStart(8, '0')}` : null
+  }
+}
+
+function generateMurid(i: number) {
+  const pria = Math.random() < 0.5
+  const namaDepan = pria ? rand(NAMA_DEPAN_PRI) : rand(NAMA_DEPAN_WANITA)
+  const namaBelakang = rand(NAMA_BELAKANG)
+  return {
+    nama: `${namaDepan} ${namaBelakang}`,
+    nisn: String(9000000000 + i),
+    nomorHp1: Math.random() < 0.7 ? `0813${String(20000000 + i).padStart(8, '0')}` : null,
+    namaWali: `${pria ? 'Bpk' : 'Ibu'} ${namaDepan} ${namaBelakang}`,
+    kontakWali: Math.random() < 0.8 ? `0821${String(30000000 + i).padStart(8, '0')}` : null
+  }
+}
+
 async function main() {
   console.log('⏳ Menyiapkan data seed...')
 
   // Bersihkan data lama (urutan reverse dependensi)
   await prisma.absensiRequest.deleteMany()
+  await prisma.izin.deleteMany()
   await prisma.sesiAbsensi.deleteMany()
   await prisma.jadwalPelajaran.deleteMany()
   await prisma.siswa.deleteMany()
@@ -80,6 +120,24 @@ async function main() {
       })
     )
   )
+
+  const guruTambahanCount = 30 - gurus.length
+  for (let i = 0; i < guruTambahanCount; i++) {
+    const g = generatePtk(i)
+    const user = await prisma.user.create({
+      data: {
+        nama: g.nama,
+        nip: g.nip,
+        email: g.email,
+        nomorHp1: g.nomorHp1,
+        nomorHp2: g.nomorHp2,
+        passwordHash: guruHash,
+        role: 'GURU',
+        isActive: true
+      }
+    })
+    gurus.push(user)
+  }
 
   console.log(`✓ ${gurus.length} PTK dibuat`)
 
@@ -177,11 +235,16 @@ async function main() {
     { nama: 'Elsa Nathania', nisn: '3234567899', nomorHp1: null, namaWali: 'Nathan', kontakWali: null },
   ]
 
+  const targetMuridPerKelas = [34, 34, 33, 33, 33, 33]
+  const NAMED_PER_KELAS = 5
+
   let idx = 0
   for (let k = 0; k < kelasList.length; k++) {
     const kelas = kelasList[k]
-    for (let m = 0; m < 5; m++) {
-      const murid = muridPerKelas[idx]
+    const target = targetMuridPerKelas[k]
+    for (let m = 0; m < target; m++) {
+      const named = m < NAMED_PER_KELAS ? muridPerKelas[k * NAMED_PER_KELAS + m] : undefined
+      const murid = named ?? generateMurid(idx)
       const user = await prisma.user.create({
         data: {
           nama: murid.nama,

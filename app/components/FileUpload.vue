@@ -3,6 +3,8 @@ import { inject } from 'vue'
 
 const isAdmin = inject('isAdmin', false)
 
+const { t } = useI18n()
+
 const props = withDefaults(defineProps<{
   label: string
   accept?: string
@@ -70,7 +72,7 @@ async function handleFileChange(event: Event) {
       emit('uploaded', res.path)
     }
   } catch {
-    fileName.value = 'Upload gagal'
+    fileName.value = t('common.uploadGagal')
   } finally {
     uploading.value = false
     input.value = ''
@@ -96,11 +98,11 @@ async function handleFileChange(event: Event) {
         <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
         </svg>
-        Pilih File
+        {{ t('common.pilihFile') }}
       </button>
 
       <span v-if="fileName && !previewUrl" class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[200px]">{{ fileName }}</span>
-      <span v-else-if="!currentPath" class="text-sm text-gray-400 dark:text-gray-500 italic">Belum ada file dipilih</span>
+      <span v-else-if="!currentPath" class="text-sm text-gray-400 dark:text-gray-500 italic">{{ t('common.belumAdaFile') }}</span>
 
       <div v-if="previewUrl" class="flex items-center gap-2">
         <img :src="previewUrl" alt="Preview" :class="['w-8 h-8 object-contain border border-gray-200 dark:border-slate-600', isAdmin ? 'rounded-lg' : 'rounded']" />
@@ -109,7 +111,7 @@ async function handleFileChange(event: Event) {
           type="button"
           :disabled="deleting"
           :class="['p-1.5 text-red-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50', isAdmin ? 'rounded-lg' : 'rounded-lg']"
-          title="Hapus file"
+          :title="t('common.hapusFile')"
           @click="handleDelete"
         >
           <svg v-if="deleting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">

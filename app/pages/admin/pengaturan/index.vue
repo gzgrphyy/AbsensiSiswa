@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { z } from 'zod'
 
+const { t } = useI18n()
 const { pengaturan, fetch: fetchPengaturan } = usePengaturan()
 const activeTab = ref<'umum' | 'absensi' | 'keamanan'>('umum')
 
@@ -80,10 +81,10 @@ const faviconAllowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/x-ic
 
 function validateFile(file: File, allowedTypes: string[]): string | null {
   if (file.size > MAX_FILE_SIZE) {
-    return 'File terlalu besar. Maksimal 2MB'
+    return t('admin.pengaturan.fileTerlaluBesar')
   }
   if (!allowedTypes.includes(file.type)) {
-    return 'Tipe file tidak didukung'
+    return t('admin.pengaturan.tipeTidakDidukung')
   }
   return null
 }
@@ -146,7 +147,7 @@ function handleIconSelect(event: Event) {
     errorMsg.value = ''
     const validationError = validateFile(file, logoAllowedTypes)
     if (validationError) {
-      errorMsg.value = `Logo: ${validationError}`
+      errorMsg.value = `${t('admin.pengaturan.labelLogoAplikasi')}: ${validationError}`
       target.value = ''
       return
     }
@@ -162,7 +163,7 @@ function handleFaviconSelect(event: Event) {
     errorMsg.value = ''
     const validationError = validateFile(file, faviconAllowedTypes)
     if (validationError) {
-      errorMsg.value = `Favicon: ${validationError}`
+      errorMsg.value = `${t('admin.pengaturan.labelFavicon')}: ${validationError}`
       target.value = ''
       return
     }
@@ -190,7 +191,7 @@ function handleLogoSekolahSelect(event: Event) {
     errorMsg.value = ''
     const validationError = validateFile(file, logoAllowedTypes)
     if (validationError) {
-      errorMsg.value = `Logo Sekolah: ${validationError}`
+      errorMsg.value = `${t('admin.pengaturan.labelLogoSekolah')}: ${validationError}`
       target.value = ''
       return
     }
@@ -257,12 +258,12 @@ async function handleSave() {
     logoSekolahFile.value = null
     logoSekolahPreview.value = null
 
-    successMsg.value = 'Pengaturan berhasil disimpan'
+    successMsg.value = t('admin.pengaturan.msgBerhasilSave')
   } catch (err: any) {
     iconUploading.value = false
     faviconUploading.value = false
     logoSekolahUploading.value = false
-    const message = err?.data?.statusMessage || err?.message || 'Gagal menyimpan pengaturan. Silakan coba lagi.'
+    const message = err?.data?.statusMessage || err?.message || t('admin.pengaturan.msgGagalSave')
     errorMsg.value = message
   } finally {
     saving.value = false
@@ -272,7 +273,7 @@ async function handleSave() {
 
 <template>
   <AppLayout>
-    <PageHeader title="Pengaturan" description="Konfigurasi aplikasi absensi" />
+    <PageHeader :title="t('admin.pengaturan.title')" :description="t('admin.pengaturan.desc')" />
 
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
@@ -281,17 +282,17 @@ async function handleSave() {
       <button @click="activeTab = 'umum'"
         class="flex-1 py-2 px-4 text-sm  rounded-lg transition-all"
         :class="activeTab === 'umum' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
-        Umum
+        {{ t('admin.pengaturan.tabUmum') }}
       </button>
       <button @click="activeTab = 'absensi'"
         class="flex-1 py-2 px-4 text-sm  rounded-lg transition-all"
         :class="activeTab === 'absensi' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
-        Absensi
+        {{ t('admin.pengaturan.tabAbsensi') }}
       </button>
       <button @click="activeTab = 'keamanan'"
         class="flex-1 py-2 px-4 text-sm  rounded-lg transition-all"
         :class="activeTab === 'keamanan' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
-        Keamanan
+        {{ t('admin.pengaturan.tabKeamanan') }}
       </button>
     </div>
 
@@ -305,20 +306,20 @@ async function handleSave() {
               <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              Branding & Visual
+              {{ t('admin.pengaturan.brandingVisual') }}
             </h3>
             <div class="bg-white dark:bg-gray-800 rounded-lg p-4 space-y-4 border border-gray-300 dark:border-gray-600">
               <!-- Nama Aplikasi & Titel -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <BaseFormField label="Nama Aplikasi">
+                <BaseFormField :label="t('admin.pengaturan.labelNamaAplikasi')">
                   <input v-model="formBranding.namaAplikasi" type="text"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    placeholder="Aplikasi Skoria" />
+                    :placeholder="t('admin.pengaturan.placeholderNamaAplikasi')" />
                 </BaseFormField>
-                <BaseFormField label="Titel Aplikasi">
+                <BaseFormField :label="t('admin.pengaturan.labelTitelAplikasi')">
                   <input v-model="formBranding.titelAplikasi" type="text"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    placeholder="Sistem Absensi" />
+                    :placeholder="t('admin.pengaturan.placeholderTitelAplikasi')" />
                 </BaseFormField>
               </div>
 
@@ -329,7 +330,7 @@ async function handleSave() {
                     <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                     </svg>
-                    Warna Utama
+                    {{ t('admin.pengaturan.labelWarnaUtama') }}
                   </span>
                 </label>
                 <div class="flex flex-wrap items-center gap-3">
@@ -351,7 +352,7 @@ async function handleSave() {
                     :title="preset.name"
                   ></button>
                 </div>
-                <p class="mt-3 text-[10px] text-gray-400 dark:text-gray-500">Warna utama website (tombol, navbar, sidebar, dsb).</p>
+                <p class="mt-3 text-[10px] text-gray-400 dark:text-gray-500">{{ t('admin.pengaturan.descWarnaUtama') }}</p>
               </div>
 
               <!-- Logo & Favicon side by side -->
@@ -363,7 +364,7 @@ async function handleSave() {
                       <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
-                      Logo Aplikasi
+                      {{ t('admin.pengaturan.labelLogoAplikasi') }}
                     </span>
                   </label>
                   <!-- Preview -->
@@ -386,7 +387,7 @@ async function handleSave() {
                           <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                           </svg>
-                          {{ iconUploading ? 'Mengunggah...' : 'Pilih File' }}
+                          {{ iconUploading ? t('admin.pengaturan.mengunggah') : t('common.pilihFile') }}
                         </span>
                       </label>
                       <button v-if="(formBranding.iconPath || iconPreview) && !iconUploading" type="button" @click="removeIcon"
@@ -394,10 +395,10 @@ async function handleSave() {
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                        Hapus
+                        {{ t('common.hapus') }}
                       </button>
                     </div>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">PNG, JPEG, SVG • Maks 10MB</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">{{ t('admin.pengaturan.infoFilePng') }}</p>
                   </div>
                 </div>
 
@@ -408,7 +409,7 @@ async function handleSave() {
                       <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                       </svg>
-                      Favicon
+                      {{ t('admin.pengaturan.labelFavicon') }}
                     </span>
                   </label>
                   <!-- Preview -->
@@ -431,7 +432,7 @@ async function handleSave() {
                           <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                           </svg>
-                          {{ faviconUploading ? 'Mengunggah...' : 'Pilih File' }}
+                          {{ faviconUploading ? t('admin.pengaturan.mengunggah') : t('common.pilihFile') }}
                         </span>
                       </label>
                       <button v-if="(formBranding.faviconPath || faviconPreview) && !faviconUploading" type="button" @click="removeFavicon"
@@ -439,10 +440,10 @@ async function handleSave() {
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                        Hapus
+                        {{ t('common.hapus') }}
                       </button>
                     </div>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">PNG, JPEG, ICO • Maks 10MB</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">{{ t('admin.pengaturan.infoFileIco') }}</p>
                   </div>
                 </div>
               </div>
@@ -451,7 +452,7 @@ async function handleSave() {
 
           <!-- Separator -->
           <div class="border-t border-gray-200 dark:border-slate-700 pt-6">
-            <h3 class="text-base  text-gray-900 dark:text-gray-100 mb-4">Informasi Sekolah</h3>
+            <h3 class="text-base  text-gray-900 dark:text-gray-100 mb-4">{{ t('admin.pengaturan.informasiSekolah') }}</h3>
             <div class="space-y-4">
               <!-- Logo Sekolah -->
               <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
@@ -460,7 +461,7 @@ async function handleSave() {
                     <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    Logo Sekolah
+                    {{ t('admin.pengaturan.labelLogoSekolah') }}
                   </span>
                 </label>
                 <div class="flex flex-col items-center gap-3">
@@ -481,7 +482,7 @@ async function handleSave() {
                         <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                         </svg>
-                        {{ logoSekolahUploading ? 'Mengunggah...' : 'Pilih File' }}
+                        {{ logoSekolahUploading ? t('admin.pengaturan.mengunggah') : t('common.pilihFile') }}
                       </span>
                     </label>
                     <button v-if="(formUmum.logoSekolahPath || logoSekolahPreview) && !logoSekolahUploading" type="button" @click="removeLogoSekolah"
@@ -489,49 +490,49 @@ async function handleSave() {
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
-                      Hapus
+                      {{ t('common.hapus') }}
                     </button>
                   </div>
-                  <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">PNG, JPEG, SVG • Maks 10MB</p>
+                  <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">{{ t('admin.pengaturan.infoFilePng') }}</p>
                 </div>
               </div>
-              <BaseFormField label="Nama Sekolah" required>
+              <BaseFormField :label="t('admin.pengaturan.labelNamaSekolah')" required>
                 <input v-model="formUmum.namaSekolah" type="text"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
               </BaseFormField>
-              <BaseFormField label="Alamat">
+              <BaseFormField :label="t('admin.pengaturan.labelAlamat')">
                 <textarea v-model="formUmum.alamat" rows="2"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"></textarea>
               </BaseFormField>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <BaseFormField label="Telepon">
+                <BaseFormField :label="t('admin.pengaturan.labelTelepon')">
                   <input v-model="formUmum.telp" type="text"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
                 </BaseFormField>
-                <BaseFormField label="Email">
+                <BaseFormField :label="t('admin.pengaturan.labelEmail')">
                   <input v-model="formUmum.email" type="email"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
                 </BaseFormField>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <BaseFormField label="Tahun Ajaran">
+                <BaseFormField :label="t('admin.pengaturan.labelTahunAjaran')">
                   <input v-model="formUmum.tahunAjaran" type="text"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
                 </BaseFormField>
-                <BaseFormField label="Semester">
+                <BaseFormField :label="t('admin.pengaturan.labelSemester')">
                   <select v-model="formUmum.semester"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
-                    <option value="Ganjil">Ganjil</option>
-                    <option value="Genap">Genap</option>
+                    <option value="Ganjil">{{ t('semester.ganjil') }}</option>
+                    <option value="Genap">{{ t('semester.genap') }}</option>
                   </select>
                 </BaseFormField>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <BaseFormField label="Kepala Sekolah">
+                <BaseFormField :label="t('admin.pengaturan.labelKepalaSekolah')">
                   <input v-model="formUmum.kepalaSekolah" type="text"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
                 </BaseFormField>
-                <BaseFormField label="NIP Kepala Sekolah">
+                <BaseFormField :label="t('admin.pengaturan.labelNipKepsek')">
                   <input v-model="formUmum.nipKepsek" type="text"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
                 </BaseFormField>
@@ -543,37 +544,37 @@ async function handleSave() {
         <!-- Absensi -->
         <div v-show="activeTab === 'absensi'" class="space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <BaseFormField label="Batas Scan (menit sebelum jam mulai)">
+            <BaseFormField :label="t('admin.pengaturan.batasScan')">
               <input v-model.number="formAbsensi.batasScan" type="number" min="1"
                 class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
-            <BaseFormField label="Batas Telat (menit)">
+            <BaseFormField :label="t('admin.pengaturan.batasTelat')">
               <input v-model.number="formAbsensi.batasTelat" type="number" min="1"
                 class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <BaseFormField label="Toleransi Alpha (kali)">
+            <BaseFormField :label="t('admin.pengaturan.toleransiAlpha')">
               <input v-model.number="formAbsensi.toleransiAlpha" type="number" min="1"
                 class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
           </div>
           <div class="space-y-3">
-            <BaseFormField label="Opsi Lainnya">
+            <BaseFormField :label="t('admin.pengaturan.opsiLainnya')">
               <div class="flex items-center gap-3">
                 <input v-model="formAbsensi.autoTutupSesi" type="checkbox" id="autoTutup"
                   class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
-                <label for="autoTutup" class="text-sm text-gray-700 dark:text-gray-300">Tutup sesi otomatis setelah jam selesai</label>
+                <label for="autoTutup" class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.pengaturan.autoTutupSesi') }}</label>
               </div>
               <div class="flex items-center gap-3">
                 <input v-model="formAbsensi.notifikasi" type="checkbox" id="notif"
                   class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
-                <label for="notif" class="text-sm text-gray-700 dark:text-gray-300">Kirim notifikasi ke wali murid</label>
+                <label for="notif" class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.pengaturan.kirimNotifikasi') }}</label>
               </div>
               <div class="flex items-center gap-3">
                 <input v-model="formAbsensi.izinTeksBebas" type="checkbox" id="izinBebas"
                   class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
-                <label for="izinBebas" class="text-sm text-gray-700 dark:text-gray-300">Izinkan teks bebas pada keterangan (selain sakit/izin)</label>
+                <label for="izinBebas" class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.pengaturan.izinTeksBebas') }}</label>
               </div>
             </BaseFormField>
           </div>
@@ -582,32 +583,32 @@ async function handleSave() {
         <!-- Keamanan -->
         <div v-show="activeTab === 'keamanan'" class="space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <BaseFormField label="Minimal Panjang Password">
+            <BaseFormField :label="t('admin.pengaturan.minPassword')">
               <input v-model.number="formKeamanan.minimalPassword" type="number" min="6"
                 class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
-            <BaseFormField label="Sesi Timeout (menit)">
+            <BaseFormField :label="t('admin.pengaturan.sesiTimeout')">
               <input v-model.number="formKeamanan.sesiTimeout" type="number" min="5"
                 class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <BaseFormField label="Max Login Gagal">
+            <BaseFormField :label="t('admin.pengaturan.maxLogin')">
               <input v-model.number="formKeamanan.maxLogin" type="number" min="1"
                 class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
           </div>
           <div class="space-y-3">
-            <BaseFormField label="Opsi Keamanan">
+            <BaseFormField :label="t('admin.pengaturan.opsiKeamanan')">
               <div class="flex items-center gap-3">
                 <input v-model="formKeamanan.twoFactorAuth" type="checkbox" id="2fa"
                   class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
-                <label for="2fa" class="text-sm text-gray-700 dark:text-gray-300">Aktifkan Two-Factor Authentication</label>
+                <label for="2fa" class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.pengaturan.aktifkan2fa') }}</label>
               </div>
               <div class="flex items-center gap-3">
                 <input v-model="formKeamanan.logAktivitas" type="checkbox" id="log"
                   class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
-                <label for="log" class="text-sm text-gray-700 dark:text-gray-300">Catat log aktivitas pengguna</label>
+                <label for="log" class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.pengaturan.catatLog') }}</label>
               </div>
             </BaseFormField>
           </div>
@@ -620,7 +621,7 @@ async function handleSave() {
             <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
             </svg>
-            {{ saving ? 'Menyimpan...' : 'Simpan Pengaturan' }}
+            {{ saving ? t('common.menyimpan') : t('admin.pengaturan.simpan') }}
           </button>
         </div>
       </form>

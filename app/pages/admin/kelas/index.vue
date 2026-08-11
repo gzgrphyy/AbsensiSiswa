@@ -9,6 +9,8 @@ interface Kelas {
   _count: { siswa: number; jadwalPelajaran: number }
 }
 
+const { t } = useI18n()
+
 const draftSearch = ref('')
 const draftTa = ref(0)
 const draftJenjang = ref('')
@@ -68,6 +70,8 @@ function resetFilter() {
   appliedTa.value = 0
   appliedJenjang.value = ''
 }
+const semesterLabel = (s: string) => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
+
 const { data: guruList } = useFetch<{ id: number; nama: string }[]>('/api/admin/guru', { immediate: true })
 const { data: taList } = useFetch<{ id: number; nama: string; semester: string; isActive: boolean }[]>('/api/admin/tahun-ajaran', { immediate: true })
 
@@ -134,7 +138,7 @@ async function handleSave() {
 
       const { error } = await useFetch(`/api/admin/kelas/${editing.value.id}`, { method: 'PATCH', body })
       if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
-      showSuccess('Data kelas berhasil diperbarui')
+      showSuccess(t('admin.kelas.msgBerhasilEdit'))
     } else {
       const { error } = await useFetch('/api/admin/kelas', {
         method: 'POST',
@@ -145,7 +149,7 @@ async function handleSave() {
         }
       })
       if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
-      showSuccess('Kelas berhasil ditambahkan')
+      showSuccess(t('admin.kelas.msgBerhasilTambah'))
     }
     showModal.value = false
     confirmClose.value = false
@@ -163,14 +167,14 @@ async function handleDelete() {
   confirmDelete.value = null
   const { error } = await useFetch(`/api/admin/kelas/${id}`, { method: 'DELETE' })
   if (error.value) { showError(error.value.statusMessage || 'Gagal menghapus'); return }
-  showSuccess('Kelas berhasil dihapus')
+  showSuccess(t('admin.kelas.msgBerhasilHapus'))
   await refresh()
 }
 </script>
 
 <template>
   <AppLayout>
-    <PageHeader title="Data Kelas" description="Kelola kelas dan wali kelas" />
+    <PageHeader :title="t('admin.kelas.title')" :description="t('admin.kelas.desc')" />
 
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <div class="flex flex-wrap items-center gap-3">
@@ -178,26 +182,26 @@ async function handleDelete() {
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input v-model="draftSearch" type="text" placeholder="Cari kelas..."
+          <input v-model="draftSearch" type="text" :placeholder="t('admin.kelas.searchPlaceholder')"
             class="pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
         <select v-model="draftJenjang"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option value="">Semua Jenjang</option>
+          <option value="">{{ t('admin.kelas.semuaJenjang') }}</option>
           <option v-for="j in jenjangList" :key="j" :value="j">{{ j }}</option>
         </select>
         <select v-model="draftTa"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option :value="0">Semua Tahun Ajaran</option>
-          <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ t.semester }})</option>
+          <option :value="0">{{ t('admin.kelas.semuaTa') }}</option>
+          <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})</option>
         </select>
         <button @click="applyFilter"
           class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg border border-blue-600 transition-colors">
-          Terapkan
+          {{ t('common.terapkan') }}
         </button>
         <button @click="resetFilter"
           class="px-3 py-2 text-sm  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg border border-gray-300 dark:border-slate-600 transition-colors">
-          Atur Ulang
+          {{ t('common.aturUlang') }}
         </button>
       </div>
       <button @click="openCreate"
@@ -205,7 +209,7 @@ async function handleDelete() {
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-        <span class="hidden sm:inline">Tambah Kelas</span>
+        <span class="hidden sm:inline">{{ t('admin.kelas.tambahKelas') }}</span>
       </button>
     </div>
 
@@ -219,11 +223,11 @@ async function handleDelete() {
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Nama Kelas</th>
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">Wali Kelas</th>
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">Tahun Ajaran</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Murid</th>
-              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Aksi</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.kelas.colNama') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.kelas.colWali') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.kelas.colTa') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.kelas.colMurid') }}</th>
+              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
@@ -236,12 +240,12 @@ async function handleDelete() {
               </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
-                  <button @click="openEdit(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="Edit">
+                  <button @click="openEdit(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" :title="t('common.edit')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                  <button @click="promptDelete(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg" title="Hapus">
+                  <button @click="promptDelete(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg" :title="t('common.hapus')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -254,7 +258,7 @@ async function handleDelete() {
                 <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                <p class="text-gray-500 dark:text-gray-400 ">Belum ada data kelas</p>
+                <p class="text-gray-500 dark:text-gray-400 ">{{ t('admin.kelas.empty') }}</p>
               </td>
             </tr>
           </tbody>
@@ -262,7 +266,7 @@ async function handleDelete() {
       </div>
       <div v-if="filteredData.length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
         <p class="text-xs text-gray-400 dark:text-gray-500">
-          Menampilkan {{ ((page - 1) * pageSize) + 1 }}-{{ Math.min(page * pageSize, filteredData.length) }} dari {{ filteredData.length }} kelas
+          {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, filteredData.length), total: filteredData.length, unit: t('admin.kelas.unitKelas') }) }}
         </p>
         <div class="ml-auto flex items-center gap-2">
           <button
@@ -273,15 +277,15 @@ async function handleDelete() {
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            Sebelumnya
+            {{ t('common.sebelumnya') }}
           </button>
-          <span class="text-xs text-gray-400 dark:text-gray-500">Halaman {{ page }} dari {{ totalPages }}</span>
+          <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages }) }}</span>
           <button
             @click="page++"
             :disabled="page >= totalPages"
             class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Selanjutnya
+            {{ t('common.selanjutnya') }}
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
@@ -291,43 +295,43 @@ async function handleDelete() {
     </div>
 
     <!-- Modal -->
-    <BaseModal :show="showModal" :title="editing ? 'Edit Kelas' : 'Tambah Kelas Baru'" @close="handleCloseClick">
+    <BaseModal :show="showModal" :title="editing ? t('admin.kelas.modalEdit') : t('admin.kelas.modalCreate')" @close="handleCloseClick">
       <form @submit.prevent="handleSave" class="space-y-4">
-        <BaseFormField label="Nama Kelas" required>
+        <BaseFormField :label="t('admin.kelas.labelNama')" required>
           <input v-model="form.nama" type="text" @input="onFormChange" required
-            placeholder="contoh: X-A, XI-B, XII-C"
+            :placeholder="t('admin.kelas.placeholderNama')"
             class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </BaseFormField>
 
-        <BaseFormField label="Wali Kelas">
+        <BaseFormField :label="t('admin.kelas.labelWali')">
           <select v-model="form.waliKelasId" @change="onFormChange"
             class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
-            <option :value="0">Tidak ada</option>
+            <option :value="0">{{ t('common.tidakAda') }}</option>
             <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
           </select>
         </BaseFormField>
 
-        <BaseFormField label="Tahun Ajaran" required>
+        <BaseFormField :label="t('admin.kelas.labelTa')" required>
           <select v-model="form.tahunAjaranId" @change="onFormChange" required
             class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
-            <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ t.semester }})</option>
+            <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})</option>
           </select>
         </BaseFormField>
       </form>
       <template #footer>
-        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">Batal</button>
+        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">{{ t('common.batal') }}</button>
         <button type="submit" @click="handleSave" :disabled="saving"
           class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
           <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-          {{ saving ? 'Menyimpan...' : 'Simpan' }}
+          {{ saving ? t('common.menyimpan') : t('common.simpan') }}
         </button>
       </template>
     </BaseModal>
 
     <ConfirmDialog
       :show="!!confirmDelete"
-      title="Hapus Kelas"
-      :message="`Yakin ingin menghapus ${confirmDelete?.nama}?`"
+      :title="t('admin.kelas.confirmDeleteTitle')"
+      :message="t('admin.kelas.confirmDeleteMsg', { nama: confirmDelete?.nama })"
       variant="danger"
       @confirm="handleDelete"
       @cancel="confirmDelete = null"

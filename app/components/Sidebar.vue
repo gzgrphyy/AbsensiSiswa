@@ -4,15 +4,16 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const { user } = useUserSession()
+const { t } = useI18n()
 const isAdmin = inject('isAdmin', false)
 const collapsed = useCookie('sidebarCollapsed', { default: () => false })
 const openGroups = ref<Record<string, boolean>>({})
 
-const roleLabel: Record<string, string> = {
-  ADMIN: 'Administrator',
-  GURU: 'PTK',
-  SISWA: 'Murid'
-}
+const roleLabel = computed<Record<string, string>>(() => ({
+  ADMIN: t('role.admin'),
+  GURU: t('role.guru'),
+  SISWA: t('role.siswa')
+}))
 
 interface MenuItem {
   label: string
@@ -21,42 +22,42 @@ interface MenuItem {
   children?: { label: string; to: string }[]
 }
 
-const adminMenus: MenuItem[] = [
-  { label: 'Beranda', to: '/admin', icon: 'dashboard' },
+const adminMenus = computed<MenuItem[]>(() => [
+  { label: t('nav.beranda'), to: '/admin', icon: 'dashboard' },
   {
-    label: 'Data Master', icon: 'master-data',
+    label: t('nav.dataMaster'), icon: 'master-data',
     children: [
-      { label: 'Data PTK', to: '/admin/guru' },
-      { label: 'Data Murid', to: '/admin/siswa' },
-      { label: 'Data Kelas', to: '/admin/kelas' },
-      { label: 'Tahun Ajaran', to: '/admin/tahun-ajaran' },
-      { label: 'Data Ruangan', to: '/admin/ruangan' },
-      { label: 'Jadwal Pelajaran', to: '/admin/jadwal-pelajaran' },
+      { label: t('nav.dataPtk'), to: '/admin/guru' },
+      { label: t('nav.dataMurid'), to: '/admin/siswa' },
+      { label: t('nav.dataKelas'), to: '/admin/kelas' },
+      { label: t('nav.tahunAjaran'), to: '/admin/tahun-ajaran' },
+      { label: t('nav.dataRuangan'), to: '/admin/ruangan' },
+      { label: t('nav.jadwalPelajaran'), to: '/admin/jadwal-pelajaran' },
     ]
   },
-  { label: 'Pemantauan Ruangan', to: '/admin/monitoring', icon: 'monitor' },
-  { label: 'Rekap Absensi', to: '/admin/rekap', icon: 'rekap' },
-  { label: 'Ekspor Laporan', to: '/admin/export', icon: 'export' },
-  { label: 'Pengaturan', to: '/admin/pengaturan', icon: 'settings' },
-  { label: 'Profil', to: '/admin/profil', icon: 'profile' },
-]
+  { label: t('nav.pemantauanRuangan'), to: '/admin/monitoring', icon: 'monitor' },
+  { label: t('nav.rekapAbsensi'), to: '/admin/rekap', icon: 'rekap' },
+  { label: t('nav.eksporLaporan'), to: '/admin/export', icon: 'export' },
+  { label: t('nav.pengaturan'), to: '/admin/pengaturan', icon: 'settings' },
+  { label: t('nav.profil'), to: '/admin/profil', icon: 'profile' },
+])
 
-const guruMenus: MenuItem[] = [
-  { label: 'Dasbor', to: '/absensi', icon: 'dashboard' },
-  { label: 'Buka Sesi Kelas', to: '/absensi', icon: 'sesi' },
-  { label: 'Riwayat Absensi', to: '/absensi/riwayat', icon: 'riwayat' },
-  { label: 'Rekap Absensi', to: '/absensi/rekap', icon: 'rekap' },
-  { label: 'Export Laporan', to: '/absensi/export', icon: 'export' },
-  { label: 'Profil', to: '/absensi/profil', icon: 'profile' },
-]
+const guruMenus = computed<MenuItem[]>(() => [
+  { label: t('nav.beranda'), to: '/absensi', icon: 'dashboard' },
+  { label: t('nav.bukaSesiKelas'), to: '/absensi', icon: 'sesi' },
+  { label: t('nav.riwayatAbsensi'), to: '/absensi/riwayat', icon: 'riwayat' },
+  { label: t('nav.rekapAbsensi'), to: '/absensi/rekap', icon: 'rekap' },
+  { label: t('nav.exportLaporan'), to: '/absensi/export', icon: 'export' },
+  { label: t('nav.profil'), to: '/absensi/profil', icon: 'profile' },
+])
 
-const siswaMenus: MenuItem[] = [
-  { label: 'Dasbor', to: '/siswa', icon: 'dashboard' },
-  { label: 'Pindai QR', to: '/siswa/scan', icon: 'scan' },
-  { label: 'Jadwal', to: '/siswa/jadwal', icon: 'jadwal' },
-  { label: 'Riwayat Absensi', to: '/siswa/riwayat', icon: 'riwayat' },
-  { label: 'Profil', to: '/siswa/profil', icon: 'profile' },
-]
+const siswaMenus = computed<MenuItem[]>(() => [
+  { label: t('nav.beranda'), to: '/siswa', icon: 'dashboard' },
+  { label: t('nav.pindaiQr'), to: '/siswa/scan', icon: 'scan' },
+  { label: t('nav.jadwal'), to: '/siswa/jadwal', icon: 'jadwal' },
+  { label: t('nav.riwayatAbsensi'), to: '/siswa/riwayat', icon: 'riwayat' },
+  { label: t('nav.profil'), to: '/siswa/profil', icon: 'profile' },
+])
 
 const isActive = (to?: string) => {
   if (!to) return false
@@ -70,9 +71,9 @@ const isChildActive = (children?: { to: string }[]) => {
 
 const currentMenus = computed(() => {
   const role = user.value?.role
-  if (role === 'ADMIN') return adminMenus
-  if (role === 'GURU') return guruMenus
-  if (role === 'SISWA') return siswaMenus
+  if (role === 'ADMIN') return adminMenus.value
+  if (role === 'GURU') return guruMenus.value
+  if (role === 'SISWA') return siswaMenus.value
   return []
 })
 
@@ -135,7 +136,7 @@ function renderIcon(icon: string) {
           {{ user?.nama?.charAt(0)?.toUpperCase() || 'U' }}
         </div>
         <div v-if="!collapsed" class="min-w-0">
-          <p class="text-sm  text-gray-900 dark:text-gray-100 truncate leading-tight">{{ user?.nama || 'Pengguna' }}</p>
+          <p class="text-sm  text-gray-900 dark:text-gray-100 truncate leading-tight">{{ user?.nama || t('common.pengguna') }}</p>
           <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ roleLabel[user?.role] || user?.role }}</p>
         </div>
       </div>

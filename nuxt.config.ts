@@ -7,7 +7,23 @@ export default defineNuxtConfig({
     port: 3000
   },
 
-  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
+  modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n'],
+
+  i18n: {
+    defaultLocale: 'id',
+    fallbackLocale: 'id',
+    langDir: 'locales',
+    locales: [
+      { code: 'id', name: 'Indonesia', file: 'id.json' },
+      { code: 'en', name: 'English', file: 'en.json' }
+    ],
+    strategy: 'no_prefix',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'locale',
+      alwaysRedirect: false
+    }
+  },
 
   components: [{ path: '~/components', pathPrefix: false }],
 

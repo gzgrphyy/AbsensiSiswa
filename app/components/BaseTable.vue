@@ -22,7 +22,7 @@ withDefaults(defineProps<{
   striped?: boolean
 }>(), {
   loading: false,
-  emptyText: 'Belum ada data',
+  emptyText: undefined,
   stickyHeader: false,
   dense: false,
   hover: true,
@@ -30,6 +30,8 @@ withDefaults(defineProps<{
 })
 
 const isAdmin = inject('isAdmin', false)
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   'empty-action': []
@@ -76,7 +78,7 @@ const emitEmptyAction = () => {
       <svg class="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
       </svg>
-      <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ emptyText }}</p>
+      <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ emptyText || t('common.belumAdaData') }}</p>
       <button v-if="emptyActionLabel" @click="emitEmptyAction"
         class="mt-2 inline-flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
@@ -114,7 +116,7 @@ const emitEmptyAction = () => {
       <svg class="w-10 h-10 text-gray-200 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
       </svg>
-      <p class="text-gray-400 dark:text-gray-500 font-medium">{{ emptyText }}</p>
+      <p class="text-gray-400 dark:text-gray-500 font-medium">{{ emptyText || t('common.belumAdaData') }}</p>
       <button v-if="emptyActionLabel" @click="emitEmptyAction"
         class="mt-3 inline-flex items-center gap-1 px-4 py-2 text-sm text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-all duration-150">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>

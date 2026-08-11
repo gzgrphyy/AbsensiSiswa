@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useI18n()
+
 interface ProfileData {
   id: number
   nama: string
@@ -57,12 +59,12 @@ function handleFotoSelect(event: Event) {
     const file = target.files[0]
     errorMsg.value = ''
     if (file.size > 10 * 1024 * 1024) {
-      errorMsg.value = 'Foto: File terlalu besar. Maksimal 10MB'
+      errorMsg.value = t('admin.profil.fotoTerlaluBesar')
       target.value = ''
       return
     }
     if (!['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'].includes(file.type)) {
-      errorMsg.value = 'Foto: Tipe file tidak didukung'
+      errorMsg.value = t('admin.profil.fotoTipe')
       target.value = ''
       return
     }
@@ -96,11 +98,11 @@ async function handleSave() {
     if (form.foto !== undefined) body.foto = form.foto
 
     await $fetch('/api/user/profile', { method: 'PUT', body })
-    successMsg.value = 'Profil berhasil diperbarui'
+    successMsg.value = t('admin.profil.msgBerhasilUpdate')
     await refresh()
   } catch (err: any) {
     fotoUploading.value = false
-    errorMsg.value = err?.data?.statusMessage || 'Gagal menyimpan profil'
+    errorMsg.value = err?.data?.statusMessage || t('admin.profil.msgGagalUpdate')
   } finally {
     saving.value = false
   }
@@ -111,19 +113,19 @@ async function handleChangePassword() {
   pwSuccessMsg.value = ''
 
   if (!pwForm.currentPassword) {
-    pwErrorMsg.value = 'Password saat ini wajib diisi'
+    pwErrorMsg.value = t('admin.profil.pwWajib')
     return
   }
   if (!pwForm.newPassword) {
-    pwErrorMsg.value = 'Password baru wajib diisi'
+    pwErrorMsg.value = t('admin.profil.pwBaruWajib')
     return
   }
   if (pwForm.newPassword.length < 6) {
-    pwErrorMsg.value = 'Password baru minimal 6 karakter'
+    pwErrorMsg.value = t('admin.profil.pwBaruMinimal')
     return
   }
   if (pwForm.newPassword !== pwForm.confirmPassword) {
-    pwErrorMsg.value = 'Konfirmasi password tidak cocok'
+    pwErrorMsg.value = t('admin.profil.pwTidakCocok')
     return
   }
 
@@ -136,12 +138,12 @@ async function handleChangePassword() {
         newPassword: pwForm.newPassword
       }
     })
-    pwSuccessMsg.value = 'Password berhasil diubah'
+    pwSuccessMsg.value = t('admin.profil.msgBerhasilPw')
     pwForm.currentPassword = ''
     pwForm.newPassword = ''
     pwForm.confirmPassword = ''
   } catch (err: any) {
-    pwErrorMsg.value = err?.data?.statusMessage || 'Gagal mengubah password'
+    pwErrorMsg.value = err?.data?.statusMessage || t('admin.profil.msgGagalPw')
   } finally {
     savingPw.value = false
   }
@@ -150,7 +152,7 @@ async function handleChangePassword() {
 
 <template>
   <AppLayout>
-    <PageHeader title="Profil Saya" description="Informasi akun administrator" />
+    <PageHeader :title="t('admin.profil.title')" :description="t('admin.profil.desc')" />
 
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
@@ -176,26 +178,26 @@ async function handleChangePassword() {
           </div>
           <div>
             <h2 class=" text-gray-900 dark:text-gray-100">{{ profile?.nama || '-' }}</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Administrator</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('role.admin') }}</p>
             <button v-if="fotoPreview || form.foto" type="button" @click="removeFoto"
               class="mt-1 text-[11px] text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-              Hapus foto
+              {{ t('admin.profil.hapusFoto') }}
             </button>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <BaseFormField label="Nama Lengkap" required>
+          <BaseFormField :label="t('admin.profil.labelNama')" required>
             <input v-model="form.nama" type="text"
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
            </BaseFormField>
-           <BaseFormField label="Role">
-             <input value="Administrator" type="text" disabled
+           <BaseFormField :label="t('admin.profil.labelRole')">
+             <input :value="t('role.admin')" type="text" disabled
                class="w-full px-3.5 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm bg-gray-50 dark:bg-slate-700 text-gray-500 dark:text-gray-400 cursor-not-allowed" />
           </BaseFormField>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <BaseFormField label="Email" required>
+          <BaseFormField :label="t('admin.profil.labelEmail')" required>
             <input v-model="form.email" type="email"
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500" />
            </BaseFormField>
@@ -205,7 +207,7 @@ async function handleChangePassword() {
           <button type="submit" :disabled="saving"
             class="px-6 py-2.5 bg-primary-500 text-sm  text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-            Simpan Perubahan
+            {{ t('admin.profil.simpanPerubahan') }}
           </button>
         </div>
       </form>
@@ -216,23 +218,23 @@ async function handleChangePassword() {
         <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
-        <h3 class="text-base  text-gray-900 dark:text-gray-100">Ubah Password</h3>
+        <h3 class="text-base  text-gray-900 dark:text-gray-100">{{ t('admin.profil.ubahPassword') }}</h3>
       </div>
 
       <Notification type="success" :message="pwSuccessMsg" :show="!!pwSuccessMsg" @dismiss="pwSuccessMsg = ''" />
       <Notification type="error" :message="pwErrorMsg" :show="!!pwErrorMsg" @dismiss="pwErrorMsg = ''" />
 
       <form @submit.prevent="handleChangePassword" class="space-y-4 max-w-md">
-        <BaseFormField label="Password Saat Ini" required>
-          <input v-model="pwForm.currentPassword" type="password" placeholder="Masukkan password saat ini"
+        <BaseFormField :label="t('admin.profil.labelPasswordSaatIni')" required>
+          <input v-model="pwForm.currentPassword" type="password" :placeholder="t('admin.profil.placeholderPasswordSaatIni')"
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
-        <BaseFormField label="Password Baru" required>
-          <input v-model="pwForm.newPassword" type="password" placeholder="Minimal 6 karakter"
+        <BaseFormField :label="t('admin.profil.labelPasswordBaru')" required>
+          <input v-model="pwForm.newPassword" type="password" :placeholder="t('admin.profil.placeholderPasswordBaru')"
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
-        <BaseFormField label="Konfirmasi Password Baru" required>
-          <input v-model="pwForm.confirmPassword" type="password" placeholder="Ketik ulang password baru"
+        <BaseFormField :label="t('admin.profil.labelKonfirmasiPassword')" required>
+          <input v-model="pwForm.confirmPassword" type="password" :placeholder="t('admin.profil.placeholderKonfirmasiPassword')"
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
 
@@ -240,7 +242,7 @@ async function handleChangePassword() {
           <button type="submit" :disabled="savingPw"
             class="px-6 py-2.5 bg-orange-500 text-sm  text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="savingPw" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-            Ubah Password
+            {{ t('admin.profil.ubahPassword') }}
           </button>
         </div>
       </form>

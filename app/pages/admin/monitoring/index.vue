@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useI18n()
+
 interface MonitoringItem {
   ruangan: string
   sesiAktif: number
@@ -15,6 +17,12 @@ const { data, pending, refresh } = useFetch<MonitoringItem[]>('/api/admin/monito
 
 const displayData = computed(() => data.value || [])
 
+function statusLabel(status: string) {
+  if (status === 'AKTIF') return t('admin.monitoring.status.AKTIF')
+  if (status === 'TIDAK AKTIF') return t('admin.monitoring.status.TIDAK AKTIF')
+  return status
+}
+
 const totalAktif = computed(() => displayData.value.filter(i => i.status === 'AKTIF').reduce((a, b) => a + b.sesiAktif, 0))
 const totalSudahAbsen = computed(() => displayData.value.reduce((a, b) => a + b.sudahAbsen, 0))
 const totalBelumAbsen = computed(() => displayData.value.reduce((a, b) => a + b.belumAbsen, 0))
@@ -28,14 +36,14 @@ onMounted(() => {
 
 <template>
   <AppLayout>
-    <PageHeader title="Pemantauan Ruangan" description="Pantau sesi absensi secara langsung">
+    <PageHeader :title="t('admin.monitoring.title')" :description="t('admin.monitoring.desc')">
       <template #actions>
         <div class="flex items-center gap-3 text-xs text-gray-500">
           <div class="flex items-center gap-1">
             <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            Langsung
+            {{ t('admin.monitoring.langsung') }}
           </div>
-          <span class="text-[10px] px-1.5 py-0.5 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 ">Hari ini</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 ">{{ t('admin.monitoring.hariIni') }}</span>
         </div>
       </template>
     </PageHeader>
@@ -44,9 +52,9 @@ onMounted(() => {
 
     <template v-else>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-        <StatCard label="Sesi Aktif" :value="totalAktif" variant="green" />
-        <StatCard label="Sudah Absen" :value="totalSudahAbsen" variant="blue" />
-        <StatCard label="Belum Absen" :value="totalBelumAbsen" variant="amber" />
+        <StatCard :label="t('admin.monitoring.statSesiAktif')" :value="totalAktif" variant="green" />
+        <StatCard :label="t('admin.monitoring.statSudahAbsen')" :value="totalSudahAbsen" variant="blue" />
+        <StatCard :label="t('admin.monitoring.statBelumAbsen')" :value="totalBelumAbsen" variant="amber" />
       </div>
 
       <BaseCard>
@@ -54,12 +62,12 @@ onMounted(() => {
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-                <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Ruangan</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Sesi Aktif</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Total Murid</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Sudah Absen</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Belum Absen</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Status</th>
+                <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colRuangan') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colSesiAktif') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colTotalMurid') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colSudahAbsen') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colBelumAbsen') }}</th>
+                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colStatus') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
@@ -71,13 +79,13 @@ onMounted(() => {
                 <td class="px-4 py-3 text-center text-amber-600 dark:text-amber-400 ">{{ item.belumAbsen }}</td>
                 <td class="px-4 py-3 text-center">
                   <BaseBadge :variant="item.status === 'AKTIF' ? 'green' : 'gray'" :dot="item.status === 'AKTIF'" :pulse="item.status === 'AKTIF'">
-                    {{ capitalize(item.status) }}
+                    {{ statusLabel(item.status) }}
                   </BaseBadge>
                 </td>
               </tr>
               <tr v-if="displayData.length === 0">
                 <td colspan="6" class="px-4 py-16 text-center">
-                  <p class="text-gray-500 ">Belum ada data pemantauan</p>
+                  <p class="text-gray-500 ">{{ t('admin.monitoring.empty') }}</p>
                 </td>
               </tr>
             </tbody>

@@ -13,6 +13,8 @@ interface Siswa {
   createdAt: string
 }
 
+const { t } = useI18n()
+
 const searchQuery = ref('')
 const filterKelas = ref(0)
 const page = ref(1)
@@ -109,7 +111,7 @@ async function handleSave() {
 
       const { error } = await useFetch(`/api/admin/siswa/${editing.value.id}`, { method: 'PATCH', body })
       if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
-      showSuccess('Data murid berhasil diperbarui')
+      showSuccess(t('admin.siswa.msgBerhasilEdit'))
     } else {
       const { data: result, error } = await useFetch('/api/admin/siswa', {
         method: 'POST',
@@ -129,7 +131,7 @@ async function handleSave() {
         generatedPassword.value = result.value.generatedPassword
         showPasswordModal.value = true
       }
-      showSuccess('Akun murid berhasil ditambahkan')
+      showSuccess(t('admin.siswa.msgBerhasilTambah'))
     }
     showModal.value = false
     confirmClose.value = false
@@ -147,7 +149,7 @@ async function handleDelete() {
   confirmDelete.value = null
   const { error } = await useFetch(`/api/admin/siswa/${id}`, { method: 'DELETE' })
   if (error.value) { showError(error.value.statusMessage || 'Gagal menghapus'); return }
-  showSuccess('Data murid berhasil dihapus')
+  showSuccess(t('admin.siswa.msgBerhasilHapus'))
   await refresh()
 }
 
@@ -167,7 +169,7 @@ async function handleResetPassword() {
     generatedPassword.value = data.generatedPassword
     showPasswordModal.value = true
     resetPasswordFor.value = null
-    showSuccess('Password berhasil di-reset')
+    showSuccess(t('admin.guru.msgBerhasilReset'))
   } catch (err: any) {
     showError(err?.data?.statusMessage || 'Gagal reset password')
   } finally {
@@ -178,16 +180,16 @@ async function handleResetPassword() {
 async function copyPassword() {
   const ok = await copyToClipboard(generatedPassword.value)
   if (ok) {
-    showSuccess('Password berhasil disalin!')
+    showSuccess(t('admin.guru.msgPasswordTersalin'))
   } else {
-    showError('Gagal menyalin password. Silakan salin manual.')
+    showError(t('admin.guru.msgGagalSalin'))
   }
 }
 </script>
 
 <template>
   <AppLayout>
-    <PageHeader title="Data Murid" description="Kelola data murid dan akun" />
+    <PageHeader :title="t('admin.siswa.title')" :description="t('admin.siswa.desc')" />
 
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <div class="flex flex-wrap items-center gap-3">
@@ -195,12 +197,12 @@ async function copyPassword() {
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input v-model="searchQuery" type="text" placeholder="Cari murid..."
+          <input v-model="searchQuery" type="text" :placeholder="t('admin.siswa.searchPlaceholder')"
             class="w-40 sm:w-56 pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
         <select v-model="filterKelas"
           class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option :value="0">Semua Kelas</option>
+          <option :value="0">{{ t('admin.jadwal.semuaKelas') }}</option>
           <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
       </div>
@@ -209,7 +211,7 @@ async function copyPassword() {
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-        <span class="hidden sm:inline">Tambah Murid</span>
+        <span class="hidden sm:inline">{{ t('admin.siswa.tambahMurid') }}</span>
       </button>
     </div>
 
@@ -225,13 +227,13 @@ async function copyPassword() {
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Nama</th>
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">NISN</th>
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">Kelas</th>
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">Wali</th>
-              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden xl:table-cell">No. HP</th>
-              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Status</th>
-              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Aksi</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.guru.colNama') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.siswa.colNisn') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.jadwal.colKelas') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">{{ t('admin.siswa.colWali') }}</th>
+              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden xl:table-cell">{{ t('admin.guru.colNoHp') }}</th>
+              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colStatus') }}</th>
+              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
@@ -246,12 +248,12 @@ async function copyPassword() {
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs text-center hidden xl:table-cell">{{ item.nomorHp1 || item.nomorHp2 ? (item.nomorHp1 || '-') : '-' }}</td>
               <td class="px-4 py-3 text-center">
                 <BaseBadge :variant="item.user.isActive ? 'green' : 'gray'" size="sm" :dot="item.user.isActive" :pulse="item.user.isActive">
-                  {{ item.user.isActive ? 'Aktif' : 'Tidak Aktif' }}
+                  {{ item.user.isActive ? t('admin.tahunAjaran.aktif') : t('admin.tahunAjaran.tidakAktif') }}
                 </BaseBadge>
               </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
-                  <button @click="openEdit(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title="Edit">
+                  <button @click="openEdit(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" :title="t('common.edit')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
@@ -260,13 +262,13 @@ async function copyPassword() {
                   <!-- Reset Password -->
                   <button @click="promptResetPassword(item)"
                     class="p-2 text-gray-400 dark:text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-lg transition-all duration-150"
-                    title="Reset password">
+                    :title="t('admin.guru.resetPwTitle').replace('{name}', item.nama)">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                     </svg>
                   </button>
 
-                  <button @click="promptDelete(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg" title="Hapus">
+                  <button @click="promptDelete(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg" :title="t('common.hapus')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -280,7 +282,7 @@ async function copyPassword() {
                 <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5zm0 7l-9-5 9-5 9 5-9 5zm0-7l-9-5 9-5 9 5-9 5z" />
                 </svg>
-                <p class="text-gray-500 dark:text-gray-400 ">Belum ada data murid</p>
+                <p class="text-gray-500 dark:text-gray-400 ">{{ t('admin.siswa.empty') }}</p>
               </td>
             </tr>
           </tbody>
@@ -288,7 +290,7 @@ async function copyPassword() {
       </div>
       <div v-if="(siswaList || []).length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
         <p class="text-xs text-gray-400 dark:text-gray-500">
-          Menampilkan {{ ((page - 1) * pageSize) + 1 }}-{{ Math.min(page * pageSize, (siswaList || []).length) }} dari {{ (siswaList || []).length }} murid
+          {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, (siswaList || []).length), total: (siswaList || []).length, unit: t('admin.siswa.unitMurid') }) }}
         </p>
         <div class="ml-auto flex items-center gap-2">
           <button
@@ -299,15 +301,15 @@ async function copyPassword() {
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
-            Sebelumnya
+            {{ t('common.sebelumnya') }}
           </button>
-          <span class="text-xs text-gray-400 dark:text-gray-500">Halaman {{ page }} dari {{ totalPages }}</span>
+          <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages }) }}</span>
           <button
             @click="page++"
             :disabled="page >= totalPages"
             class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Selanjutnya
+            {{ t('common.selanjutnya') }}
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
@@ -317,60 +319,60 @@ async function copyPassword() {
     </div>
 
     <!-- Modal Create/Edit -->
-    <BaseModal :show="showModal" :title="editing ? 'Edit Data Murid' : 'Tambah Murid Baru'" @close="handleCloseClick">
+    <BaseModal :show="showModal" :title="editing ? t('admin.siswa.modalEdit') : t('admin.siswa.modalCreate')" @close="handleCloseClick">
       <form @submit.prevent="handleSave" class="space-y-4">
-        <BaseFormField label="Nama Lengkap" required :error="undefined">
+        <BaseFormField :label="t('admin.guru.labelNama')" required :error="undefined">
           <input v-model="form.nama" type="text" @input="onFormChange" required
-            placeholder="Nama lengkap murid"
+            :placeholder="t('admin.siswa.placeholderNama')"
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
 
         <div class="grid grid-cols-2 gap-4">
-          <BaseFormField label="NISN" required>
+          <BaseFormField :label="t('admin.siswa.labelNisn')" required>
             <input v-model="form.nisn" type="text" @input="onFormChange" required
-              placeholder="Nomor Induk"
+              :placeholder="t('admin.siswa.placeholderNisn')"
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
           </BaseFormField>
 
-          <BaseFormField label="Kelas" required>
+          <BaseFormField :label="t('admin.jadwal.labelKelas')" required>
             <select v-model="form.kelasId" @change="onFormChange" required
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700">
-              <option :value="0" disabled>Pilih kelas</option>
+              <option :value="0" disabled>{{ t('admin.jadwal.pilihKelas') }}</option>
               <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
             </select>
           </BaseFormField>
         </div>
 
-        <BaseFormField label="Email (untuk login)">
+        <BaseFormField :label="t('admin.siswa.labelEmailLogin')">
           <input v-model="form.email" type="email" @input="onFormChange"
-            placeholder="email@sekolah.sch.id"
+            :placeholder="t('admin.guru.placeholderEmail')"
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
 
         <div class="grid grid-cols-2 gap-4">
-          <BaseFormField label="Nama Wali">
+          <BaseFormField :label="t('admin.siswa.labelNamaWali')">
             <input v-model="form.namaWali" type="text" @input="onFormChange"
-              placeholder="Nama orang tua/wali"
+              :placeholder="t('admin.siswa.placeholderNamaWali')"
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
           </BaseFormField>
 
-          <BaseFormField label="Kontak Wali">
+          <BaseFormField :label="t('admin.siswa.labelKontakWali')">
             <input v-model="form.kontakWali" type="text" @input="onFormChange"
-              placeholder="No. telepon"
+              :placeholder="t('admin.siswa.placeholderKontakWali')"
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
           </BaseFormField>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
-          <BaseFormField label="No. HP 1">
+          <BaseFormField :label="t('admin.siswa.labelNoHp1')">
             <input v-model="form.nomorHp1" type="text" @input="onFormChange"
-              placeholder="Nomor HP murid"
+              :placeholder="t('admin.siswa.placeholderHpMurid')"
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
           </BaseFormField>
 
-          <BaseFormField label="No. HP 2">
+          <BaseFormField :label="t('admin.siswa.labelNoHp2')">
             <input v-model="form.nomorHp2" type="text" @input="onFormChange"
-              placeholder="Nomor HP cadangan"
+              :placeholder="t('admin.guru.placeholderHp2')"
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
           </BaseFormField>
         </div>
@@ -380,7 +382,7 @@ async function copyPassword() {
             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>Password akan digenerate otomatis</span>
+            <span>{{ t('admin.siswa.infoPassword') }}</span>
           </div>
         </Transition>
 

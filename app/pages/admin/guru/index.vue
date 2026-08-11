@@ -13,6 +13,8 @@ interface Guru {
   _count: { kelasWali: number }
 }
 
+const { t } = useI18n()
+
 const showInactive = ref(false)
 const searchQuery = ref('')
 const page = ref(1)
@@ -119,7 +121,7 @@ async function handleSave() {
         showError(error.value.statusMessage || 'Gagal menyimpan')
         return
       }
-      showSuccess('Data PTK berhasil diperbarui')
+      showSuccess(t('admin.guru.msgBerhasilEdit'))
     } else {
       const { data: result, error } = await useFetch('/api/admin/guru', {
         method: 'POST',
@@ -139,7 +141,7 @@ async function handleSave() {
         generatedPassword.value = result.value.generatedPassword
         showPasswordModal.value = true
       }
-      showSuccess('Akun PTK berhasil ditambahkan')
+      showSuccess(t('admin.guru.msgBerhasilTambah'))
     }
     showModal.value = false
     confirmClose.value = false
@@ -161,7 +163,7 @@ async function handleResetPassword() {
     generatedPassword.value = data.generatedPassword
     showPasswordModal.value = true
     resetPasswordFor.value = null
-    showSuccess('Password berhasil di-reset')
+    showSuccess(t('admin.guru.msgBerhasilReset'))
   } catch (err: any) {
     showError(err?.data?.statusMessage || 'Gagal reset password')
   } finally {
@@ -179,7 +181,7 @@ async function handleToggleActive() {
     await $fetch(`/api/admin/guru/${id}/toggle-active`, {
       method: 'PATCH'
     })
-    showSuccess(active ? 'Akun PTK dinonaktifkan' : 'Akun PTK diaktifkan')
+    showSuccess(active ? t('admin.guru.msgBerhasilNonaktif') : t('admin.guru.msgBerhasilAktif'))
     await refresh()
   } catch (err: any) {
     showError(err?.data?.statusMessage || 'Gagal mengubah status')
@@ -199,23 +201,23 @@ function promptResetPassword(item: Guru) {
 async function copyPassword() {
   const ok = await copyToClipboard(generatedPassword.value)
   if (ok) {
-    showSuccess('Password berhasil disalin!')
+    showSuccess(t('admin.guru.msgPasswordTersalin'))
   } else {
-    showError('Gagal menyalin password. Silakan salin manual.')
+    showError(t('admin.guru.msgGagalSalin'))
   }
 }
 </script>
 
 <template>
   <AppLayout>
-    <PageHeader title="Data PTK" description="Kelola data & aktivasi status PTK">
+    <PageHeader :title="t('admin.guru.title')" :description="t('admin.guru.desc')">
       <template #actions>
         <button @click="openCreate"
           class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-sm ">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span class="hidden sm:inline">Tambah PTK</span>
+          <span class="hidden sm:inline">{{ t('admin.guru.tambahPtk') }}</span>
         </button>
       </template>
     </PageHeader>
@@ -229,12 +231,12 @@ async function copyPassword() {
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input v-model="searchQuery" type="text" placeholder="Cari PTK..."
+          <input v-model="searchQuery" type="text" :placeholder="t('admin.guru.searchPlaceholder')"
             class="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
         <div class="flex items-center justify-end ml-auto">
         <label class="inline-flex items-center gap-2 cursor-pointer select-none group">
-          <span class="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">Tampilkan nonaktif</span>
+          <span class="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">{{ t('admin.guru.tampilkanNonaktif') }}</span>
           <button
             role="switch"
             :aria-checked="showInactive"
@@ -273,12 +275,12 @@ async function copyPassword() {
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Nama</th>
-                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">Email</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">NIP</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">No. HP</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Status</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">Aksi</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.guru.colNama') }}</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.guru.colEmail') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.guru.colNip') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">{{ t('admin.guru.colNoHp') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colStatus') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
@@ -310,7 +312,7 @@ async function copyPassword() {
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
                   <BaseBadge :variant="item.isActive ? 'green' : 'gray'" size="sm" :dot="item.isActive" :pulse="item.isActive">
-                    {{ item.isActive ? 'Aktif' : 'Tidak Aktif' }}
+                    {{ item.isActive ? t('admin.tahunAjaran.aktif') : t('admin.tahunAjaran.tidakAktif') }}
                   </BaseBadge>
                 </td>
                 <td class="px-4 sm:px-6 py-4">
@@ -318,7 +320,7 @@ async function copyPassword() {
                     <!-- Edit -->
                     <button @click="openEdit(item)"
                       class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-150"
-                      :title="`Edit ${item.nama}`">
+                      :title="t('admin.guru.editTitle', { name: item.nama })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
@@ -327,7 +329,7 @@ async function copyPassword() {
                     <!-- Reset Password -->
                     <button @click="promptResetPassword(item)"
                       class="p-2 text-gray-400 dark:text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-lg transition-all duration-150"
-                      :title="`Reset password ${item.nama}`">
+                      :title="t('admin.guru.resetPwTitle', { name: item.nama })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                       </svg>
@@ -338,7 +340,7 @@ async function copyPassword() {
                       :class="item.isActive
                         ? 'p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all duration-150'
                         : 'p-2 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg transition-all duration-150'"
-                      :title="item.isActive ? 'Nonaktifkan akun' : 'Aktifkan akun'">
+                      :title="item.isActive ? t('admin.guru.nonaktifkanTitle') : t('admin.guru.aktifkanTitle')">
                       <svg v-if="item.isActive" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                       </svg>
@@ -358,14 +360,14 @@ async function copyPassword() {
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <p class="text-gray-500 dark:text-gray-400 ">
-                      {{ showInactive ? 'Belum ada PTK nonaktif' : 'Belum ada data PTK' }}
+                      {{ showInactive ? t('admin.guru.emptyInactive') : t('admin.guru.empty') }}
                     </p>
                     <button v-if="!showInactive" @click="openCreate"
                       class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                       </svg>
-                      Tambah sekarang
+                      {{ t('admin.tahunAjaran.emptyAction') }}
                     </button>
                   </div>
                 </td>
@@ -375,7 +377,7 @@ async function copyPassword() {
         </div>
         <div v-if="(data || []).length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
           <p class="text-xs text-gray-400 dark:text-gray-500">
-            Menampilkan {{ ((page - 1) * pageSize) + 1 }}-{{ Math.min(page * pageSize, (data || []).length) }} dari {{ (data || []).length }} PTK
+            {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, (data || []).length), total: (data || []).length, unit: t('admin.guru.unitPtk') }) }}
           </p>
           <div class="ml-auto flex items-center gap-2">
             <button
@@ -386,15 +388,15 @@ async function copyPassword() {
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
-              Sebelumnya
+              {{ t('common.sebelumnya') }}
             </button>
-            <span class="text-xs text-gray-400 dark:text-gray-500">Halaman {{ page }} dari {{ totalPages }}</span>
+            <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages }) }}</span>
             <button
               @click="page++"
               :disabled="page >= totalPages"
               class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              Selanjutnya
+              {{ t('common.selanjutnya') }}
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
@@ -412,7 +414,7 @@ async function copyPassword() {
           <div class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-md mx-auto overflow-hidden border border-gray-300 dark:border-gray-600">
             <div class="flex items-center justify-between px-4 pt-4 pb-2">
               <h2 class="text-lg  text-gray-900 dark:text-gray-100">
-                {{ editing ? 'Edit Data PTK' : 'Tambah PTK Baru' }}
+                {{ editing ? t('admin.guru.modalEdit') : t('admin.guru.modalCreate') }}
               </h2>
               <button @click="handleCloseClick"
                 class="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
@@ -426,43 +428,43 @@ async function copyPassword() {
               <!-- Nama Lengkap -->
               <div>
                 <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">
-                  Nama Lengkap <span class="text-red-500">*</span>
+                  {{ t('admin.guru.labelNama') }} <span class="text-red-500">*</span>
                 </label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
-                  placeholder="Nama lengkap PTK"
+                  :placeholder="t('admin.guru.placeholderNama')"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
               <!-- Email -->
               <div>
                 <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">
-                  Email <span class="text-red-500">*</span>
+                  {{ t('admin.guru.labelEmail') }} <span class="text-red-500">*</span>
                 </label>
                 <input v-model="form.email" type="email" @input="onFormChange"
-                  placeholder="email@sekolah.sch.id"
+                  :placeholder="t('admin.guru.placeholderEmail')"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
               <!-- NIP -->
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">NIP (opsional)</label>
+                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.guru.labelNip') }}</label>
                 <input v-model="form.nip" type="text" @input="onFormChange"
-                  placeholder="Nomor Induk Pegawai"
+                  :placeholder="t('admin.guru.placeholderNip')"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
               <!-- Nomor HP -->
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">No. HP 1 (opsional)</label>
+                  <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.guru.labelNoHp1') }}</label>
                   <input v-model="form.nomorHp1" type="text" @input="onFormChange"
-                    placeholder="Nomor HP"
+                    :placeholder="t('admin.guru.placeholderHp')"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 </div>
                 <div>
-                  <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">No. HP 2 (opsional)</label>
+                  <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.guru.labelNoHp2') }}</label>
                   <input v-model="form.nomorHp2" type="text" @input="onFormChange"
-                    placeholder="Nomor HP cadangan"
+                    :placeholder="t('admin.guru.placeholderHp2')"
                     class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 </div>
               </div>
@@ -473,7 +475,7 @@ async function copyPassword() {
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span>Password akan digenerate otomatis dan ditampilkan setelah simpan</span>
+                  <span>{{ t('admin.guru.infoPassword') }}</span>
                 </div>
               </Transition>
 
@@ -491,7 +493,7 @@ async function copyPassword() {
               <div class="flex justify-end gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                 <button type="button" @click="handleCloseClick"
                   class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                  Batal
+                  {{ t('common.batal') }}
                 </button>
                 <button type="submit" :disabled="saving"
                   class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
@@ -499,7 +501,7 @@ async function copyPassword() {
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  {{ saving ? 'Menyimpan...' : 'Simpan' }}
+                  {{ saving ? t('common.menyimpan') : t('common.simpan') }}
                 </button>
               </div>
             </form>
@@ -512,16 +514,16 @@ async function copyPassword() {
         <div v-if="confirmClose" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmClose = false"></div>
           <div class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
-            <h2 class="text-lg  text-gray-900 dark:text-gray-100 mb-2">Batalkan perubahan?</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">Perubahan yang belum disimpan akan hilang.</p>
+            <h2 class="text-lg  text-gray-900 dark:text-gray-100 mb-2">{{ t('admin.tahunAjaran.confirmCloseTitle') }}</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">{{ t('admin.tahunAjaran.confirmCloseMsg') }}</p>
             <div class="flex justify-end gap-3">
               <button @click="confirmClose = false"
                 class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                Lanjutkan Edit
+                {{ t('admin.tahunAjaran.lanjutkanEdit') }}
               </button>
               <button @click="showModal = false; confirmClose = false"
                 class="px-4 py-2 text-sm  text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
-                Ya, Batalkan
+                {{ t('admin.tahunAjaran.yaBatalkan') }}
               </button>
             </div>
           </div>
@@ -539,11 +541,11 @@ async function copyPassword() {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                 </svg>
               </div>
-              <h2 class="text-lg  text-gray-900 dark:text-gray-100">Password Generated</h2>
+              <h2 class="text-lg  text-gray-900 dark:text-gray-100">{{ t('admin.guru.pwModalTitle') }}</h2>
             </div>
 
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              Password untuk akun ini. Salin dan sampaikan ke PTK yang bersangkutan.
+              {{ t('admin.guru.pwModalMsg') }}
             </p>
 
             <div class="flex items-center gap-2 p-4 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg mb-4">
@@ -555,14 +557,14 @@ async function copyPassword() {
             <div class="flex justify-end gap-3">
               <button @click="showPasswordModal = false"
                 class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                Tutup
+                {{ t('admin.guru.tutup') }}
               </button>
               <button @click="copyPassword"
                 class="px-4 py-2 text-sm  text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 inline-flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
-                Salin Password
+                {{ t('admin.guru.salinPassword') }}
               </button>
             </div>
           </div>
@@ -585,29 +587,29 @@ async function copyPassword() {
               </div>
               <div>
                 <h2 class="text-lg  text-gray-900 dark:text-gray-100">
-                  {{ confirmToggle.active ? 'Nonaktifkan Akun' : 'Aktifkan Akun' }}
+                  {{ confirmToggle.active ? t('admin.guru.toggleTitleNonaktif') : t('admin.guru.toggleTitleAktif') }}
                 </h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ confirmToggle.nama }}</p>
               </div>
             </div>
 
             <p v-if="confirmToggle.active" class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              PTK ini tidak akan bisa login sampai diaktifkan kembali. Data kelas dan absensi tetap aman.
+              {{ t('admin.guru.toggleMsgNonaktif') }}
             </p>
             <p v-else class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              PTK ini akan bisa login kembali setelah diaktifkan.
+              {{ t('admin.guru.toggleMsgAktif') }}
             </p>
 
             <div class="flex justify-end gap-3">
               <button @click="confirmToggle = null"
                 class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                Batal
+                {{ t('common.batal') }}
               </button>
               <button @click="handleToggleActive"
                 :class="confirmToggle.active
                   ? 'px-4 py-2 text-sm  text-white bg-red-600 rounded-lg hover:bg-red-700'
                   : 'px-4 py-2 text-sm  text-white bg-green-600 rounded-lg hover:bg-green-700'">
-                {{ confirmToggle.active ? 'Ya, Nonaktifkan' : 'Ya, Aktifkan' }}
+                {{ confirmToggle.active ? t('admin.guru.yaNonaktifkan') : t('common.yaAktifkan') }}
               </button>
             </div>
           </div>
@@ -626,23 +628,23 @@ async function copyPassword() {
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg  text-gray-900 dark:text-gray-100">Reset Password</h2>
+                <h2 class="text-lg  text-gray-900 dark:text-gray-100">{{ t('admin.guru.resetTitle') }}</h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ resetPasswordFor.nama }}</p>
               </div>
             </div>
 
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">
-              Password baru akan digenerate otomatis. Password lama tidak bisa digunakan lagi. Lanjutkan?
+              {{ t('admin.guru.resetMsg') }}
             </p>
 
             <div class="flex justify-end gap-3">
               <button @click="resetPasswordFor = null"
                 class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                Batal
+                {{ t('common.batal') }}
               </button>
               <button @click="handleResetPassword"
                 class="px-4 py-2 text-sm  text-white bg-amber-600 rounded-lg hover:bg-amber-700 active:bg-amber-800">
-                Ya, Reset
+                {{ t('admin.guru.yaReset') }}
               </button>
             </div>
           </div>

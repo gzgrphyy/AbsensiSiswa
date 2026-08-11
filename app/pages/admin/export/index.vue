@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { t } = useI18n()
+
 interface ExportOption {
   id: string
   label: string
@@ -6,25 +8,33 @@ interface ExportOption {
   icon: string
 }
 
-const exportOptions: { title: string; description: string; items: ExportOption[] }[] = [
+interface ExportSection {
+  title: string
+  description: string
+  items: ExportOption[]
+}
+
+const exportSections = computed<ExportSection[]>(() => [
   {
-    title: 'Rekap Absensi',
-    description: 'Laporan rekap absensi murid',
+    title: t('admin.export.sectionRekap'),
+    description: t('admin.export.descRekap'),
     items: [
-      { id: 'rekap-harian', label: 'Rekap Harian', description: 'Data absensi harian semua kelas', icon: 'day' },
-      { id: 'rekap-bulanan', label: 'Rekap Bulanan', description: 'Rekapitulasi bulanan per murid', icon: 'month' },
-      { id: 'rekap-kelas', label: 'Rekap Kelas', description: 'Data kehadiran per kelas', icon: 'class' },
+      { id: 'rekap-harian', label: t('admin.export.rekapHarian'), description: t('admin.export.descRekapHarian'), icon: 'day' },
+      { id: 'rekap-bulanan', label: t('admin.export.rekapBulanan'), description: t('admin.export.descRekapBulanan'), icon: 'month' },
+      { id: 'rekap-kelas', label: t('admin.export.rekapKelas'), description: t('admin.export.descRekapKelas'), icon: 'class' },
     ],
   },
   {
-    title: 'Data Sekolah',
-    description: 'Ekspor data sekolah',
+    title: t('admin.export.sectionSekolah'),
+    description: t('admin.export.descSekolah'),
     items: [
-      { id: 'data-siswa', label: 'Data Murid', description: 'Ekspor data sekolah murid', icon: 'student' },
-      { id: 'data-guru', label: 'Data PTK', description: 'Ekspor data sekolah PTK', icon: 'teacher' },
+      { id: 'data-siswa', label: t('admin.export.dataSiswa'), description: t('admin.export.descDataSiswa'), icon: 'student' },
+      { id: 'data-guru', label: t('admin.export.dataGuru'), description: t('admin.export.descDataGuru'), icon: 'teacher' },
     ],
   },
-]
+])
+
+const allOptions = computed(() => exportSections.value.flatMap(s => s.items))
 
 const exporting = ref<string | null>(null)
 const errorMsg = ref('')
@@ -45,10 +55,10 @@ async function handleExport(id: string) {
     a.download = `${id}-${new Date().toISOString().slice(0, 10)}.xlsx`
     a.click()
     URL.revokeObjectURL(url)
-    successMsg.value = 'Ekspor berhasil diunduh'
+    successMsg.value = t('admin.export.msgBerhasil', { label: allOptions.value.find(o => o.id === id)?.label })
   } catch {
     // Fallback: simulate success
-    successMsg.value = `Export "${exportOptions.flatMap(s => s.items).find(o => o.id === id)?.label}" berhasil`
+    successMsg.value = t('admin.export.msgBerhasil', { label: allOptions.value.find(o => o.id === id)?.label })
   } finally {
     exporting.value = null
   }
@@ -57,12 +67,12 @@ async function handleExport(id: string) {
 
 <template>
   <AppLayout>
-    <PageHeader title="Ekspor Data" description="Unduh data absensi dalam format Excel" />
+    <PageHeader :title="t('admin.export.title')" :description="t('admin.export.desc')" />
 
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
 
-    <div v-for="section in exportOptions" :key="section.title" class="mb-6">
+    <div v-for="section in exportSections" :key="section.title" class="mb-6">
       <div class="mb-2">
         <h2 class="text-sm  text-gray-900 dark:text-gray-100">{{ section.title }}</h2>
         <p class="text-xs text-gray-400 dark:text-gray-500">{{ section.description }}</p>
