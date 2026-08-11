@@ -67,7 +67,8 @@
   "miniNavbar": {
     "ta": "TA",
     "gantiBahasa": "Ganti Bahasa",
-    "pengembang": "Pengembang"
+    "pengembang": "Pengembang",
+    "role": "Pengembang Aplikasi"
   },
   "semester": {
     "ganjil": "Ganjil",
@@ -243,7 +244,8 @@
       "msgBerhasilEdit": "Jadwal berhasil diperbarui",
       "msgBerhasilHapus": "Jadwal berhasil dihapus",
       "confirmDeleteTitle": "Hapus Jadwal",
-      "confirmDeleteMsg": "Yakin ingin menghapus jadwal {mapel}?"
+      "confirmDeleteMsg": "Yakin ingin menghapus jadwal {mapel}?",
+      "searchPlaceholder": "Cari mata pelajaran..."
     },
     "tahunAjaran": {
       "title": "Tahun Ajaran",

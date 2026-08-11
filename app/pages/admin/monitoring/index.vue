@@ -78,7 +78,7 @@ onMounted(() => {
                 <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 ">{{ item.sudahAbsen }}</td>
                 <td class="px-4 py-3 text-center text-amber-600 dark:text-amber-400 ">{{ item.belumAbsen }}</td>
                 <td class="px-4 py-3 text-center">
-                  <BaseBadge :variant="item.status === 'AKTIF' ? 'green' : 'gray'" :dot="item.status === 'AKTIF'" :pulse="item.status === 'AKTIF'">
+                  <BaseBadge :variant="item.status === 'AKTIF' ? 'green' : 'gray'" :dot="item.status === 'AKTIF'">
                     {{ statusLabel(item.status) }}
                   </BaseBadge>
                 </td>

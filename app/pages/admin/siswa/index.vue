@@ -18,7 +18,7 @@ const { t } = useI18n()
 const searchQuery = ref('')
 const filterKelas = ref(0)
 const page = ref(1)
-const pageSize = 5
+const pageSize = 10
 
 const totalPages = computed(() => Math.max(1, Math.ceil((siswaList.value || []).length / pageSize)))
 const visibleData = computed(() => {

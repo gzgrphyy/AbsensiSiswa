@@ -11,5 +11,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  return pengaturan
+  return {
+    ...pengaturan,
+    tahunAjaran: pengaturan.tahunAjaran || '2026/2027',
+    semester: pengaturan.semester || 'Ganjil',
+  }
 })

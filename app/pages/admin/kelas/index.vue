@@ -20,7 +20,7 @@ const appliedTa = ref(0)
 const appliedJenjang = ref('')
 
 const page = ref(1)
-const pageSize = 5
+const pageSize = 10
 
 function jenjangOf(nama: string) {
   return (nama.match(/^[IVXLCDM]+/)?.[0] || '').toUpperCase()

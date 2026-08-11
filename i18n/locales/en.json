@@ -67,7 +67,8 @@
   "miniNavbar": {
     "ta": "AY",
     "gantiBahasa": "Change Language",
-    "pengembang": "Developer"
+    "pengembang": "Developer",
+    "role": "Application Developer"
   },
   "semester": {
     "ganjil": "Odd",
@@ -243,7 +244,8 @@
       "msgBerhasilEdit": "Schedule updated successfully",
       "msgBerhasilHapus": "Schedule deleted successfully",
       "confirmDeleteTitle": "Delete Schedule",
-      "confirmDeleteMsg": "Are you sure you want to delete the {mapel} schedule?"
+      "confirmDeleteMsg": "Are you sure you want to delete the {mapel} schedule?",
+      "searchPlaceholder": "Search subjects..."
     },
     "tahunAjaran": {
       "title": "Academic Year",

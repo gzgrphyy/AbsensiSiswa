@@ -18,7 +18,7 @@ const { t } = useI18n()
 const showInactive = ref(false)
 const searchQuery = ref('')
 const page = ref(1)
-const pageSize = 5
+const pageSize = 10
 
 const totalPages = computed(() => Math.max(1, Math.ceil((data.value || []).length / pageSize)))
 const visibleData = computed(() => {

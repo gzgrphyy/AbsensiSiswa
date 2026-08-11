@@ -6,18 +6,14 @@ const { t, locale, setLocale } = useI18n()
 const isAdmin = inject('isAdmin', false)
 
 const showProfile = ref(false)
-const showLang = ref(false)
 
 const langOptions = [
-  { code: 'id', name: 'Indonesia', short: 'ID' },
-  { code: 'en', name: 'English', short: 'EN' }
+  { code: 'en', name: 'English', flag: '/bendera_uk.svg' },
+  { code: 'id', name: 'Indonesia', flag: '/bendera_indonesia.png' }
 ]
-
-const currentLang = computed(() => langOptions.find(l => l.code === locale.value) || langOptions[0])
 
 function selectLocale(code: string) {
   setLocale(code)
-  showLang.value = false
 }
 
 const now = ref(new Date())
@@ -34,7 +30,6 @@ const currentTime = computed(() =>
 
 const dev = {
   nama: 'Geza Nurhalim Irfansyah Putra',
-  role: 'Pengembang Aplikasi',
   email: 'gezanurhalimm@gmail.com',
   telepon: '0857-2235-5108',
   github: 'github.com/gzgrphyy',
@@ -49,9 +44,8 @@ function toggleProfile() {
 
 function handleClickOutside(e: MouseEvent) {
   const target = e.target as HTMLElement
-  if (!target.closest('#profile-dropdown') && !target.closest('#lang-dropdown')) {
+  if (!target.closest('#profile-dropdown')) {
     showProfile.value = false
-    showLang.value = false
   }
 }
 
@@ -90,31 +84,17 @@ onUnmounted(() => {
         <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ t('miniNavbar.ta') }} {{ pengaturan?.tahunAjaran || '—' }}</span>
 
         <!-- Language Switcher -->
-        <div id="lang-dropdown" class="relative">
+        <div class="flex items-center gap-1">
           <button
-            @click.stop="showLang = !showLang"
-            class="h-5 px-1.5 inline-flex items-center gap-1 text-[10px]  text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 rounded hover:bg-gray-300/60 dark:hover:bg-slate-700 transition-colors"
-            :title="t('miniNavbar.gantiBahasa')"
+            v-for="opt in langOptions"
+            :key="opt.code"
+            @click="selectLocale(opt.code)"
+            class="w-5 h-3 rounded-sm overflow-hidden flex-shrink-0 transition-all cursor-pointer"
+            :class="locale === opt.code ? 'ring-2 ring-primary-500 dark:ring-primary-400 opacity-100' : 'ring-1 ring-gray-300 dark:ring-slate-600 opacity-60 hover:opacity-100 hover:ring-gray-400 dark:hover:ring-slate-400'"
+            :title="t('miniNavbar.gantiBahasa') + ' · ' + opt.name"
           >
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-            </svg>
-            <span class="font-medium">{{ currentLang.short }}</span>
+            <img :src="opt.flag" :alt="opt.name" class="w-full h-full object-cover" />
           </button>
-
-          <div v-if="showLang" class="fixed top-8 right-16 sm:right-24 w-36 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow z-[100] py-1">
-            <button
-              v-for="opt in langOptions"
-              :key="opt.code"
-              @click="selectLocale(opt.code)"
-              class="w-full px-3 py-1.5 text-xs text-left flex items-center justify-between gap-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-gray-900 dark:hover:text-gray-100"
-            >
-              <span>{{ opt.name }}</span>
-              <svg v-if="locale === opt.code" class="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-            </button>
-          </div>
         </div>
 
         <!-- Developer Profile -->
@@ -142,7 +122,7 @@ onUnmounted(() => {
           </div>
           <div>
         <p class="text-sm  text-gray-900 dark:text-gray-100">{{ dev.nama }}</p>
-        <p class="text-xs text-gray-500 dark:text-gray-400">{{ dev.role }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">{{ t('miniNavbar.role') }}</p>
           </div>
         </div>
 

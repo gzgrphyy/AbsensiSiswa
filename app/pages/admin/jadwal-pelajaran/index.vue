@@ -19,44 +19,21 @@ const { data: ruanganList } = useFetch<{ id: number; nama: string }[]>('/api/adm
 const hariList = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU']
 const hariLabel = (h: string) => t('hari.' + h)
 
-const route = useRoute()
-
-const filterKelasId = ref<number | undefined>(route.query.kelasId ? Number(route.query.kelasId) : undefined)
-const filterHari = ref<string | undefined>(route.query.hari ? String(route.query.hari) : undefined)
-const filterGuruId = ref<number | undefined>(route.query.guruId ? Number(route.query.guruId) : undefined)
-
-const queryParams = computed(() => {
-  const params: Record<string, any> = {}
-  if (filterKelasId.value) params.kelasId = filterKelasId.value
-  if (filterHari.value) params.hari = filterHari.value
-  if (filterGuruId.value) params.guruId = filterGuruId.value
-  return params
-})
+const searchQuery = ref('')
+const filterKelasId = ref<number | undefined>(undefined)
 
 const { data: jadwalList, pending, refresh } = useFetch<Jadwal[]>('/api/admin/jadwal-pelajaran', {
-  query: queryParams,
-  immediate: true,
-  watch: [queryParams]
+  immediate: true
 })
 
-const activeFilterCount = computed(() => {
-  let count = 0
-  if (filterKelasId.value) count++
-  if (filterHari.value) count++
-  if (filterGuruId.value) count++
-  return count
+const filteredJadwal = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  return (jadwalList.value || []).filter((j) => {
+    const matchKelas = !filterKelasId.value || j.kelas.id === filterKelasId.value
+    const matchMapel = !q || j.mapel.toLowerCase().includes(q)
+    return matchKelas && matchMapel
+  })
 })
-
-function applyFilter() {
-  navigateTo({ query: queryParams.value })
-}
-
-function resetFilter() {
-  filterKelasId.value = undefined
-  filterHari.value = undefined
-  filterGuruId.value = undefined
-  navigateTo({ query: {} })
-}
 
 const showModal = ref(false)
 const editing = ref<Jadwal | null>(null)
@@ -158,37 +135,19 @@ async function handleDelete() {
     <PageHeader :title="t('admin.jadwal.title')" :description="t('admin.jadwal.desc')" />
 
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-      <div class="flex flex-wrap items-center gap-2">
-        <select v-model="filterHari"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[120px]">
-          <option :value="undefined">{{ t('admin.jadwal.semuaHari') }}</option>
-          <option v-for="h in hariList" :key="h" :value="h">{{ hariLabel(h) }}</option>
-        </select>
-
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input v-model="searchQuery" type="text" :placeholder="t('admin.jadwal.searchPlaceholder')"
+            class="w-40 sm:w-56 pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+        </div>
         <select v-model="filterKelasId"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[140px]">
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="undefined">{{ t('admin.jadwal.semuaKelas') }}</option>
           <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
-
-        <select v-model="filterGuruId"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[160px]">
-          <option :value="undefined">{{ t('admin.jadwal.semuaPtk') }}</option>
-          <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
-        </select>
-
-        <button @click="applyFilter"
-          class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm inline-flex items-center gap-1.5">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-          </svg>
-          {{ t('admin.jadwal.filter') }}
-        </button>
-        <button v-if="activeFilterCount > 0" @click="resetFilter"
-          class="px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 text-sm inline-flex items-center gap-1.5">
-          {{ t('common.aturUlang') }}
-          <span class="inline-flex items-center justify-center w-5 h-5 text-xs bg-blue-600 text-white rounded-lg">{{ activeFilterCount }}</span>
-        </button>
       </div>
       <button @click="openCreate"
         class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm ">
@@ -219,7 +178,7 @@ async function handleDelete() {
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-            <tr v-for="item in jadwalList" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+            <tr v-for="item in filteredJadwal" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
               <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
               <td class="px-4 py-3">
                 <BaseBadge variant="blue" size="sm">{{ hariLabel(item.hari) }}</BaseBadge>
@@ -243,7 +202,7 @@ async function handleDelete() {
                 </div>
               </td>
             </tr>
-            <tr v-if="!jadwalList || jadwalList.length === 0">
+            <tr v-if="filteredJadwal.length === 0">
               <td colspan="7" class="px-4 py-16 text-center">
                 <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
