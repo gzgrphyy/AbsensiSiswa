@@ -120,7 +120,10 @@ function renderIcon(icon: string) {
     ]"
   >
     <!-- Garis aksen atas (sama dengan Header) -->
-    <div class="h-0.5 bg-primary-500" />
+    <div class="flex flex-col">
+      <div class="h-0.5 bg-red-600" />
+      <div class="h-0.5 bg-white border-b border-gray-200 dark:border-slate-700" />
+    </div>
 
     <!-- Profil Pengguna -->
     <div class="flex-shrink-0 border-b border-gray-200 dark:border-slate-700">

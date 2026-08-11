@@ -25,8 +25,11 @@ async function handleLogout() {
 
 <template>
   <header class="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 flex-shrink-0">
-    <!-- Garis primary di paling atas -->
-    <div class="h-0.5 bg-primary-500" />
+    <!-- Garis merah putih di paling atas (fixed, tidak ikut warna utama) -->
+    <div class="flex flex-col">
+      <div class="h-0.5 bg-red-600" />
+      <div class="h-0.5 bg-white border-b border-gray-200 dark:border-slate-700" />
+    </div>
 
     <div class="px-6 py-2.5 flex items-center justify-between">
       <!-- Left: Logo & School Name (Admin only) -->

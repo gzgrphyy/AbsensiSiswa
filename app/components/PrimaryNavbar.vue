@@ -74,7 +74,7 @@ function renderIcon(icon: string) {
 
 <template>
   <header class="bg-[#212529] flex-shrink-0 sticky top-0 z-50">
-    <div class="h-0.5 bg-primary-500" />
+    <div class="h-0.5 bg-primary-500 dark:bg-primary-600" />
 
     <div class="px-4 sm:px-6">
       <div class="flex items-center justify-between h-[74px]">
