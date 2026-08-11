@@ -28,7 +28,7 @@ onMounted(() => {
 
 <template>
   <AppLayout>
-    <PageHeader title="Pemantauan Absensi" description="Pantau sesi absensi secara langsung">
+    <PageHeader title="Pemantauan Ruangan" description="Pantau sesi absensi secara langsung">
       <template #actions>
         <div class="flex items-center gap-3 text-xs text-gray-500">
           <div class="flex items-center gap-1">

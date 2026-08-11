@@ -35,6 +35,17 @@ const filteredData = computed(() => {
   return result
 })
 
+const page = ref(1)
+const pageSize = 5
+
+watch([searchQuery, filterJenis], () => { page.value = 1 })
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredData.value.length / pageSize)))
+const visibleData = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return filteredData.value.slice(start, start + pageSize)
+})
+
 const showModal = ref(false)
 const editing = ref<Ruangan | null>(null)
 const form = ref({ nama: '', jenis: 'KELAS' })
@@ -173,17 +184,31 @@ function ruanganUrl(item: Ruangan) {
 
 <template>
   <AppLayout>
-    <PageHeader title="Data Ruangan" description="Kelola ruangan kelas dan generate QR Code">
-      <template #actions>
-        <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm ">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+    <PageHeader title="Data Ruangan" description="Kelola ruangan kelas dan generate QR Code" />
+
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <span class="hidden sm:inline">Tambah Ruangan</span>
-        </button>
-      </template>
-    </PageHeader>
+          <input v-model="searchQuery" type="text" placeholder="Cari ruangan atau kode QR..."
+            class="w-40 sm:w-56 pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+        </div>
+        <select v-model="filterJenis"
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Semua Jenis</option>
+          <option v-for="j in jenisOptions" :key="j" :value="j">{{ capitalize(j) }}</option>
+        </select>
+      </div>
+      <button @click="openCreate"
+        class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm ">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="hidden sm:inline">Tambah Ruangan</span>
+      </button>
+    </div>
 
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
@@ -199,21 +224,6 @@ function ruanganUrl(item: Ruangan) {
       </div>
 
       <div v-else class="bg-white dark:bg-gray-800 rounded-none border border-gray-300 dark:border-gray-600 overflow-hidden">
-        <!-- Search + Filter -->
-        <div class="px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center gap-3">
-          <div class="relative max-w-xs flex-1">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input v-model="searchQuery" type="text" placeholder="Cari ruangan atau kode QR..."
-              class="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
-          </div>
-          <select v-model="filterJenis"
-            class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="">Semua Jenis</option>
-            <option v-for="j in jenisOptions" :key="j" :value="j">{{ capitalize(j) }}</option>
-          </select>
-        </div>
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
@@ -227,7 +237,7 @@ function ruanganUrl(item: Ruangan) {
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-              <tr v-for="item in filteredData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+              <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 sm:px-6 py-4">
                   <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
                 </td>
@@ -281,6 +291,34 @@ function ruanganUrl(item: Ruangan) {
               </tr>
             </tbody>
           </table>
+        </div>
+        <div v-if="filteredData.length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            Menampilkan {{ ((page - 1) * pageSize) + 1 }}-{{ Math.min(page * pageSize, filteredData.length) }} dari {{ filteredData.length }} ruangan
+          </p>
+          <div class="ml-auto flex items-center gap-2">
+            <button
+              @click="page--"
+              :disabled="page <= 1"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-none text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              Sebelumnya
+            </button>
+            <span class="text-xs text-gray-400 dark:text-gray-500">Halaman {{ page }} dari {{ totalPages }}</span>
+            <button
+              @click="page++"
+              :disabled="page >= totalPages"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-none text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Selanjutnya
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
 

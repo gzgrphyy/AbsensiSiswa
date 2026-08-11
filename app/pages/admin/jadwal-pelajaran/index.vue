@@ -153,70 +153,52 @@ async function handleDelete() {
 
 <template>
   <AppLayout>
-    <PageHeader title="Jadwal Pelajaran" description="Kelola jadwal pelajaran">
-      <template #actions>
-        <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm ">
+    <PageHeader title="Jadwal Pelajaran" description="Kelola jadwal pelajaran" />
+
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="flex flex-wrap items-center gap-2">
+        <select v-model="filterHari"
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[120px]">
+          <option :value="undefined">Semua Hari</option>
+          <option v-for="h in hariList" :key="h" :value="h">{{ hariLabel[h] }}</option>
+        </select>
+
+        <select v-model="filterKelasId"
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[140px]">
+          <option :value="undefined">Semua Kelas</option>
+          <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
+        </select>
+
+        <select v-model="filterGuruId"
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[160px]">
+          <option :value="undefined">Semua PTK</option>
+          <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
+        </select>
+
+        <button @click="applyFilter"
+          class="px-3 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm inline-flex items-center gap-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
           </svg>
-          <span class="hidden sm:inline">Tambah Jadwal</span>
+          Penyaring
         </button>
-      </template>
-    </PageHeader>
+        <button v-if="activeFilterCount > 0" @click="resetFilter"
+          class="px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-none hover:bg-gray-200 dark:hover:bg-slate-600 text-sm inline-flex items-center gap-1.5">
+          Atur Ulang
+          <span class="inline-flex items-center justify-center w-5 h-5 text-xs bg-blue-600 text-white rounded-none">{{ activeFilterCount }}</span>
+        </button>
+      </div>
+      <button @click="openCreate"
+        class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm ">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="hidden sm:inline">Tambah Jadwal</span>
+      </button>
+    </div>
 
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
-
-    <!-- Filter Bar -->
-    <div class="mb-4 p-4 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-none">
-      <div class="flex flex-wrap items-end gap-3">
-        <div>
-          <label class="block text-xs  text-gray-500 dark:text-gray-400 mb-1">Hari</label>
-          <select v-model="filterHari"
-            class="px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 min-w-[130px]">
-            <option :value="undefined">Semua Hari</option>
-            <option v-for="h in hariList" :key="h" :value="h">{{ hariLabel[h] }}</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs  text-gray-500 dark:text-gray-400 mb-1">Kelas</label>
-          <select v-model="filterKelasId"
-            class="px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 min-w-[150px]">
-            <option :value="undefined">Semua Kelas</option>
-            <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs  text-gray-500 dark:text-gray-400 mb-1">PTK</label>
-          <select v-model="filterGuruId"
-            class="px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-none text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 min-w-[180px]">
-            <option :value="undefined">Semua PTK</option>
-            <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs  text-transparent mb-1">Aksi</label>
-          <div class="flex items-center gap-2">
-            <button @click="applyFilter"
-              class="px-4 py-2.5 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm  inline-flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              Penyaring
-            </button>
-            <button v-if="activeFilterCount > 0" @click="resetFilter"
-              class="px-4 py-2.5 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-none hover:bg-gray-200 dark:hover:bg-slate-600 text-sm  inline-flex items-center gap-1.5">
-              Atur Ulang
-              <span class="inline-flex items-center justify-center w-5 h-5 text-xs  bg-blue-600 text-white rounded-none">{{ activeFilterCount }}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="7" />
 

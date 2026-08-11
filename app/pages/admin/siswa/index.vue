@@ -187,36 +187,34 @@ async function copyPassword() {
 
 <template>
   <AppLayout>
-    <PageHeader title="Data Murid" description="Kelola data murid dan akun">
-      <template #actions>
-        <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm ">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+    <PageHeader title="Data Murid" description="Kelola data murid dan akun" />
+
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <span class="hidden sm:inline">Tambah Murid</span>
-        </button>
-      </template>
-    </PageHeader>
+          <input v-model="searchQuery" type="text" placeholder="Cari murid..."
+            class="w-40 sm:w-56 pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+        </div>
+        <select v-model="filterKelas"
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option :value="0">Semua Kelas</option>
+          <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
+        </select>
+      </div>
+      <button @click="openCreate"
+        class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm ">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="hidden sm:inline">Tambah Murid</span>
+      </button>
+    </div>
 
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
-
-    <!-- Filter -->
-    <div class="flex items-center gap-3 mb-4">
-      <div class="relative flex-1 max-w-xs">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <input v-model="searchQuery" type="text" placeholder="Cari murid..."
-          class="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
-      </div>
-      <select v-model="filterKelas"
-        class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-        <option :value="0">Semua Kelas</option>
-        <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
-      </select>
-    </div>
 
     <!-- Loading -->
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="6" />

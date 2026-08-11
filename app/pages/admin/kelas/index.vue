@@ -128,30 +128,27 @@ async function handleDelete() {
 
 <template>
   <AppLayout>
-    <PageHeader title="Data Kelas" description="Kelola kelas dan wali kelas">
-      <template #actions>
-        <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm ">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          <span class="hidden sm:inline">Tambah Kelas</span>
-        </button>
-      </template>
-    </PageHeader>
+    <PageHeader title="Data Kelas" description="Kelola kelas dan wali kelas" />
+
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <select v-model="filterTa"
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option :value="0">Semua Tahun Ajaran</option>
+          <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ t.semester }})</option>
+        </select>
+      </div>
+      <button @click="openCreate"
+        class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-none hover:bg-blue-700 text-sm ">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="hidden sm:inline">Tambah Kelas</span>
+      </button>
+    </div>
 
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
-
-    <!-- Filter -->
-    <div class="flex items-center gap-3 mb-4">
-      <div class="flex-1"></div>
-      <select v-model="filterTa"
-        class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-none text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-        <option :value="0">Semua Tahun Ajaran</option>
-        <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ t.semester }})</option>
-      </select>
-    </div>
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="5" />
 

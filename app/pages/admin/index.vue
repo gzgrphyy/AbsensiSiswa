@@ -133,15 +133,6 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
             </div>
             <div class="flex items-center gap-2">
               <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-none">{{ data.topAlpha.length }} murid</span>
-              <NuxtLink
-                to="/admin/alpha"
-                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-none text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
-              >
-                Lihat Selengkapnya
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </NuxtLink>
             </div>
           </div>
           <div class="overflow-x-auto">
@@ -166,6 +157,17 @@ const { data, pending } = useFetch<DashboardData>('/api/admin/dashboard', { imme
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3">
+            <NuxtLink
+              to="/admin/alpha"
+              class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-none text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+            >
+              Lihat Selengkapnya
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </NuxtLink>
           </div>
         </div>
 
