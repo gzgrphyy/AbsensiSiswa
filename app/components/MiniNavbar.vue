@@ -16,17 +16,12 @@ function selectLocale(code: string) {
   setLocale(code)
 }
 
-const now = ref(new Date())
-let clockTimer: ReturnType<typeof setInterval> | null = null
-
-const currentTime = computed(() =>
-  now.value.toLocaleTimeString(locale.value === 'en' ? 'en-GB' : 'id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-  })
-)
+const semesterLabel = computed(() => {
+  const s = pengaturan.value?.semester
+  if (s?.toUpperCase() === 'GANJIL') return t('semester.ganjil')
+  if (s?.toUpperCase() === 'GENAP') return t('semester.genap')
+  return s || '—'
+})
 
 const dev = {
   nama: 'Geza Nurhalim Irfansyah Putra',
@@ -50,14 +45,10 @@ function handleClickOutside(e: MouseEvent) {
 }
 
 onMounted(() => {
-  clockTimer = setInterval(() => {
-    now.value = new Date()
-  }, 1000)
   document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
-  if (clockTimer) clearInterval(clockTimer)
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
@@ -74,17 +65,12 @@ onUnmounted(() => {
         <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ pengaturan?.namaAplikasi || t('app.aplikasiSkoria') }}</span>
       </NuxtLink>
 
-      <!-- Centered: Live Clock -->
-      <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span class="text-[10px]  text-gray-500 dark:text-gray-400 tabular-nums tracking-wide">{{ currentTime }}</span>
-      </div>
-
       <!-- Right: Language & Developer Profile -->
-      <div class="flex items-center gap-1.5">
-        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ t('miniNavbar.ta') }} {{ pengaturan?.tahunAjaran || '—' }}</span>
+      <div class="flex items-center gap-3">
+        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ t('miniNavbar.ta') }} {{ pengaturan?.tahunAjaran || '—' }} · {{ semesterLabel }}</span>
 
         <!-- Language Switcher -->
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-1 ml-1">
           <button
             v-for="opt in langOptions"
             :key="opt.code"

@@ -18,6 +18,28 @@ const today = computed(() => new Date().toLocaleDateString(locale.value === 'en'
   year: 'numeric'
 }))
 
+const now = ref(new Date())
+let clockTimer: ReturnType<typeof setInterval> | null = null
+
+const currentTime = computed(() =>
+  now.value.toLocaleTimeString(locale.value === 'en' ? 'en-GB' : 'id-ID', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
+)
+
+onMounted(() => {
+  clockTimer = setInterval(() => {
+    now.value = new Date()
+  }, 1000)
+})
+
+onUnmounted(() => {
+  if (clockTimer) clearInterval(clockTimer)
+})
+
 async function handleLogout() {
   try { await clear() } catch {}
   navigateTo('/login')
@@ -47,7 +69,10 @@ async function handleLogout() {
 
       <!-- Right: User Info -->
       <div class="flex items-center gap-3">
-        <span class="text-[11px] text-gray-400 dark:text-gray-500 hidden md:block">{{ today }}</span>
+        <div class="hidden md:block leading-tight">
+          <p class="text-[11px] text-gray-400 dark:text-gray-500">{{ today }}</p>
+          <p class="text-[11px] text-gray-400 dark:text-gray-500 tabular-nums tracking-wide">{{ currentTime }}</p>
+        </div>
         <div class="h-4 w-px bg-gray-200 dark:bg-slate-700 hidden md:block" />
 
         <!-- Theme Toggle -->
