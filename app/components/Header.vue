@@ -50,12 +50,12 @@ async function handleLogout() {
     <div class="px-6 py-2.5 flex items-center justify-between">
       <!-- Left: Logo & School Name (Admin only) -->
       <NuxtLink v-if="isAdmin" to="/admin" class="flex items-center gap-2.5 min-w-0 flex-shrink-0">
-        <div class="w-9 h-9 bg-[#0A66A0] flex items-center justify-center text-white text-sm  overflow-hidden flex-shrink-0 rounded-full">
+        <div class="w-9 h-9 bg-[#e8ecf1] flex items-center justify-center text-white text-sm  overflow-hidden flex-shrink-0 rounded-full">
           <img v-if="pengaturan?.logoSekolahPath" :src="pengaturan.logoSekolahPath" class="w-full h-full object-contain p-1" />
           <span v-else class="text-[10px]  text-center leading-tight px-1">SMK</span>
         </div>
         <div class="min-w-0 hidden md:block">
-          <p class="text-sm  text-gray-900 dark:text-gray-100 truncate leading-tight">{{ pengaturan?.namaSekolah || 'SMK Negeri 1 Bandung' }}</p>
+          <p class="text-sm  text-gray-900 dark:text-gray-100 truncate leading-tight">{{ pengaturan?.namaSekolah || 'SMK Negeri 4 Bandung' }}</p>
           <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ t('app.sistemAbsensi') }}</p>
         </div>
       </NuxtLink>
@@ -70,7 +70,7 @@ async function handleLogout() {
         <div class="h-6 w-px bg-gray-200 dark:bg-slate-700 hidden md:block" />
 
         <div class="flex items-center gap-2.5">
-          <div v-if="pengaturan?.iconPath" class="w-8 h-8 bg-[#0A66A0] rounded-full overflow-hidden border border-primary-100 dark:border-primary-800 flex-shrink-0 flex items-center justify-center">
+          <div v-if="pengaturan?.iconPath" class="w-8 h-8 bg-[#e8ecf1] rounded-full overflow-hidden border border-primary-100 dark:border-primary-800 flex-shrink-0 flex items-center justify-center">
             <img :src="pengaturan.iconPath" class="w-full h-full object-contain p-1" />
           </div>
           <div v-else class="w-8 h-8 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs  text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800 flex-shrink-0">
