@@ -51,7 +51,7 @@ const sizes = {
     :class="[
       'inline-flex items-center justify-center gap-1.5 font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed',
       isAdmin ? (adminVariants[variant] || adminVariants.primary) : variants[variant],
-      isAdmin ? 'rounded-lg' : 'rounded-lg',
+      isAdmin ? 'rounded-md' : 'rounded-lg',
       sizes[size](iconOnly),
     ]"
   >

@@ -213,7 +213,7 @@ async function copyPassword() {
     <PageHeader :title="t('admin.guru.title')" :description="t('admin.guru.desc')">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-sm ">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 active:bg-blue-800 text-sm ">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -245,7 +245,7 @@ async function copyPassword() {
               ? 'bg-blue-600 ring-1 ring-blue-300'
               : 'bg-gray-200 dark:bg-slate-600 ring-1 ring-gray-300 dark:ring-slate-500'
             "
-            class="relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
+            class="relative inline-flex h-5 w-9 items-center rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
           >
             <span
               :class="showInactive ? 'translate-x-[18px]' : 'translate-x-[2px]'"
@@ -319,7 +319,7 @@ async function copyPassword() {
                   <div class="flex items-center justify-center gap-1">
                     <!-- Edit -->
                     <button @click="openEdit(item)"
-                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-150"
+                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-150"
                       :title="t('admin.guru.editTitle', { name: item.nama })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -328,7 +328,7 @@ async function copyPassword() {
 
                     <!-- Reset Password -->
                     <button @click="promptResetPassword(item)"
-                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-lg transition-all duration-150"
+                      class="p-2 text-gray-400 dark:text-gray-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-md transition-all duration-150"
                       :title="t('admin.guru.resetPwTitle', { name: item.nama })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -338,8 +338,8 @@ async function copyPassword() {
                     <!-- Toggle Active -->
                     <button @click="promptToggle(item)"
                       :class="item.isActive
-                        ? 'p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all duration-150'
-                        : 'p-2 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg transition-all duration-150'"
+                        ? 'p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-all duration-150'
+                        : 'p-2 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-md transition-all duration-150'"
                       :title="item.isActive ? t('admin.guru.nonaktifkanTitle') : t('admin.guru.aktifkanTitle')">
                       <svg v-if="item.isActive" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
@@ -363,7 +363,7 @@ async function copyPassword() {
                       {{ showInactive ? t('admin.guru.emptyInactive') : t('admin.guru.empty') }}
                     </p>
                     <button v-if="!showInactive" @click="openCreate"
-                      class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                      class="inline-flex items-center gap-1 px-4 py-2 text-sm text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                       </svg>
@@ -383,7 +383,7 @@ async function copyPassword() {
             <button
               @click="page--"
               :disabled="page <= 1"
-              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -394,7 +394,7 @@ async function copyPassword() {
             <button
               @click="page++"
               :disabled="page >= totalPages"
-              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {{ t('common.selanjutnya') }}
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -417,7 +417,7 @@ async function copyPassword() {
                 {{ editing ? t('admin.guru.modalEdit') : t('admin.guru.modalCreate') }}
               </h2>
               <button @click="handleCloseClick"
-                class="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                class="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -492,11 +492,11 @@ async function copyPassword() {
               <!-- Actions -->
               <div class="flex justify-end gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                 <button type="button" @click="handleCloseClick"
-                  class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                  class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                   {{ t('common.batal') }}
                 </button>
                 <button type="submit" :disabled="saving"
-                  class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
+                  class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
                   <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -518,11 +518,11 @@ async function copyPassword() {
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">{{ t('admin.tahunAjaran.confirmCloseMsg') }}</p>
             <div class="flex justify-end gap-3">
               <button @click="confirmClose = false"
-                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 {{ t('admin.tahunAjaran.lanjutkanEdit') }}
               </button>
               <button @click="showModal = false; confirmClose = false"
-                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
                 {{ t('admin.tahunAjaran.yaBatalkan') }}
               </button>
             </div>
@@ -556,11 +556,11 @@ async function copyPassword() {
 
             <div class="flex justify-end gap-3">
               <button @click="showPasswordModal = false"
-                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 {{ t('admin.guru.tutup') }}
               </button>
               <button @click="copyPassword"
-                class="px-4 py-2 text-sm  text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 inline-flex items-center gap-1.5">
+                class="px-4 py-2 text-sm  text-white bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 inline-flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
@@ -602,13 +602,13 @@ async function copyPassword() {
 
             <div class="flex justify-end gap-3">
               <button @click="confirmToggle = null"
-                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 {{ t('common.batal') }}
               </button>
               <button @click="handleToggleActive"
                 :class="confirmToggle.active
-                  ? 'px-4 py-2 text-sm  text-white bg-red-600 rounded-lg hover:bg-red-700'
-                  : 'px-4 py-2 text-sm  text-white bg-green-600 rounded-lg hover:bg-green-700'">
+                  ? 'px-4 py-2 text-sm  text-white bg-red-600 rounded-md hover:bg-red-700'
+                  : 'px-4 py-2 text-sm  text-white bg-green-600 rounded-md hover:bg-green-700'">
                 {{ confirmToggle.active ? t('admin.guru.yaNonaktifkan') : t('common.yaAktifkan') }}
               </button>
             </div>
@@ -639,11 +639,11 @@ async function copyPassword() {
 
             <div class="flex justify-end gap-3">
               <button @click="resetPasswordFor = null"
-                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 {{ t('common.batal') }}
               </button>
               <button @click="handleResetPassword"
-                class="px-4 py-2 text-sm  text-white bg-amber-600 rounded-lg hover:bg-amber-700 active:bg-amber-800">
+                class="px-4 py-2 text-sm  text-white bg-amber-600 rounded-md hover:bg-amber-700 active:bg-amber-800">
                 {{ t('admin.guru.yaReset') }}
               </button>
             </div>

@@ -70,14 +70,14 @@ const iconVariants = {
           <div class="flex justify-end gap-3">
             <button
               @click="emit('cancel')"
-              :class="['px-4 py-2 text-sm  text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-150', isAdmin ? '' : 'rounded-lg']"
+              :class="['px-4 py-2 text-sm  text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all duration-150', isAdmin ? 'rounded-md' : 'rounded-lg']"
             >
               {{ cancelLabel || t('common.batal') }}
             </button>
             <button
               @click="emit('confirm')"
               :disabled="loading"
-              :class="['px-4 py-2 text-sm  transition-all duration-150 inline-flex items-center gap-1.5 disabled:opacity-50', isAdmin ? 'rounded-sm' : 'rounded-lg shadow-sm', btnVariants[variant]]"
+              :class="['px-4 py-2 text-sm  transition-all duration-150 inline-flex items-center gap-1.5 disabled:opacity-50', isAdmin ? 'rounded-md' : 'rounded-lg shadow-sm', btnVariants[variant]]"
             >
               <svg v-if="loading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

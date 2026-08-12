@@ -88,7 +88,7 @@ async function handleFileChange(event: Event) {
       <button
         type="button"
         :disabled="uploading"
-        :class="['px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 hover:bg-gray-200 dark:hover:bg-slate-600 hover:text-gray-700 dark:hover:text-gray-200 transition-colors disabled:opacity-50 flex items-center gap-2', isAdmin ? 'rounded-lg' : 'rounded-lg']"
+        :class="['px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 hover:bg-gray-200 dark:hover:bg-slate-600 hover:text-gray-700 dark:hover:text-gray-200 transition-colors disabled:opacity-50 flex items-center gap-2', isAdmin ? 'rounded-md' : 'rounded-lg']"
         @click="handleClick"
       >
         <svg v-if="uploading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -110,7 +110,7 @@ async function handleFileChange(event: Event) {
         <button
           type="button"
           :disabled="deleting"
-          :class="['p-1.5 text-red-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50', isAdmin ? 'rounded-lg' : 'rounded-lg']"
+          :class="['p-1.5 text-red-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50', isAdmin ? 'rounded-md' : 'rounded-lg']"
           :title="t('common.hapusFile')"
           @click="handleDelete"
         >

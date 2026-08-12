@@ -205,7 +205,7 @@ async function handleChangePassword() {
 
         <div class="flex justify-end pt-4 border-t border-gray-200 dark:border-slate-700">
           <button type="submit" :disabled="saving"
-            class="px-6 py-2.5 bg-primary-500 text-sm  text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
+            class="px-6 py-2.5 bg-primary-500 text-sm  text-white rounded-md hover:bg-primary-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             {{ t('admin.profil.simpanPerubahan') }}
           </button>
@@ -240,7 +240,7 @@ async function handleChangePassword() {
 
         <div class="flex justify-end pt-2">
           <button type="submit" :disabled="savingPw"
-            class="px-6 py-2.5 bg-orange-500 text-sm  text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
+            class="px-6 py-2.5 bg-orange-500 text-sm  text-white rounded-md hover:bg-orange-600 disabled:opacity-50 inline-flex items-center gap-2 shadow-sm">
             <svg v-if="savingPw" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             {{ t('admin.profil.ubahPassword') }}
           </button>

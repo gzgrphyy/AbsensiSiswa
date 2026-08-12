@@ -80,7 +80,7 @@ const emitEmptyAction = () => {
       </svg>
       <p class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ emptyText || t('common.belumAdaData') }}</p>
       <button v-if="emptyActionLabel" @click="emitEmptyAction"
-        class="mt-2 inline-flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+        class="mt-2 inline-flex items-center gap-1 px-3 py-1.5 text-xs text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
         {{ emptyActionLabel }}
       </button>

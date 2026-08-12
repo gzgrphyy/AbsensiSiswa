@@ -171,7 +171,7 @@ function promptDelete(item: TahunAjaran) {
     <PageHeader :title="t('admin.tahunAjaran.title')" :description="t('admin.tahunAjaran.desc')">
       <template #actions>
         <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:bg-primary-800 text-sm ">
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:bg-primary-800 text-sm ">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -240,7 +240,7 @@ function promptDelete(item: TahunAjaran) {
                   <div class="flex items-center justify-center gap-1">
                     <!-- Edit -->
                     <button @click="openEdit(item)"
-                      class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all duration-150"
+                      class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-md transition-all duration-150"
                       :title="t('admin.tahunAjaran.editTitle', { name: fullLabel(item) })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -249,7 +249,7 @@ function promptDelete(item: TahunAjaran) {
 
                     <!-- Activate (only if not active) -->
                     <button v-if="!item.isActive" @click="promptToggle(item)"
-                      class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-all duration-150"
+                      class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-md transition-all duration-150"
                       :title="t('admin.tahunAjaran.aktifkanTitle', { name: fullLabel(item) })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -265,7 +265,7 @@ function promptDelete(item: TahunAjaran) {
 
                     <!-- Delete (only if not active) -->
                     <button v-if="!item.isActive" @click="promptDelete(item)"
-                      class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-150"
+                      class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all duration-150"
                       :title="t('admin.tahunAjaran.hapusTitle', { name: fullLabel(item) })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -284,7 +284,7 @@ function promptDelete(item: TahunAjaran) {
                     </svg>
                     <p class="text-gray-500 ">{{ t('admin.tahunAjaran.empty') }}</p>
                     <button @click="openCreate"
-                      class="inline-flex items-center gap-1 px-4 py-2 text-sm text-primary-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                      class="inline-flex items-center gap-1 px-4 py-2 text-sm text-primary-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                       </svg>
@@ -312,7 +312,7 @@ function promptDelete(item: TahunAjaran) {
                 {{ editing ? t('admin.tahunAjaran.modalEdit') : t('admin.tahunAjaran.modalCreate') }}
               </h2>
               <button @click="handleCloseClick"
-                class="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                class="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -385,11 +385,11 @@ function promptDelete(item: TahunAjaran) {
               <!-- Actions -->
               <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-slate-700">
                 <button type="button" @click="handleCloseClick"
-                  class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                  class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                   {{ t('common.batal') }}
                 </button>
                 <button type="submit" :disabled="saving"
-                  class="px-5 py-2 text-sm  text-white bg-primary-600 rounded-lg hover:bg-primary-700 active:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
+                  class="px-5 py-2 text-sm  text-white bg-primary-600 rounded-md hover:bg-primary-700 active:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
                   <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -411,11 +411,11 @@ function promptDelete(item: TahunAjaran) {
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">{{ t('admin.tahunAjaran.confirmCloseMsg') }}</p>
             <div class="flex justify-end gap-3">
               <button @click="confirmClose = false"
-                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 {{ t('admin.tahunAjaran.lanjutkanEdit') }}
               </button>
               <button @click="showModal = false; confirmClose = false"
-                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
                 {{ t('admin.tahunAjaran.yaBatalkan') }}
               </button>
             </div>
@@ -444,11 +444,11 @@ function promptDelete(item: TahunAjaran) {
             </p>
             <div class="flex justify-end gap-3">
               <button @click="confirmToggle = null"
-                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 {{ t('common.batal') }}
               </button>
               <button @click="handleToggle"
-                class="px-4 py-2 text-sm  text-white bg-green-600 rounded-lg hover:bg-green-700 active:bg-green-800">
+                class="px-4 py-2 text-sm  text-white bg-green-600 rounded-md hover:bg-green-700 active:bg-green-800">
                 {{ t('common.yaAktifkan') }}
               </button>
             </div>
@@ -489,11 +489,11 @@ function promptDelete(item: TahunAjaran) {
             </p>
             <div class="flex justify-end gap-3 mt-5 pt-4 border-t border-gray-100 dark:border-slate-700">
               <button @click="confirmDelete = null"
-                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 {{ t('common.batal') }}
               </button>
               <button @click="handleDelete"
-                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-lg hover:bg-red-700 active:bg-red-800">
+                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-md hover:bg-red-700 active:bg-red-800">
                 {{ t('common.yaHapus') }}
               </button>
             </div>

@@ -90,7 +90,7 @@ onUnmounted(() => {
             :key="opt.code"
             @click="selectLocale(opt.code)"
             class="w-5 h-3 rounded-sm overflow-hidden flex-shrink-0 transition-all cursor-pointer"
-            :class="locale === opt.code ? 'ring-2 ring-primary-500 dark:ring-primary-400 opacity-100' : 'ring-1 ring-gray-300 dark:ring-slate-600 opacity-60 hover:opacity-100 hover:ring-gray-400 dark:hover:ring-slate-400'"
+            :class="locale === opt.code ? 'opacity-100' : 'opacity-50 grayscale hover:opacity-100 hover:grayscale-0'"
             :title="t('miniNavbar.gantiBahasa') + ' · ' + opt.name"
           >
             <img :src="opt.flag" :alt="opt.name" class="w-full h-full object-cover" />

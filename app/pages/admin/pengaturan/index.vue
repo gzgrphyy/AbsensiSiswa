@@ -280,17 +280,17 @@ async function handleSave() {
 
     <div class="flex gap-1 mb-5 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
       <button @click="activeTab = 'umum'"
-        class="flex-1 py-2 px-4 text-sm  rounded-lg transition-all"
+        class="flex-1 py-2 px-4 text-sm  rounded-md transition-all"
         :class="activeTab === 'umum' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
         {{ t('admin.pengaturan.tabUmum') }}
       </button>
       <button @click="activeTab = 'absensi'"
-        class="flex-1 py-2 px-4 text-sm  rounded-lg transition-all"
+        class="flex-1 py-2 px-4 text-sm  rounded-md transition-all"
         :class="activeTab === 'absensi' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
         {{ t('admin.pengaturan.tabAbsensi') }}
       </button>
       <button @click="activeTab = 'keamanan'"
-        class="flex-1 py-2 px-4 text-sm  rounded-lg transition-all"
+        class="flex-1 py-2 px-4 text-sm  rounded-md transition-all"
         :class="activeTab === 'keamanan' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
         {{ t('admin.pengaturan.tabKeamanan') }}
       </button>
@@ -347,7 +347,7 @@ async function handleSave() {
                     :key="preset.value"
                     type="button"
                     @click="formBranding.warnaUtama = preset.value"
-                    :class="['w-8 h-8 rounded-lg border-2 transition-transform hover:scale-110', formBranding.warnaUtama.toLowerCase() === preset.value.toLowerCase() ? 'border-primary-500 ring-2 ring-primary-500/30' : 'border-gray-200 dark:border-gray-600']"
+                    :class="['w-8 h-8 rounded-md border-2 transition-transform hover:scale-110', formBranding.warnaUtama.toLowerCase() === preset.value.toLowerCase() ? 'border-primary-500 ring-2 ring-primary-500/30' : 'border-gray-200 dark:border-gray-600']"
                     :style="{ backgroundColor: preset.value }"
                     :title="preset.name"
                   ></button>
@@ -391,7 +391,7 @@ async function handleSave() {
                         </span>
                       </label>
                       <button v-if="(formBranding.iconPath || iconPreview) && !iconUploading" type="button" @click="removeIcon"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -436,7 +436,7 @@ async function handleSave() {
                         </span>
                       </label>
                       <button v-if="(formBranding.faviconPath || faviconPreview) && !faviconUploading" type="button" @click="removeFavicon"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -486,7 +486,7 @@ async function handleSave() {
                       </span>
                     </label>
                     <button v-if="(formUmum.logoSekolahPath || logoSekolahPreview) && !logoSekolahUploading" type="button" @click="removeLogoSekolah"
-                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors">
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors">
                       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
@@ -616,7 +616,7 @@ async function handleSave() {
 
         <div class="flex justify-end mt-6 pt-4 border-t border-gray-200 dark:border-slate-700">
           <button type="submit" :disabled="saving"
-            class="px-6 py-2.5 bg-blue-600 text-sm  text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
+            class="px-6 py-2.5 bg-blue-600 text-sm  text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
             <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />

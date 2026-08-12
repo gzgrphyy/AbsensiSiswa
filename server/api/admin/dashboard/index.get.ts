@@ -93,7 +93,7 @@ export default defineEventHandler(async (event) => {
   ).map(s => ({
     waktu: s.createdAt.toISOString().slice(11, 16),
     aksi: s.status === 'AKTIF' ? 'Sesi dibuka' : 'Sesi ditutup',
-    detail: `${s.jadwal.mapel} - ${s.jadwal.kelas.nama} oleh ${s.jadwal.guru.nama}`
+    detail: `${s.jadwal.mapel} - ${s.jadwal.kelas.nama} - ${s.jadwal.guru.nama}`
   }))
 
   return {
