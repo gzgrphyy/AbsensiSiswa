@@ -139,7 +139,7 @@ const rataPersentase = computed(() =>
       <div class="flex flex-col gap-1 min-w-[180px]">
         <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelTa') }}</label>
         <select v-model="selectedTa"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="''">{{ t('admin.kelas.semuaTa') }}</option>
           <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})</option>
         </select>
@@ -149,7 +149,7 @@ const rataPersentase = computed(() =>
       <div class="flex flex-col gap-1 min-w-[160px]">
         <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelKelas') }}</label>
         <select v-model="selectedKelas"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="''">{{ t('admin.jadwal.semuaKelas') }}</option>
           <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
@@ -159,7 +159,7 @@ const rataPersentase = computed(() =>
       <div class="flex flex-col gap-1 min-w-[180px]">
         <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelPeriode') }}</label>
         <select v-model="selectedBulan"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="">{{ t('admin.rekap.semuaPeriode') }}</option>
           <option v-for="o in bulanOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
@@ -173,7 +173,7 @@ const rataPersentase = computed(() =>
 
       <!-- Tombol Reset -->
       <button @click="resetFilter()"
-        class="px-3 py-2 text-sm  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border border-gray-300 dark:border-slate-600 transition-colors">
+        class="px-3 py-2 text-sm  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border admin-accent-border transition-colors">
         {{ t('common.aturUlang') }}
       </button>
     </div>
@@ -195,7 +195,7 @@ const rataPersentase = computed(() =>
         <div class="overflow-x-auto scrollbar-thin">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colKelas') }}</th>
                 <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colTotalMurid') }}</th>
                 <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colHadir') }}</th>
@@ -206,7 +206,7 @@ const rataPersentase = computed(() =>
                 <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colPersentase') }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+            <tbody class="divide-y admin-accent-divide">
               <tr v-for="item in displayData" :key="item.kelas" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.kelas }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.totalSiswa }}</td>

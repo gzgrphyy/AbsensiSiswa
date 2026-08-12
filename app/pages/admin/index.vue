@@ -149,7 +149,7 @@ function aksiLabel(aksi: string) {
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
-                <tr class="bg-gray-50 dark:bg-slate-700/50">
+                <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                   <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colNama') }}</th>
                   <th class="text-center px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colKelas') }}</th>
                   <th class="text-center px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colTotalAlpha') }}</th>
@@ -194,7 +194,7 @@ function aksiLabel(aksi: string) {
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
-                <tr class="bg-gray-50 dark:bg-slate-700/50">
+                <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                   <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colRuangan') }}</th>
                   <th class="text-center px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colStatus') }}</th>
                   <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colSesi') }}</th>
@@ -248,7 +248,7 @@ function aksiLabel(aksi: string) {
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-gray-50 dark:bg-slate-700/50">
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider w-20">{{ t('admin.beranda.colWaktu') }}</th>
                 <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colAksi') }}</th>
                 <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colDetail') }}</th>

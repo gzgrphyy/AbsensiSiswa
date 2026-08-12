@@ -275,17 +275,17 @@ async function handleSave() {
     <div class="flex gap-1 mb-5 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
       <button @click="activeTab = 'umum'"
         class="flex-1 py-2 px-4 text-sm  rounded-md transition-all"
-        :class="activeTab === 'umum' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
+        :class="activeTab === 'umum' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border admin-accent-border' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
         {{ t('admin.pengaturan.tabUmum') }}
       </button>
       <button @click="activeTab = 'absensi'"
         class="flex-1 py-2 px-4 text-sm  rounded-md transition-all"
-        :class="activeTab === 'absensi' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
+        :class="activeTab === 'absensi' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border admin-accent-border' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
         {{ t('admin.pengaturan.tabAbsensi') }}
       </button>
       <button @click="activeTab = 'keamanan'"
         class="flex-1 py-2 px-4 text-sm  rounded-md transition-all"
-        :class="activeTab === 'keamanan' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
+        :class="activeTab === 'keamanan' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border admin-accent-border' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
         {{ t('admin.pengaturan.tabKeamanan') }}
       </button>
     </div>
@@ -302,11 +302,11 @@ async function handleSave() {
               </svg>
               {{ t('admin.pengaturan.brandingVisual') }}
             </h3>
-            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 space-y-4 border border-gray-300 dark:border-gray-600">
+            <div class="bg-white dark:bg-gray-800 rounded-lg p-4 space-y-4 border admin-accent-border">
 
 
               <!-- Warna Utama -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
+              <div class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border p-4">
                 <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-3">
                   <span class="flex items-center gap-1.5">
                     <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -320,7 +320,7 @@ async function handleSave() {
                     <input type="color" v-model="formBranding.warnaUtama" class="sr-only" />
                   </label>
                   <input v-model="formBranding.warnaUtama" type="text"
-                    class="w-28 px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 uppercase"
+                    class="w-28 px-3 py-2 text-sm border admin-accent-border dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 uppercase"
                     maxlength="7" />
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
@@ -340,7 +340,7 @@ async function handleSave() {
               <!-- Logo & Favicon side by side -->
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Logo Aplikasi (Icon) -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border p-4">
                   <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-3">
                     <span class="flex items-center gap-1.5">
                       <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,7 +351,7 @@ async function handleSave() {
                   </label>
                   <!-- Preview -->
                   <div class="flex flex-col items-center gap-3">
-                    <div class="w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
+                    <div class="w-24 h-24 rounded-lg border-2 border-dashed admin-accent-border flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
                       <img v-if="iconPreview || formBranding.iconPath"
                         :src="iconPreview || formBranding.iconPath"
                         class="w-full h-full object-contain p-2"
@@ -364,7 +364,7 @@ async function handleSave() {
                     <div class="flex items-center gap-2">
                       <label class="relative cursor-pointer" :class="{ 'opacity-50 pointer-events-none': iconUploading }">
                         <input type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml" class="sr-only" @change="handleIconSelect" :disabled="iconUploading" />
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border admin-accent-border">
                           <svg v-if="iconUploading" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                           <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -385,7 +385,7 @@ async function handleSave() {
                 </div>
 
                 <!-- Favicon -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border p-4">
                   <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-3">
                     <span class="flex items-center gap-1.5">
                       <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -396,7 +396,7 @@ async function handleSave() {
                   </label>
                   <!-- Preview -->
                   <div class="flex flex-col items-center gap-3">
-                    <div class="w-16 h-16 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
+                    <div class="w-16 h-16 rounded-lg border-2 border-dashed admin-accent-border flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
                       <img v-if="faviconPreview || formBranding.faviconPath"
                         :src="faviconPreview || formBranding.faviconPath"
                         class="w-full h-full object-contain p-1.5"
@@ -409,7 +409,7 @@ async function handleSave() {
                     <div class="flex items-center gap-2">
                       <label class="relative cursor-pointer" :class="{ 'opacity-50 pointer-events-none': faviconUploading }">
                         <input type="file" accept="image/png,image/jpeg,image/jpg,image/x-icon,image/vnd.microsoft.icon" class="sr-only" @change="handleFaviconSelect" :disabled="faviconUploading" />
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border admin-accent-border">
                           <svg v-if="faviconUploading" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                           <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -433,11 +433,11 @@ async function handleSave() {
           </div>
 
           <!-- Separator -->
-          <div class="border-t border-gray-200 dark:border-slate-700 pt-6">
+          <div class="border-t admin-accent-border pt-6">
             <h3 class="text-base  text-gray-900 dark:text-gray-100 mb-4">{{ t('admin.pengaturan.informasiSekolah') }}</h3>
             <div class="space-y-4">
               <!-- Logo Sekolah -->
-              <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">
+              <div class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border p-4">
                 <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-3">
                   <span class="flex items-center gap-1.5">
                     <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -447,7 +447,7 @@ async function handleSave() {
                   </span>
                 </label>
                 <div class="flex flex-col items-center gap-3">
-                  <div class="w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
+                  <div class="w-24 h-24 rounded-lg border-2 border-dashed admin-accent-border flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
                     <img v-if="logoSekolahPreview || formUmum.logoSekolahPath"
                       :src="logoSekolahPreview || formUmum.logoSekolahPath"
                       class="w-full h-full object-contain p-2"
@@ -459,7 +459,7 @@ async function handleSave() {
                   <div class="flex items-center gap-2">
                     <label class="relative cursor-pointer" :class="{ 'opacity-50 pointer-events-none': logoSekolahUploading }">
                       <input type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml" class="sr-only" @change="handleLogoSekolahSelect" :disabled="logoSekolahUploading" />
-                      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600">
+                      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs  text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors border admin-accent-border">
                         <svg v-if="logoSekolahUploading" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
                         <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -480,30 +480,30 @@ async function handleSave() {
               </div>
               <BaseFormField :label="t('admin.pengaturan.labelNamaSekolah')" required>
                 <input v-model="formUmum.namaSekolah" type="text"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                  class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
               </BaseFormField>
               <BaseFormField :label="t('admin.pengaturan.labelAlamat')">
                 <textarea v-model="formUmum.alamat" rows="2"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"></textarea>
+                  class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"></textarea>
               </BaseFormField>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <BaseFormField :label="t('admin.pengaturan.labelTelepon')">
                   <input v-model="formUmum.telp" type="text"
-                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                    class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
                 </BaseFormField>
                 <BaseFormField :label="t('admin.pengaturan.labelEmail')">
                   <input v-model="formUmum.email" type="email"
-                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                    class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
                 </BaseFormField>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <BaseFormField :label="t('admin.pengaturan.labelTahunAjaran')">
                   <input v-model="formUmum.tahunAjaran" type="text"
-                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                    class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
                 </BaseFormField>
                 <BaseFormField :label="t('admin.pengaturan.labelSemester')">
                   <select v-model="formUmum.semester"
-                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+                    class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
                     <option value="Ganjil">{{ t('semester.ganjil') }}</option>
                     <option value="Genap">{{ t('semester.genap') }}</option>
                   </select>
@@ -512,11 +512,11 @@ async function handleSave() {
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <BaseFormField :label="t('admin.pengaturan.labelKepalaSekolah')">
                   <input v-model="formUmum.kepalaSekolah" type="text"
-                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                    class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
                 </BaseFormField>
                 <BaseFormField :label="t('admin.pengaturan.labelNipKepsek')">
                   <input v-model="formUmum.nipKepsek" type="text"
-                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                    class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
                 </BaseFormField>
               </div>
             </div>
@@ -528,34 +528,34 @@ async function handleSave() {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField :label="t('admin.pengaturan.batasScan')">
               <input v-model.number="formAbsensi.batasScan" type="number" min="1"
-                class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
             <BaseFormField :label="t('admin.pengaturan.batasTelat')">
               <input v-model.number="formAbsensi.batasTelat" type="number" min="1"
-                class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField :label="t('admin.pengaturan.toleransiAlpha')">
               <input v-model.number="formAbsensi.toleransiAlpha" type="number" min="1"
-                class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
           </div>
           <div class="space-y-3">
             <BaseFormField :label="t('admin.pengaturan.opsiLainnya')">
               <div class="flex items-center gap-3">
                 <input v-model="formAbsensi.autoTutupSesi" type="checkbox" id="autoTutup"
-                  class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
+                  class="w-4 h-4 rounded admin-accent-border text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
                 <label for="autoTutup" class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.pengaturan.autoTutupSesi') }}</label>
               </div>
               <div class="flex items-center gap-3">
                 <input v-model="formAbsensi.notifikasi" type="checkbox" id="notif"
-                  class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
+                  class="w-4 h-4 rounded admin-accent-border text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
                 <label for="notif" class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.pengaturan.kirimNotifikasi') }}</label>
               </div>
               <div class="flex items-center gap-3">
                 <input v-model="formAbsensi.izinTeksBebas" type="checkbox" id="izinBebas"
-                  class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
+                  class="w-4 h-4 rounded admin-accent-border text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
                 <label for="izinBebas" class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.pengaturan.izinTeksBebas') }}</label>
               </div>
             </BaseFormField>
@@ -567,36 +567,36 @@ async function handleSave() {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField :label="t('admin.pengaturan.minPassword')">
               <input v-model.number="formKeamanan.minimalPassword" type="number" min="6"
-                class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
             <BaseFormField :label="t('admin.pengaturan.sesiTimeout')">
               <input v-model.number="formKeamanan.sesiTimeout" type="number" min="5"
-                class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BaseFormField :label="t('admin.pengaturan.maxLogin')">
               <input v-model.number="formKeamanan.maxLogin" type="number" min="1"
-                class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+                class="w-full px-3.5 py-2.5 border admin-accent-border text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
             </BaseFormField>
           </div>
           <div class="space-y-3">
             <BaseFormField :label="t('admin.pengaturan.opsiKeamanan')">
               <div class="flex items-center gap-3">
                 <input v-model="formKeamanan.twoFactorAuth" type="checkbox" id="2fa"
-                  class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
+                  class="w-4 h-4 rounded admin-accent-border text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
                 <label for="2fa" class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.pengaturan.aktifkan2fa') }}</label>
               </div>
               <div class="flex items-center gap-3">
                 <input v-model="formKeamanan.logAktivitas" type="checkbox" id="log"
-                  class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
+                  class="w-4 h-4 rounded admin-accent-border text-blue-600 dark:bg-slate-700 focus:ring-blue-500" />
                 <label for="log" class="text-sm text-gray-700 dark:text-gray-300">{{ t('admin.pengaturan.catatLog') }}</label>
               </div>
             </BaseFormField>
           </div>
         </div>
 
-        <div class="flex justify-end mt-6 pt-4 border-t border-gray-200 dark:border-slate-700">
+        <div class="flex justify-end mt-6 pt-4 border-t admin-accent-border">
           <button type="submit" :disabled="saving"
             class="px-6 py-2.5 bg-blue-600 text-sm  text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
             <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>

@@ -141,10 +141,10 @@ async function handleDelete() {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input v-model="searchQuery" type="text" :placeholder="t('admin.jadwal.searchPlaceholder')"
-            class="w-40 sm:w-56 pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+            class="w-40 sm:w-56 pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
         <select v-model="filterKelasId"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="undefined">{{ t('admin.jadwal.semuaKelas') }}</option>
           <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
@@ -163,11 +163,11 @@ async function handleDelete() {
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="7" />
 
-    <div v-else class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+    <div v-else class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
       <div class="overflow-x-auto scrollbar-thin">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+            <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.jadwal.colMapel') }}</th>
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.jadwal.colHari') }}</th>
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.jadwal.colJam') }}</th>
@@ -177,7 +177,7 @@ async function handleDelete() {
               <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+          <tbody class="divide-y admin-accent-divide">
             <tr v-for="item in filteredJadwal" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
               <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
               <td class="px-4 py-3">

@@ -232,7 +232,7 @@ async function copyPassword() {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input v-model="searchQuery" type="text" :placeholder="t('admin.guru.searchPlaceholder')"
-            class="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+            class="w-full pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
         <div class="flex items-center justify-end ml-auto">
         <label class="inline-flex items-center gap-2 cursor-pointer select-none group">
@@ -257,7 +257,7 @@ async function copyPassword() {
       </div>
 
       <!-- Loading skeleton -->
-      <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+      <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
         <div class="p-4 space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-center gap-4 animate-pulse">
             <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-40"></div>
@@ -270,11 +270,11 @@ async function copyPassword() {
       </div>
 
       <!-- Table -->
-      <div v-else class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+      <div v-else class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.guru.colNama') }}</th>
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.guru.colEmail') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.guru.colNip') }}</th>
@@ -283,7 +283,7 @@ async function copyPassword() {
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+            <tbody class="divide-y admin-accent-divide">
               <tr v-for="item in visibleData" :key="item.id"
                 class="transition-all duration-150"
                 :class="item.isActive
@@ -375,7 +375,7 @@ async function copyPassword() {
             </tbody>
           </table>
         </div>
-        <div v-if="(data || []).length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
+        <div v-if="(data || []).length > pageSize" class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
           <p class="text-xs text-gray-400 dark:text-gray-500">
             {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, (data || []).length), total: (data || []).length, unit: t('admin.guru.unitPtk') }) }}
           </p>

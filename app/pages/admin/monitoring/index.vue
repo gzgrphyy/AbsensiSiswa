@@ -61,7 +61,7 @@ onMounted(() => {
         <div class="overflow-x-auto scrollbar-thin">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colRuangan') }}</th>
                 <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colSesiAktif') }}</th>
                 <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colTotalMurid') }}</th>
@@ -70,7 +70,7 @@ onMounted(() => {
                 <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colStatus') }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+            <tbody class="divide-y admin-accent-divide">
               <tr v-for="item in displayData" :key="item.ruangan" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.ruangan }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.sesiAktif }}</td>

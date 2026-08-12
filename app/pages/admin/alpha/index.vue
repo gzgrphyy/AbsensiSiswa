@@ -48,7 +48,7 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
       <div class="flex flex-col gap-1 min-w-[180px]">
         <label class="text-xs text-gray-500">Periode</label>
         <select v-model="selectedBulan"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="">Bulan Berjalan</option>
           <option v-for="o in bulanOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
@@ -58,7 +58,7 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
       <div class="flex flex-col gap-1 min-w-[160px]">
         <label class="text-xs text-gray-500">Kelas</label>
         <select v-model="selectedKelas"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="''">Semua Kelas</option>
           <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
@@ -66,7 +66,7 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
 
       <!-- Tombol Reset -->
       <button @click="selectedBulan = ''; selectedKelas = ''"
-        class="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border border-gray-300 dark:border-slate-600 transition-colors">
+        class="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border admin-accent-border transition-colors">
         Atur Ulang
       </button>
     </div>

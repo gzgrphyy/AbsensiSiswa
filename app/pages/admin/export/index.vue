@@ -80,7 +80,7 @@ async function handleExport(id: string) {
       <div :class="section.items.length >= 3 ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'grid grid-cols-1 sm:grid-cols-2 gap-4'">
         <div v-for="opt in section.items" :key="opt.id"
           @click="handleExport(opt.id)"
-          class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4 hover:border-blue-500 dark:hover:border-blue-400 transition-all cursor-pointer"
+          class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border p-4 hover:border-gray-400 dark:hover:border-gray-500 transition-all cursor-pointer"
           :class="{ 'opacity-50 pointer-events-none': !!exporting }">
           <div class="flex items-start gap-4">
             <div class="p-2.5 bg-gray-100 dark:bg-gray-700 rounded-lg flex-shrink-0">

@@ -36,7 +36,7 @@ const cardStyle = {
 </script>
 
 <template>
-  <div v-if="isAdmin" class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 p-3">
+  <div v-if="isAdmin" class="rounded-lg border admin-accent-border bg-white dark:bg-slate-800 p-3">
     <div class="flex items-center gap-3">
       <div v-if="$slots.icon" class="p-2 rounded-full bg-gray-100 dark:bg-slate-700 admin-accent-icon flex-shrink-0">
         <slot name="icon" />

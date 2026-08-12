@@ -184,7 +184,7 @@ function promptDelete(item: TahunAjaran) {
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
 
       <!-- Loading skeleton -->
-      <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+      <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
         <div class="p-6 space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-center gap-4 animate-pulse">
             <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-32"></div>
@@ -197,11 +197,11 @@ function promptDelete(item: TahunAjaran) {
       </div>
 
       <!-- Table -->
-      <div v-else class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+      <div v-else class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colTahunAjaran') }}</th>
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.tahunAjaran.colSemester') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colKelas') }}</th>
@@ -209,7 +209,7 @@ function promptDelete(item: TahunAjaran) {
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+            <tbody class="divide-y admin-accent-divide">
               <tr v-for="item in data" :key="item.id"
                 class="transition-all duration-150"
                 :class="item.isActive

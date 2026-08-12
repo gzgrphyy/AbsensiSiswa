@@ -183,15 +183,15 @@ async function handleDelete() {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input v-model="draftSearch" type="text" :placeholder="t('admin.kelas.searchPlaceholder')"
-            class="pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+            class="pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
         <select v-model="draftJenjang"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="">{{ t('admin.kelas.semuaJenjang') }}</option>
           <option v-for="j in jenjangList" :key="j" :value="j">{{ j }}</option>
         </select>
         <select v-model="draftTa"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="0">{{ t('admin.kelas.semuaTa') }}</option>
           <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})</option>
         </select>
@@ -200,7 +200,7 @@ async function handleDelete() {
           {{ t('common.terapkan') }}
         </button>
         <button @click="resetFilter"
-          class="px-3 py-2 text-sm  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border border-gray-300 dark:border-slate-600 transition-colors">
+          class="px-3 py-2 text-sm  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border admin-accent-border transition-colors">
           {{ t('common.aturUlang') }}
         </button>
       </div>
@@ -218,11 +218,11 @@ async function handleDelete() {
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="5" />
 
-    <div v-else class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+    <div v-else class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
       <div class="overflow-x-auto scrollbar-thin">
         <table class="w-full text-sm">
           <thead>
-            <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+            <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.kelas.colNama') }}</th>
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.kelas.colWali') }}</th>
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.kelas.colTa') }}</th>
@@ -230,7 +230,7 @@ async function handleDelete() {
               <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+          <tbody class="divide-y admin-accent-divide">
             <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
               <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.nama }}</td>
               <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.waliKelas?.nama || '-' }}</td>
@@ -264,7 +264,7 @@ async function handleDelete() {
           </tbody>
         </table>
       </div>
-      <div v-if="filteredData.length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
+      <div v-if="filteredData.length > pageSize" class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
         <p class="text-xs text-gray-400 dark:text-gray-500">
           {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, filteredData.length), total: filteredData.length, unit: t('admin.kelas.unitKelas') }) }}
         </p>

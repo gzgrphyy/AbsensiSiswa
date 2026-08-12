@@ -199,10 +199,10 @@ function ruanganUrl(item: Ruangan) {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input v-model="searchQuery" type="text" :placeholder="t('admin.ruangan.searchPlaceholder')"
-            class="w-40 sm:w-56 pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+            class="w-40 sm:w-56 pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
         <select v-model="filterJenis"
-          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="">{{ t('admin.ruangan.semuaJenis') }}</option>
           <option v-for="j in jenisOptions" :key="j" :value="j">{{ jenisLabel(j) }}</option>
         </select>
@@ -219,7 +219,7 @@ function ruanganUrl(item: Ruangan) {
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
 
-      <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+      <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
         <div class="p-6 space-y-4">
           <div v-for="i in 3" :key="i" class="flex items-center gap-4 animate-pulse">
             <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-40"></div>
@@ -229,11 +229,11 @@ function ruanganUrl(item: Ruangan) {
         </div>
       </div>
 
-      <div v-else class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+      <div v-else class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.ruangan.colRuangan') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.ruangan.colJenis') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.ruangan.colJadwal') }}</th>
@@ -242,7 +242,7 @@ function ruanganUrl(item: Ruangan) {
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+            <tbody class="divide-y admin-accent-divide">
               <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 sm:px-6 py-4">
                   <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
@@ -298,7 +298,7 @@ function ruanganUrl(item: Ruangan) {
             </tbody>
           </table>
         </div>
-        <div v-if="filteredData.length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
+        <div v-if="filteredData.length > pageSize" class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
           <p class="text-xs text-gray-400 dark:text-gray-500">
             {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, filteredData.length), total: filteredData.length, unit: t('admin.ruangan.unitRuangan') }) }}
           </p>
