@@ -13,8 +13,8 @@ const pengaturanSchema = z.object({
     nipKepsek: z.string().max(30).optional().default(''),
   }),
   branding: z.object({
-    namaAplikasi: z.string().min(1).max(100),
-    titelAplikasi: z.string().min(1).max(100),
+    namaAplikasi: z.string().min(1).max(100).optional(),
+    titelAplikasi: z.string().min(1).max(100).optional(),
     iconPath: z.string().nullable().optional(),
     faviconPath: z.string().nullable().optional(),
     warnaUtama: z.string().regex(/^#[0-9a-fA-F]{3,8}$/).optional(),
@@ -59,8 +59,7 @@ export default defineEventHandler(async (event) => {
   }
 
   if (parsed.branding) {
-    data.namaAplikasi = parsed.branding.namaAplikasi
-    data.titelAplikasi = parsed.branding.titelAplikasi
+    // namaAplikasi & titelAplikasi tidak dikelola dari form (pakai i18n)
     if (parsed.branding.iconPath !== undefined) {
       data.iconPath = parsed.branding.iconPath
     }
@@ -90,7 +89,7 @@ export default defineEventHandler(async (event) => {
         kepalaSekolah: data.kepalaSekolah || '',
         nipKepsek: data.nipKepsek || '',
         namaAplikasi: data.namaAplikasi || 'Aplikasi Skoria',
-        titelAplikasi: data.titelAplikasi || 'Sistem Absensi',
+        titelAplikasi: data.titelAplikasi || 'EduPresensi | Sistem Absensi Digital',
         iconPath: data.iconPath || null,
         faviconPath: data.faviconPath || null,
         warnaUtama: data.warnaUtama || '#0A66A0',

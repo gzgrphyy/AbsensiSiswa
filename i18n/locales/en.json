@@ -37,12 +37,15 @@
     "siswa": "Student"
   },
   "app": {
-    "sistemAbsensi": "Attendance System",
-    "aplikasiSkoria": "Skoria App"
+    "sistemAbsensi": "Digital Attendance System",
+    "aplikasiSkoria": "EduPresensi App"
   },
   "nav": {
     "beranda": "Home",
+    "dasbor": "Dashboard",
     "dataMaster": "Master Data",
+    "pemantauan": "Monitoring",
+    "laporan": "Reports",
     "dataPtk": "Teachers Data",
     "dataMurid": "Students Data",
     "dataKelas": "Classes Data",

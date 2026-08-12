@@ -136,8 +136,8 @@ function aksiLabel(aksi: string) {
       <!-- Tables Section -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
         <!-- Top Alpha Siswa -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600">
-          <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border">
+          <div class="px-4 py-3 border-b admin-accent-border flex items-center justify-between">
             <div>
               <h3 class="text-sm font text-gray-900 dark:text-gray-100">{{ t('admin.beranda.topAlphaTitle') }}</h3>
               <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ t('admin.beranda.topAlphaDesc') }}</p>
@@ -155,7 +155,7 @@ function aksiLabel(aksi: string) {
                   <th class="text-center px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colTotalAlpha') }}</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody class="divide-y admin-accent-divide">
                 <tr v-for="(item, idx) in data.topAlpha" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
                   <td class="px-4 py-3 text-gray-900 dark:text-gray-100 ">{{ item.nama }}</td>
                   <td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-center">{{ item.kelas }}</td>
@@ -169,7 +169,7 @@ function aksiLabel(aksi: string) {
               </tbody>
             </table>
           </div>
-          <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3">
+          <div class="px-4 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
             <NuxtLink
               to="/admin/alpha"
               class="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
@@ -183,8 +183,8 @@ function aksiLabel(aksi: string) {
         </div>
 
         <!-- Monitoring Ruangan -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600">
-          <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border">
+          <div class="px-4 py-3 border-b admin-accent-border flex items-center justify-between">
             <div>
               <h3 class="text-sm font text-gray-900 dark:text-gray-100">{{ t('admin.beranda.monitoringTitle') }}</h3>
               <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ t('admin.beranda.monitoringDesc') }}</p>
@@ -201,7 +201,7 @@ function aksiLabel(aksi: string) {
                   <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider hidden md:table-cell">{{ t('admin.beranda.colPtk') }}</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody class="divide-y admin-accent-divide">
                 <tr v-for="(item, idx) in data.monitoring.slice(0, 5)" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
                   <td class="px-4 py-3 text-gray-900 dark:text-gray-100 ">{{ item.ruangan }}</td>
                   <td class="px-4 py-3 text-center">
@@ -222,7 +222,7 @@ function aksiLabel(aksi: string) {
               </tbody>
             </table>
           </div>
-          <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3">
+          <div class="px-4 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
             <p v-if="data.monitoring.length > 5" class="text-xs text-gray-400 dark:text-gray-500">
               {{ t('admin.beranda.ruanganLainnya', { count: data.monitoring.length - 5 }) }}
             </p>
@@ -240,8 +240,8 @@ function aksiLabel(aksi: string) {
       </div>
 
       <!-- Aktivitas Terbaru -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600">
-        <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <div class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border">
+        <div class="px-4 py-3 border-b admin-accent-border flex items-center justify-between">
           <h3 class="text-sm font text-gray-900 dark:text-gray-100">{{ t('admin.beranda.aktivitasTitle') }}</h3>
           <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-lg">{{ data.aktivitasTerbaru.length }} {{ t('admin.beranda.unitAktivitas') }}</span>
         </div>
@@ -254,7 +254,7 @@ function aksiLabel(aksi: string) {
                 <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colDetail') }}</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody class="divide-y admin-accent-divide">
               <tr v-for="(item, idx) in data.aktivitasTerbaru" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
                 <td class="px-4 py-3 text-gray-400 dark:text-gray-500 text-xs font-mono">{{ item.waktu }}</td>
                 <td class="px-4 py-3">

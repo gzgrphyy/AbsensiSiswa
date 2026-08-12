@@ -48,13 +48,13 @@ const emitEmptyAction = () => {
 </script>
 
 <template>
-  <div v-if="isAdmin" class="bg-white dark:bg-slate-800 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+  <div v-if="isAdmin" class="bg-white dark:bg-slate-800 rounded-lg border admin-accent-border overflow-hidden">
     <div class="overflow-x-auto scrollbar-thin">
       <table class="w-full text-sm">
         <thead>
           <tr class="bg-gray-100 dark:bg-gray-700">
             <th v-for="col in columns" :key="col.key"
-              :class="['px-3 py-2 font-bold text-gray-700 dark:text-gray-200 text-xs uppercase text-left border border-gray-300 dark:border-gray-600', col.headerClass, { 'cursor-pointer select-none': col.sortable }]"
+              :class="['px-3 py-2 font-bold text-gray-700 dark:text-gray-200 text-xs uppercase text-left border admin-accent-border', col.headerClass, { 'cursor-pointer select-none': col.sortable }]"
               :style="{ width: col.width }">{{ col.label }}</th>
           </tr>
         </thead>
@@ -62,7 +62,7 @@ const emitEmptyAction = () => {
           <tr v-for="(item, idx) in data" :key="item.id || idx" @click="emitRowClick(item)"
             :class="[{ 'hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-100': hover, 'cursor-pointer': hover }, { 'bg-gray-50/30 dark:bg-gray-700/20': striped && idx % 2 === 1 }]">
             <td v-for="col in columns" :key="col.key"
-              :class="['px-3 py-2 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600', col.class]">
+              :class="['px-3 py-2 text-gray-700 dark:text-gray-300 border admin-accent-border', col.class]">
               <slot :name="`cell-${col.key}`" :item="item" :value="item[col.key]">{{ item[col.key] }}</slot>
             </td>
           </tr>

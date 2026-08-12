@@ -40,11 +40,24 @@ export function generatePrimaryScale(baseHex: string): Record<string, string> {
   }
 }
 
+/**
+ * Mengeset --primary-* (navbar, sidebar, tombol, dll.)
+ * sekaligus --admin-accent-* khusus untuk garis tabel & icon beranda.
+ * Logo background pakai warna fixed (bukan primary) — lihat komponen.
+ */
 export function applyPrimaryColor(hex: string) {
   if (!import.meta.client) return
+  const rgb = hexToRgb(hex) || [10, 102, 160]
   const scale = generatePrimaryScale(hex)
   const root = document.documentElement
+
+  // Set --primary-* agar navbar, sidebar, tombol, dll. ikut warna
   for (const [key, value] of Object.entries(scale)) {
     root.style.setProperty(key, value)
   }
+
+  // Set --admin-accent-* khusus garis tabel & icon beranda
+  root.style.setProperty('--admin-accent',       rgb.join(' '))
+  root.style.setProperty('--admin-accent-light', mixWhite(rgb, 0.85).join(' '))
+  root.style.setProperty('--admin-accent-dark',  mixBlack(rgb, 0.2).join(' '))
 }

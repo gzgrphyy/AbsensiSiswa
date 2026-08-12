@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
     pengaturan = await prisma.pengaturan.create({
       data: {
         namaSekolah: 'SMK Negeri 1 Bandung',
-        titelAplikasi: 'Sistem Absensi',
+        titelAplikasi: 'EduPresensi | Sistem Absensi Digital',
         namaAplikasi: 'Aplikasi Skoria',
       }
     })

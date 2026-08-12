@@ -83,13 +83,13 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
         <div class="overflow-x-auto scrollbar-thin">
           <table class="w-full text-sm">
             <thead>
-              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">Nama</th>
                 <th class="text-left px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">Kelas</th>
                 <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">Total Alpha</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+            <tbody class="divide-y admin-accent-divide">
               <tr v-for="item in data" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 py-3 text-gray-900 dark:text-gray-100">{{ item.nama }}</td>
                 <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.kelas }}</td>

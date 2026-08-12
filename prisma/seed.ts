@@ -278,7 +278,7 @@ async function main() {
     data: {
       namaSekolah: 'SMK Negeri 1 Bandung',
       namaAplikasi: 'Aplikasi Skoria',
-      titelAplikasi: 'Sistem Absensi',
+      titelAplikasi: 'EduPresensi | Sistem Absensi Digital',
       warnaUtama: '#0A66A0',
     }
   })

@@ -4,8 +4,15 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 const { pengaturan } = usePengaturan()
 const { t, locale, setLocale } = useI18n()
 const isAdmin = inject('isAdmin', false)
+const colorMode = useColorMode()
 
 const showProfile = ref(false)
+
+const isDark = computed(() => colorMode.value === 'dark')
+
+function toggleColorMode() {
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+}
 
 const langOptions = [
   { code: 'en', name: 'English', flag: '/bendera_uk.svg' },
@@ -58,16 +65,30 @@ onUnmounted(() => {
     <div class="px-3 sm:px-4 flex items-center justify-between h-[26px]">
       <!-- Left: Logo & App Name -->
       <NuxtLink to="/admin" class="flex items-center gap-1.5 min-w-0">
-        <div class="w-4 h-4 bg-primary-500 flex items-center justify-center text-white text-[9px]  flex-shrink-0 overflow-hidden rounded">
+        <div class="w-4 h-4 bg-[#0A66A0] flex items-center justify-center text-white text-[9px]  flex-shrink-0 overflow-hidden rounded">
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain" />
-          <span v-else>{{ pengaturan?.namaAplikasi?.charAt(0) || 'S' }}</span>
+          <span v-else>{{ t('app.aplikasiSkoria').charAt(0) }}</span>
         </div>
-        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ pengaturan?.namaAplikasi || t('app.aplikasiSkoria') }}</span>
+        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ t('app.aplikasiSkoria') }}</span>
       </NuxtLink>
 
       <!-- Right: Language & Developer Profile -->
       <div class="flex items-center gap-3">
         <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ t('miniNavbar.ta') }} {{ pengaturan?.tahunAjaran || '—' }} · {{ semesterLabel }}</span>
+
+        <!-- Theme Toggle -->
+        <button
+          @click="toggleColorMode"
+          class="p-0.5 rounded text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-150"
+          :title="isDark ? t('header.modeTerang') : t('header.modeGelap')"
+        >
+          <svg v-if="isDark" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg v-else class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
 
         <!-- Language Switcher -->
         <div class="flex items-center gap-1 ml-1">

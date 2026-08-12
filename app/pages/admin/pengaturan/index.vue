@@ -18,8 +18,6 @@ const formUmum = reactive({
 })
 
 const formBranding = reactive({
-  namaAplikasi: 'Aplikasi Skoria',
-  titelAplikasi: 'Sistem Absensi',
   iconPath: null as string | null,
   faviconPath: null as string | null,
   warnaUtama: '#0A66A0',
@@ -101,8 +99,7 @@ onMounted(() => {
     formUmum.semester = pengaturan.value.semester || 'Ganjil'
     formUmum.kepalaSekolah = pengaturan.value.kepalaSekolah || ''
     formUmum.nipKepsek = pengaturan.value.nipKepsek || ''
-    formBranding.namaAplikasi = pengaturan.value.namaAplikasi
-    formBranding.titelAplikasi = pengaturan.value.titelAplikasi
+
     formBranding.iconPath = pengaturan.value.iconPath
     formBranding.faviconPath = pengaturan.value.faviconPath
     formBranding.warnaUtama = pengaturan.value.warnaUtama || '#0A66A0'
@@ -121,8 +118,7 @@ watch(pengaturan, (val) => {
     formUmum.semester = val.semester || 'Ganjil'
     formUmum.kepalaSekolah = val.kepalaSekolah || ''
     formUmum.nipKepsek = val.nipKepsek || ''
-    formBranding.namaAplikasi = val.namaAplikasi
-    formBranding.titelAplikasi = val.titelAplikasi
+
     formBranding.iconPath = val.iconPath
     formBranding.faviconPath = val.faviconPath
     formBranding.warnaUtama = val.warnaUtama || '#0A66A0'
@@ -238,8 +234,6 @@ async function handleSave() {
       body: {
         umum: formUmum,
         branding: {
-          namaAplikasi: formBranding.namaAplikasi,
-          titelAplikasi: formBranding.titelAplikasi,
           iconPath: formBranding.iconPath,
           faviconPath: formBranding.faviconPath,
           warnaUtama: formBranding.warnaUtama,
@@ -309,19 +303,7 @@ async function handleSave() {
               {{ t('admin.pengaturan.brandingVisual') }}
             </h3>
             <div class="bg-white dark:bg-gray-800 rounded-lg p-4 space-y-4 border border-gray-300 dark:border-gray-600">
-              <!-- Nama Aplikasi & Titel -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <BaseFormField :label="t('admin.pengaturan.labelNamaAplikasi')">
-                  <input v-model="formBranding.namaAplikasi" type="text"
-                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    :placeholder="t('admin.pengaturan.placeholderNamaAplikasi')" />
-                </BaseFormField>
-                <BaseFormField :label="t('admin.pengaturan.labelTitelAplikasi')">
-                  <input v-model="formBranding.titelAplikasi" type="text"
-                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                    :placeholder="t('admin.pengaturan.placeholderTitelAplikasi')" />
-                </BaseFormField>
-              </div>
+
 
               <!-- Warna Utama -->
               <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 p-4">

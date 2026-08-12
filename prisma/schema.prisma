@@ -202,7 +202,7 @@ model Pengaturan {
   kepalaSekolah    String   @default("") @map("kepala_sekolah") @db.VarChar(100)
   nipKepsek        String   @default("") @map("nip_kepsek") @db.VarChar(30)
   warnaUtama       String   @default("#0A66A0") @map("warna_utama") @db.VarChar(20)
-  titelAplikasi    String   @default("Sistem Absensi") @map("titel_aplikasi") @db.VarChar(100)
+  titelAplikasi    String   @default("EduPresensi | Sistem Absensi Digital") @map("titel_aplikasi") @db.VarChar(100)
   namaAplikasi     String   @default("Aplikasi Skoria") @map("nama_aplikasi") @db.VarChar(100)
   iconPath         String?  @map("icon_path") @db.VarChar(255)
   faviconPath      String?  @map("favicon_path") @db.VarChar(255)

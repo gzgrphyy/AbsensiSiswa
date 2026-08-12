@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
       warnaUtama: branding.warnaUtama,
     } : {
       namaAplikasi: 'Aplikasi Skoria',
-      titelAplikasi: 'Sistem Absensi',
+      titelAplikasi: 'EduPresensi | Sistem Absensi Digital',
       iconPath: null,
       faviconPath: null,
       warnaUtama: '#0A66A0',

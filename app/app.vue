@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { pengaturan } = usePengaturan()
+const { t } = useI18n()
 
 // Apply brand color (warna utama) from pengaturan
 watch(pengaturan, (val) => {
@@ -20,7 +21,7 @@ useHead({
     }
     return []
   }),
-  title: computed(() => pengaturan.value?.titelAplikasi || 'Sistem Absensi')
+  title: computed(() => `${t('app.aplikasiSkoria')} | ${t('app.sistemAbsensi')}`)
 })
 </script>
 

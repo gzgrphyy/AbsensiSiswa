@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { user, clear } = useUserSession()
 const { pengaturan } = usePengaturan()
+const { t } = useI18n()
 const colorMode = useColorMode()
 
 const isDark = computed(() => colorMode.value === 'dark')
@@ -26,13 +27,13 @@ onMounted(() => {
       <div class="h-0.5 bg-primary-500 dark:bg-primary-600" />
       <div class="max-w-lg mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
         <NuxtLink to="/absensi" class="flex items-center gap-2.5 min-w-0">
-          <div class="w-8 h-8 rounded-lg bg-primary-500 dark:bg-primary-600 flex items-center justify-center text-white text-xs font-bold overflow-hidden flex-shrink-0">
+          <div class="w-8 h-8 rounded-lg bg-[#0A66A0] flex items-center justify-center text-white text-xs font-bold overflow-hidden flex-shrink-0">
             <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain p-0.5" />
-            <span v-else>{{ (pengaturan?.namaAplikasi || 'S').charAt(0) }}</span>
+            <span v-else>{{ t('app.aplikasiSkoria').charAt(0) }}</span>
           </div>
           <div class="min-w-0">
-            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight">{{ pengaturan?.namaAplikasi || 'Aplikasi Skoria' }}</p>
-            <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ pengaturan?.titelAplikasi || 'Sistem Absensi' }}</p>
+            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate leading-tight">{{ t('app.aplikasiSkoria') }}</p>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ t('app.sistemAbsensi') }}</p>
           </div>
         </NuxtLink>
 
@@ -40,7 +41,7 @@ onMounted(() => {
           <button
             @click="toggleColorMode"
             class="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
-            :title="isDark ? 'Mode Terang' : 'Mode Gelap'"
+            :title="isDark ? t('header.modeTerang') : t('header.modeGelap')"
           >
             <svg v-if="isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -53,7 +54,7 @@ onMounted(() => {
           <button
             @click="handleLogout"
             class="p-2 rounded-lg text-gray-400 dark:text-gray-500 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors"
-            title="Keluar"
+            :title="t('common.keluar')"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

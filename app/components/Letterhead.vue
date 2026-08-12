@@ -11,7 +11,7 @@ const { pengaturan } = usePengaturan()
       </div>
       <div class="flex-1 min-w-0">
         <h1 class="text-base font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wide">{{ pengaturan?.namaAplikasi || 'SMKN 4 BANDUNG' }}</h1>
-        <p class="text-xs text-gray-500 dark:text-gray-400">{{ pengaturan?.titelAplikasi || 'SISTEM ABSENSI MURID' }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">{{ pengaturan?.titelAplikasi || 'EduPresensi | Sistem Absensi Digital' }}</p>
       </div>
       <div class="text-right text-[10px] text-gray-400 dark:text-gray-500 hidden sm:block">
         <p>Terintegrasi & Aman</p>

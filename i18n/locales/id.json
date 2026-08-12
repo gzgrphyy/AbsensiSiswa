@@ -37,12 +37,15 @@
     "siswa": "Murid"
   },
   "app": {
-    "sistemAbsensi": "Sistem Absensi",
-    "aplikasiSkoria": "Aplikasi Skoria"
+    "sistemAbsensi": "Sistem Absensi Digital",
+    "aplikasiSkoria": "Aplikasi EduPresensi"
   },
   "nav": {
     "beranda": "Beranda",
+    "dasbor": "Dasbor",
     "dataMaster": "Data Master",
+    "pemantauan": "Pemantauan",
+    "laporan": "Laporan",
     "dataPtk": "Data PTK",
     "dataMurid": "Data Murid",
     "dataKelas": "Data Kelas",
@@ -431,7 +434,7 @@
       "labelNamaAplikasi": "Nama Aplikasi",
       "placeholderNamaAplikasi": "Aplikasi Skoria",
       "labelTitelAplikasi": "Titel Aplikasi",
-      "placeholderTitelAplikasi": "Sistem Absensi",
+      "placeholderTitelAplikasi": "EduPresensi | Sistem Absensi Digital",
       "labelWarnaUtama": "Warna Utama",
       "descWarnaUtama": "Warna utama website (tombol, navbar, sidebar, dsb).",
       "labelLogoAplikasi": "Logo Aplikasi",

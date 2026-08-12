@@ -15,7 +15,33 @@
   --primary-700: 6 69 115;
   --primary-800: 4 53 92;
   --primary-900: 3 38 69;
+
+  /* Accent admin: hanya untuk garis tabel & icon stroke beranda */
+  --admin-accent:       10 102 160;
+  --admin-accent-light: 214 234 247;
+  --admin-accent-dark:  8 82 128;
 }
+
+/* Utility classes admin-accent — dipakai di BaseTable & icon beranda */
+.admin-accent-border {
+  border-color: rgb(var(--admin-accent) / 0.35);
+}
+.dark .admin-accent-border {
+  border-color: rgb(var(--admin-accent) / 0.25);
+}
+.admin-accent-divide > * + * {
+  border-color: rgb(var(--admin-accent) / 0.2);
+}
+.dark .admin-accent-divide > * + * {
+  border-color: rgb(var(--admin-accent) / 0.15);
+}
+.admin-accent-icon {
+  color: rgb(var(--admin-accent));
+}
+.dark .admin-accent-icon {
+  color: rgb(var(--admin-accent-light));
+}
+
 
 @layer base {
   html {
