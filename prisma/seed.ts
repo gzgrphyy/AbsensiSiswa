@@ -6,7 +6,10 @@ const prisma = new PrismaClient()
 const NAMA_DEPAN_PRI = ['Agus', 'Bambang', 'Catur', 'Dedi', 'Eko', 'Fajar', 'Guntur', 'Hendra', 'Imam', 'Joko', 'Kurnia', 'Lukman', 'Maman', 'Nanda', 'Oka', 'Puji', 'Rahmat', 'Surya', 'Taufik', 'Ujang', 'Wahyu', 'Yudi', 'Zainal', 'Arif', 'Bayu', 'Dimas', 'Farhan', 'Galih', 'Ilham', 'Rizky']
 const NAMA_DEPAN_WANITA = ['Ayu', 'Dewi', 'Eka', 'Fitri', 'Gita', 'Hesti', 'Intan', 'Juwita', 'Kartika', 'Lestari', 'Maya', 'Nia', 'Ovi', 'Putri', 'Ratna', 'Sari', 'Tika', 'Umi', 'Vina', 'Wulan', 'Yuni', 'Zulaikha', 'Annisa', 'Citra', 'Dinda', 'Farah', 'Nabila', 'Salsabila', 'Zahra', 'Rahma']
 const NAMA_BELAKANG = ['Pratama', 'Santoso', 'Wijaya', 'Nugroho', 'Saputra', 'Hidayat', 'Kurniawan', 'Susanto', 'Setiawan', 'Ramadhan', 'Firdaus', 'Maulana', 'Purnama', 'Utami', 'Permata', 'Anggraini', 'Wulandari', 'Saputri', 'Gunawan', 'Haryanto', 'Subekti', 'Prasetyo']
+const NAMA_DEPAN_PANJANG = ['Muhammad', 'Abdurrahman', 'Fathurrahman', 'Muhammadiyah', 'Yudhistira', 'Satriawan', 'Prasetyaningrum', 'Nurhalimah', 'Syafruddin', 'Abdulhakim', 'Darmawansyah', 'Pramudito']
+const NAMA_BELAKANG_PANJANG = ['Pamungkas', 'Alamsyah', 'Ramadhansyah', 'Kusumawijaya', 'Sejahterawan', 'Prawiradilaga', 'Muhammadzaki', 'Anandawijaya']
 const GELAR_PTK = ['S.Pd.', 'M.Pd.', 'S.Kom.', 'S.Si.', 'S.E.', 'S.Pd.I.', 'M.T.']
+const GELAR_PTK_DOUBLE = ['S.Pd., M.Pd.', 'S.Kom., M.Kom.', 'S.Si., M.Sc.', 'S.T., M.T.', 'S.E., M.M.', 'S.Pd.I., M.Pd.', 'S.H., M.H.', 'Dr., M.Pd.']
 const KETERANGAN_PTK = ['Pendamping Mapel Matematika', 'Pendamping Mapel Bahasa Indonesia', 'Pendamping Mapel Bahasa Inggris', 'Pendamping Mapel Fisika', 'Pendamping Mapel Kimia', 'Pendamping Mapel Biologi', 'Pendamping Mapel Ekonomi', 'Pendamping Mapel Geografi', 'Pendamping Mapel Sejarah', 'Asisten Praktikum Lab Komputer', 'Asisten Praktikum Lab IPA', 'Pendamping Kelas Khusus', 'Pendamping Kegiatan Ekstrakurikuler', 'Pendamping Pembinaan Karakter', 'Pendamping Literasi Perpustakaan']
 
 function rand<T>(arr: T[]): T {
@@ -17,25 +20,43 @@ function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '.').replace(/^\.|\.$/g, '')
 }
 
+function buildPtkNama() {
+  const r = Math.random()
+  const depan = () => (Math.random() < 0.5 ? rand(NAMA_DEPAN_PRI) : rand(NAMA_DEPAN_WANITA))
+
+  if (r < 0.15) {
+    // Pendek — 1 kata + 1 gelar
+    return `${depan()} ${rand(GELAR_PTK)}`
+  }
+  if (r < 0.6) {
+    // Standar — 2 kata + 1 gelar
+    return `${depan()} ${rand(NAMA_BELAKANG)}, ${rand(GELAR_PTK)}`
+  }
+  if (r < 0.9) {
+    // Panjang — 3 kata + gelar ganda
+    const blk = Math.random() < 0.5 ? rand(NAMA_BELAKANG) : rand(NAMA_BELAKANG_PANJANG)
+    return `${depan()} ${rand(NAMA_BELAKANG)} ${blk}, ${rand(GELAR_PTK_DOUBLE)}`
+  }
+  // Sangat panjang — 4 kata + gelar ganda
+  const blk1 = rand(NAMA_BELAKANG)
+  const blk2 = rand(NAMA_BELAKANG_PANJANG)
+  return `${rand(NAMA_DEPAN_PANJANG)} ${depan()} ${blk1} ${blk2}, ${rand(GELAR_PTK_DOUBLE)}`
+}
+
 function generatePtk(i: number) {
-  const pria = Math.random() < 0.5
-  const namaDepan = pria ? rand(NAMA_DEPAN_PRI) : rand(NAMA_DEPAN_WANITA)
-  const namaBelakang = rand(NAMA_BELAKANG)
+  const nama = buildPtkNama()
   return {
-    nama: `${namaDepan} ${namaBelakang}, ${rand(GELAR_PTK)}`,
+    nama,
     nip: String(197501010000000000n + BigInt(i)),
-    email: `${slugify(namaDepan)}.${slugify(namaBelakang)}-${i}@sekolah.sch.id`,
+    email: `${slugify(nama.split(',')[0].trim())}-${i}@sekolah.sch.id`,
     nomorHp1: `0812${String(10000000 + i).padStart(8, '0')}`,
     nomorHp2: Math.random() < 0.3 ? `0857${String(50000000 + i).padStart(8, '0')}` : null
   }
 }
 
 function generatePtkPendamping(i: number) {
-  const pria = Math.random() < 0.5
-  const namaDepan = pria ? rand(NAMA_DEPAN_PRI) : rand(NAMA_DEPAN_WANITA)
-  const namaBelakang = rand(NAMA_BELAKANG)
   return {
-    nama: `${namaDepan} ${namaBelakang}, ${rand(GELAR_PTK)}`,
+    nama: buildPtkNama(),
     nip: `1990${String(1000000000 + i).padStart(10, '0')}`,
     nomorHp: Math.random() < 0.8 ? `0859${String(60000000 + i).padStart(8, '0')}` : null,
     keterangan: rand(KETERANGAN_PTK),
@@ -43,15 +64,37 @@ function generatePtkPendamping(i: number) {
   }
 }
 
+function buildMuridNama() {
+  const r = Math.random()
+  const depan = () => (Math.random() < 0.5 ? rand(NAMA_DEPAN_PRI) : rand(NAMA_DEPAN_WANITA))
+
+  if (r < 0.15) {
+    // Pendek — 1 kata
+    return depan()
+  }
+  if (r < 0.65) {
+    // Standar — 2 kata
+    return `${depan()} ${rand(NAMA_BELAKANG)}`
+  }
+  if (r < 0.9) {
+    // Panjang — 3 kata
+    const blk = Math.random() < 0.5 ? rand(NAMA_BELAKANG) : rand(NAMA_BELAKANG_PANJANG)
+    return `${depan()} ${rand(NAMA_BELAKANG)} ${blk}`
+  }
+  // Sangat panjang — 4 kata
+  const blk1 = rand(NAMA_BELAKANG)
+  const blk2 = rand(NAMA_BELAKANG_PANJANG)
+  return `${rand(NAMA_DEPAN_PANJANG)} ${depan()} ${blk1} ${blk2}`
+}
+
 function generateMurid(i: number) {
   const pria = Math.random() < 0.5
-  const namaDepan = pria ? rand(NAMA_DEPAN_PRI) : rand(NAMA_DEPAN_WANITA)
-  const namaBelakang = rand(NAMA_BELAKANG)
+  const nama = buildMuridNama()
   return {
-    nama: `${namaDepan} ${namaBelakang}`,
+    nama,
     nisn: String(9000000000 + i),
     nomorHp1: Math.random() < 0.7 ? `0813${String(20000000 + i).padStart(8, '0')}` : null,
-    namaWali: `${pria ? 'Bpk' : 'Ibu'} ${namaDepan} ${namaBelakang}`,
+    namaWali: `${pria ? 'Bpk' : 'Ibu'} ${nama}`,
     kontakWali: Math.random() < 0.8 ? `0821${String(30000000 + i).padStart(8, '0')}` : null
   }
 }
@@ -109,10 +152,10 @@ async function main() {
   // PTK / GURU
   // ============================================
   const guruData = [
-    { nama: 'Ahmad Fauzi, S.Pd., M.Pd.', nip: '197001012005011001', email: 'ahmad.fauzi@sekolah.sch.id', nomorHp1: '081234567890', nomorHp2: '085712345678' },
+    { nama: 'Muhammad Ahmad Fauzi Ramadhansyah Alamsyah, S.Pd., M.Pd.', nip: '197001012005011001', email: 'muhammad.ahmad.fauzi@sekolah.sch.id', nomorHp1: '081234567890', nomorHp2: '085712345678' },
     { nama: 'Siti Nurhaliza, S.Pd., M.Pd.', nip: '197207122006042002', email: 'siti.nurhaliza@sekolah.sch.id', nomorHp1: '082234567891', nomorHp2: null },
     { nama: 'Budi Santoso, S.Pd.', nip: '198003152007011003', email: 'budi.santoso@sekolah.sch.id', nomorHp1: '083234567892', nomorHp2: '087812345679' },
-    { nama: 'Dewi Lestari, S.Pd.', nip: '198205202008012004', email: 'dewi.lestari@sekolah.sch.id', nomorHp1: '084234567893', nomorHp2: null },
+    { nama: 'Dewi Lestari Permata Kusumawijaya, S.Pd., M.Pd.', nip: '198205202008012004', email: 'dewi.lestari.permata@sekolah.sch.id', nomorHp1: '084234567893', nomorHp2: null },
     { nama: 'Joko Susilo, S.Kom.', nip: '198307112009021005', email: 'joko.susilo@sekolah.sch.id', nomorHp1: '085234567894', nomorHp2: '089912345680' },
     { nama: 'Rina Wijaya, S.Si.', nip: '198408122010032006', email: 'rina.wijaya@sekolah.sch.id', nomorHp1: '086234567895', nomorHp2: null },
     { nama: 'Hendra Gunawan, S.Pd.I.', nip: '198509132011041007', email: 'hendra.gunawan@sekolah.sch.id', nomorHp1: '087234567896', nomorHp2: null },
@@ -232,7 +275,7 @@ async function main() {
   // ============================================
   const muridPerKelas = [
     // X-A
-    { nama: 'Aditya Pratama', nisn: '1234567890', nomorHp1: '081234567801', namaWali: 'Bambang Pratama', kontakWali: '081234567890' },
+    { nama: 'Muhammad Aditya Pratama Ramadhansyah', nisn: '1234567890', nomorHp1: '081234567801', namaWali: 'Bambang Pratama', kontakWali: '081234567890' },
     { nama: 'Bella Oktaviani', nisn: '1234567891', nomorHp1: '081234567802', namaWali: 'Sukirman', kontakWali: null },
     { nama: 'Candra Wijaya', nisn: '1234567892', nomorHp1: null, namaWali: 'Hendra Wijaya', kontakWali: '081234567891' },
     { nama: 'Dian Permata Sari', nisn: '1234567893', nomorHp1: '081234567803', namaWali: 'Agus Sari', kontakWali: '081234567892' },
@@ -258,11 +301,11 @@ async function main() {
     // XII-A
     { nama: 'Umar Al-Faruq', nisn: '3234567890', nomorHp1: '081234567813', namaWali: 'Al-Faruq', kontakWali: '081234567802' },
     { nama: 'Vina Amalia', nisn: '3234567891', nomorHp1: '081234567814', namaWali: 'Amalia', kontakWali: null },
-    { nama: 'Wahyu Hidayat', nisn: '3234567892', nomorHp1: null, namaWali: 'Hidayat', kontakWali: '081234567803' },
+    { nama: 'Muhammad Wahyu Hidayat Kusumawijaya', nisn: '3234567892', nomorHp1: null, namaWali: 'Hidayat', kontakWali: '081234567803' },
     { nama: 'Xena Olivia', nisn: '3234567893', nomorHp1: '081234567815', namaWali: 'Olivia', kontakWali: '081234567804' },
     { nama: 'Yoga Pratama', nisn: '3234567894', nomorHp1: null, namaWali: 'Pratama', kontakWali: null },
     // XII-B
-    { nama: 'Zahra Anindita', nisn: '3234567895', nomorHp1: '081234567816', namaWali: 'Anindita', kontakWali: '081234567805' },
+    { nama: 'Zahra Anindita Puspita Kusumawijaya', nisn: '3234567895', nomorHp1: '081234567816', namaWali: 'Anindita', kontakWali: '081234567805' },
     { nama: 'Adi Saputra', nisn: '3234567896', nomorHp1: '081234567817', namaWali: 'Saputra', kontakWali: null },
     { nama: 'Citra Febriani', nisn: '3234567897', nomorHp1: null, namaWali: 'Febrianto', kontakWali: '081234567806' },
     { nama: 'Dimas Ardiansyah', nisn: '3234567898', nomorHp1: '081234567818', namaWali: 'Ardiansyah', kontakWali: '081234567807' },

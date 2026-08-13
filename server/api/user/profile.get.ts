@@ -18,7 +18,8 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!user) {
-    throw createError({ statusCode: 404, statusMessage: 'User tidak ditemukan' })
+    await clearUserSession(event)
+    throw createError({ statusCode: 401, statusMessage: 'Sesi berakhir, silakan login kembali' })
   }
 
   if (user.role === 'SISWA') {

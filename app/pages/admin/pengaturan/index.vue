@@ -8,13 +8,13 @@ const activeTab = ref<'umum' | 'absensi' | 'keamanan'>('umum')
 const formUmum = reactive({
   namaSekolah: 'SMK Negeri 1 Bandung',
   logoSekolahPath: null as string | null,
-  alamat: 'Jl. Merdeka No. 123, Bandung',
-  telp: '022-1234567',
-  email: 'info@smkn1bdg.sch.id',
+  alamat: '',
+  telp: '',
+  email: '',
   tahunAjaran: '2026/2027',
   semester: 'Ganjil',
-  kepalaSekolah: 'Drs. H. Agus Salim, M.Pd.',
-  nipKepsek: '196501011990011001',
+  kepalaSekolah: '',
+  nipKepsek: '',
 })
 
 const formBranding = reactive({

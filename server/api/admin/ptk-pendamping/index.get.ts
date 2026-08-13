@@ -3,12 +3,11 @@ export default defineEventHandler(async (event) => {
   const search = query.search as string | undefined
   const showInactive = query.showInactive === 'true'
 
-  return await prisma.ptkPendamping.findMany({
+  const data = await prisma.ptkPendamping.findMany({
     where: {
       ...(showInactive ? { isActive: false } : { isActive: true }),
       ...(search && { nama: { contains: search } })
     },
-    orderBy: { nama: 'asc' },
     select: {
       id: true,
       nama: true,
@@ -21,4 +20,6 @@ export default defineEventHandler(async (event) => {
       _count: { select: { jadwalPelajaran: true } }
     }
   })
+
+  return data.sort((a, b) => a.nama.length - b.nama.length || a.nama.localeCompare(b.nama))
 })

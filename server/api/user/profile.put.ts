@@ -22,7 +22,8 @@ export default defineEventHandler(async (event) => {
 
     const user = await prisma.user.findUnique({ where: { id: session.user.id } })
     if (!user) {
-      throw createError({ statusCode: 404, statusMessage: 'User tidak ditemukan' })
+      await clearUserSession(event)
+      throw createError({ statusCode: 401, statusMessage: 'Sesi berakhir, silakan login kembali' })
     }
 
     const body = await readBody(event)

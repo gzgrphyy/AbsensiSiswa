@@ -6,7 +6,7 @@ const pengaturanSchema = z.object({
     logoSekolahPath: z.string().nullable().optional(),
     alamat: z.string().max(500).optional().default(''),
     telp: z.string().max(20).optional().default(''),
-    email: z.string().email().max(150).optional().default(''),
+    email: z.union([z.string().email().max(150), z.literal('')]).optional().default(''),
     tahunAjaran: z.string().max(20).optional().default(''),
     semester: z.string().max(20).optional().default(''),
     kepalaSekolah: z.string().max(100).optional().default(''),

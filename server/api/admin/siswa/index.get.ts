@@ -19,9 +19,5 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return data.sort((a, b) => {
-    const kelasCompare = b.kelas.nama.localeCompare(a.kelas.nama)
-    if (kelasCompare !== 0) return kelasCompare
-    return a.nama.localeCompare(b.nama)
-  })
+  return data.sort((a, b) => a.nama.length - b.nama.length || a.nama.localeCompare(b.nama))
 })

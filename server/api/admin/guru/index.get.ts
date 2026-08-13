@@ -3,16 +3,12 @@ export default defineEventHandler(async (event) => {
   const showInactive = query.showInactive === 'true'
   const search = query.search as string | undefined
 
-  return await prisma.user.findMany({
+  const data = await prisma.user.findMany({
     where: {
       role: 'GURU',
       ...(showInactive ? { isActive: false } : { isActive: true }),
       ...(search && { nama: { contains: search } })
     },
-    orderBy: [
-      { isActive: 'desc' },
-      { createdAt: 'desc' }
-    ],
     select: {
       id: true,
       nama: true,
@@ -30,4 +26,6 @@ export default defineEventHandler(async (event) => {
       }
     }
   })
+
+  return data.sort((a, b) => a.nama.length - b.nama.length || a.nama.localeCompare(b.nama))
 })
