@@ -44,10 +44,12 @@ export default defineEventHandler(async (event) => {
 
   const siswaMap = new Map(siswa.map(s => [s.id, s]))
 
-  return grouped.map(g => ({
+  const result = grouped.map(g => ({
     id: g.siswaId,
     nama: siswaMap.get(g.siswaId)?.nama || '-',
     kelas: siswaMap.get(g.siswaId)?.kelas?.nama || '-',
     totalAlpha: g._count.status
   }))
+
+  return result.sort((a, b) => a.nama.length - b.nama.length || a.nama.localeCompare(b.nama))
 })

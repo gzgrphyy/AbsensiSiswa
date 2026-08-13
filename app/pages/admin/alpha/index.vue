@@ -6,14 +6,19 @@ interface AlphaItem {
   totalAlpha: number
 }
 
+const { t } = useI18n()
+
 const selectedBulan = ref('')
 const selectedKelas = ref<number | ''>('')
+
+const appliedBulan = ref('')
+const appliedKelas = ref<number | ''>('')
 
 const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin/kelas', { immediate: true })
 
 const queryParams = computed(() => ({
-  ...(selectedBulan.value ? { bulan: selectedBulan.value } : {}),
-  ...(selectedKelas.value ? { kelasId: selectedKelas.value } : {}),
+  ...(appliedBulan.value ? { bulan: appliedBulan.value } : {}),
+  ...(appliedKelas.value ? { kelasId: appliedKelas.value } : {}),
 }))
 
 const { data, pending, refresh } = useFetch<AlphaItem[]>('/api/admin/alpha', {
@@ -22,7 +27,28 @@ const { data, pending, refresh } = useFetch<AlphaItem[]>('/api/admin/alpha', {
   transform: (res: any) => Array.isArray(res) ? res : []
 })
 
-watch([selectedBulan, selectedKelas], () => refresh())
+const page = ref(1)
+const pageSize = 10
+
+watch([appliedBulan, appliedKelas], () => { page.value = 1 })
+
+function applyFilter() {
+  appliedBulan.value = selectedBulan.value
+  appliedKelas.value = selectedKelas.value
+}
+
+function resetFilter() {
+  selectedBulan.value = ''
+  selectedKelas.value = ''
+  appliedBulan.value = ''
+  appliedKelas.value = ''
+}
+
+const totalPages = computed(() => Math.max(1, Math.ceil((data.value || []).length / pageSize)))
+const visibleData = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return (data.value || []).slice(start, start + pageSize)
+})
 
 const bulanOptions = computed(() => {
   const options = []
@@ -64,10 +90,16 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
         </select>
       </div>
 
+      <!-- Tombol Terapkan -->
+      <button @click="applyFilter()"
+        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md border border-blue-600 transition-colors">
+        {{ t('common.terapkan') }}
+      </button>
+
       <!-- Tombol Reset -->
-      <button @click="selectedBulan = ''; selectedKelas = ''"
+      <button @click="resetFilter()"
         class="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border admin-accent-border transition-colors">
-        Atur Ulang
+        {{ t('common.aturUlang') }}
       </button>
     </div>
 
@@ -90,7 +122,7 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
               </tr>
             </thead>
             <tbody class="divide-y admin-accent-divide">
-              <tr v-for="item in data" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+              <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 py-3 text-gray-900 dark:text-gray-100">{{ item.nama }}</td>
                 <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.kelas }}</td>
                 <td class="px-4 py-3 text-center">
@@ -107,6 +139,34 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
               </tr>
             </tbody>
           </table>
+        </div>
+        <div v-if="(data || []).length > pageSize" class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, (data || []).length), total: (data || []).length, unit: t('admin.siswa.unitMurid') }) }}
+          </p>
+          <div class="ml-auto flex items-center gap-2">
+            <button
+              @click="page--"
+              :disabled="page <= 1"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              {{ t('common.sebelumnya') }}
+            </button>
+            <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages }) }}</span>
+            <button
+              @click="page++"
+              :disabled="page >= totalPages"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {{ t('common.selanjutnya') }}
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </BaseCard>
     </template>
