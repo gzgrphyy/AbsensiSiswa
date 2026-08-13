@@ -214,7 +214,13 @@
       "msgBerhasilHapus": "Kelas berhasil dihapus",
       "confirmDeleteTitle": "Hapus Kelas",
       "confirmDeleteMsg": "Yakin ingin menghapus {nama}?",
-      "unitKelas": "kelas"
+      "unitKelas": "kelas",
+      "lihatDetail": "Lihat detail kelas",
+      "detailTitle": "Detail Kelas",
+      "colJadwal": "Jadwal Pelajaran",
+      "daftarMurid": "Daftar Murid",
+      "emptyMurid": "Belum ada murid di kelas ini",
+      "msgGagalDetail": "Gagal memuat detail kelas"
     },
     "jadwal": {
       "title": "Jadwal Pelajaran",

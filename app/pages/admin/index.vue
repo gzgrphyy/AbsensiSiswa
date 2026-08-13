@@ -157,7 +157,7 @@ function aksiLabel(aksi: string) {
               </thead>
               <tbody class="divide-y admin-accent-divide">
                 <tr v-for="(item, idx) in data.topAlpha" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
-                  <td class="px-4 py-3 text-gray-900 dark:text-gray-100 ">{{ item.nama }}</td>
+                  <td class="px-4 py-3 text-gray-900 dark:text-gray-100 truncate max-w-[11rem]" :title="item.nama">{{ item.nama }}</td>
                   <td class="px-4 py-3 text-gray-600 dark:text-gray-400 text-center">{{ item.kelas }}</td>
                   <td class="px-4 py-3 text-center">
                     <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs  bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 ring-1 ring-red-200 dark:ring-red-800">{{ item.totalAlpha }}x</span>
@@ -203,7 +203,7 @@ function aksiLabel(aksi: string) {
               </thead>
               <tbody class="divide-y admin-accent-divide">
                 <tr v-for="(item, idx) in data.monitoring.slice(0, 5)" :key="idx" class="hover:bg-gray-50/40 dark:hover:bg-gray-700/30 transition-colors">
-                  <td class="px-4 py-3 text-gray-900 dark:text-gray-100 ">{{ item.ruangan }}</td>
+                  <td class="px-4 py-3 text-gray-900 dark:text-gray-100 truncate max-w-[7rem]" :title="item.ruangan">{{ item.ruangan }}</td>
                   <td class="px-4 py-3 text-center">
                     <BaseBadge
                       :variant="item.status === 'Aktif' ? 'green' : 'gray'"
@@ -213,8 +213,8 @@ function aksiLabel(aksi: string) {
                       {{ statusLabel(item.status) }}
                     </BaseBadge>
                   </td>
-                  <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ item.sesi }}</td>
-                  <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.ptk }}</td>
+                  <td class="px-4 py-3 text-gray-700 dark:text-gray-300 truncate max-w-[8rem]" :title="item.sesi">{{ item.sesi }}</td>
+                  <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell truncate max-w-[10rem]" :title="item.ptk">{{ item.ptk }}</td>
                 </tr>
                 <tr v-if="data.monitoring.length === 0">
                   <td colspan="4" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">{{ t('common.belumAdaData') }}</td>

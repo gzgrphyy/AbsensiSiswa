@@ -7,9 +7,18 @@ export default defineEventHandler(async (event) => {
     include: {
       waliKelas: { select: { id: true, nama: true, nip: true } },
       tahunAjaran: true,
-      _count: { select: { siswa: true, jadwalPelajaran: true } }
+      _count: { select: { siswa: true, jadwalPelajaran: true } },
+      siswa: {
+        include: {
+          user: { select: { id: true, nama: true, email: true, isActive: true } }
+        }
+      }
     }
   })
+
+  if (data) {
+    data.siswa.sort((a, b) => a.nama.length - b.nama.length || a.nama.localeCompare(b.nama))
+  }
 
   if (!data) throw createError({ statusCode: 404, statusMessage: 'Kelas tidak ditemukan' })
 

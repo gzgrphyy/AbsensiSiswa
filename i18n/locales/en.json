@@ -214,7 +214,13 @@
       "msgBerhasilHapus": "Class deleted successfully",
       "confirmDeleteTitle": "Delete Class",
       "confirmDeleteMsg": "Are you sure you want to delete {nama}?",
-      "unitKelas": "classes"
+      "unitKelas": "classes",
+      "lihatDetail": "View class details",
+      "detailTitle": "Class Details",
+      "colJadwal": "Class Schedule",
+      "daftarMurid": "Student List",
+      "emptyMurid": "No students in this class yet",
+      "msgGagalDetail": "Failed to load class details"
     },
     "jadwal": {
       "title": "Class Schedule",
