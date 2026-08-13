@@ -9,8 +9,10 @@ interface ProfileData {
   nisn?: string
   namaSiswa?: string
   kelas?: { id: number; nama: string }
+  waliKelas?: { id: number; nama: string } | null
   namaWali?: string | null
   kontakWali?: string | null
+  ptkPendamping?: { id: number; nama: string }[]
 }
 
 const { data: profile, refresh } = useFetch<ProfileData>('/api/user/profile', { immediate: true })
@@ -237,6 +239,50 @@ async function handleChangePassword() {
           </button>
         </div>
       </form>
+    </BaseCard>
+
+    <!-- PTK Kelas -->
+    <BaseCard class="mt-6">
+      <div class="flex items-center gap-2 mb-4">
+        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">PTK Wali Kelas</h3>
+      </div>
+
+      <div v-if="profile?.waliKelas" class="flex flex-wrap gap-2">
+        <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-sm text-gray-800 dark:text-gray-200">
+          <span class="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
+            {{ profile.waliKelas.nama.charAt(0).toUpperCase() }}
+          </span>
+          {{ profile.waliKelas.nama }}
+        </span>
+      </div>
+      <p v-else class="text-sm text-gray-500 dark:text-gray-400">Belum ada wali kelas untuk kelas kamu.</p>
+    </BaseCard>
+
+    <!-- PTK Pendamping Kelas -->
+    <BaseCard class="mt-6">
+      <div class="flex items-center gap-2 mb-4">
+        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">PTK Pendamping </h3>
+      </div>
+
+      <div v-if="profile?.ptkPendamping?.length" class="flex flex-wrap gap-2">
+        <span
+          v-for="p in profile.ptkPendamping"
+          :key="p.id"
+          class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-sm text-gray-800 dark:text-gray-200"
+        >
+          <span class="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
+            {{ p.nama.charAt(0).toUpperCase() }}
+          </span>
+          {{ p.nama }}
+        </span>
+      </div>
+      <p v-else class="text-sm text-gray-500 dark:text-gray-400">Belum ada PTK pendamping di kelas kamu.</p>
     </BaseCard>
 
     <!-- Ubah Password -->

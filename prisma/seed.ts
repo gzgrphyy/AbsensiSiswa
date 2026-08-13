@@ -203,9 +203,10 @@ async function main() {
   // PTK PENDAMPING (30 data)
   // ============================================
   const ptkPendampingCount = 30
+  const ptkPendampingList: { id: number }[] = []
   for (let i = 0; i < ptkPendampingCount; i++) {
     const p = generatePtkPendamping(i)
-    await prisma.ptkPendamping.create({
+    const created = await prisma.ptkPendamping.create({
       data: {
         nama: p.nama,
         nip: p.nip,
@@ -214,6 +215,7 @@ async function main() {
         isActive: p.isActive
       }
     })
+    ptkPendampingList.push(created)
   }
 
   console.log(`✓ ${ptkPendampingCount} PTK pendamping dibuat`)
@@ -363,18 +365,123 @@ async function main() {
   console.log('✓ Pengaturan default dibuat')
 
   // ============================================
-  // JADWAL PELAJARAN (1 jadwal per kelas)
+  // JADWAL PELAJARAN (lengkap Senin–Sabtu per kelas)
   // ============================================
   const [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10] = await prisma.ruangan.findMany({ orderBy: { id: 'asc' } })
 
-  const jadwalData = [
-    { kelasIdx: 0, mapel: 'Matematika', guruIdx: 2, ruanganId: r5.id, hari: 'SENIN', jamMulai: '07:00', jamSelesai: '08:30' },
-    { kelasIdx: 1, mapel: 'Bahasa Indonesia', guruIdx: 3, ruanganId: r6.id, hari: 'SENIN', jamMulai: '07:00', jamSelesai: '08:30' },
-    { kelasIdx: 2, mapel: 'Fisika', guruIdx: 5, ruanganId: r7.id, hari: 'SENIN', jamMulai: '08:30', jamSelesai: '10:00' },
-    { kelasIdx: 3, mapel: 'Biologi', guruIdx: 1, ruanganId: r8.id, hari: 'SELASA', jamMulai: '07:00', jamSelesai: '08:30' },
-    { kelasIdx: 4, mapel: 'Bahasa Inggris', guruIdx: 4, ruanganId: r1.id, hari: 'SENIN', jamMulai: '10:00', jamSelesai: '11:30' },
-    { kelasIdx: 5, mapel: 'Ekonomi', guruIdx: 7, ruanganId: r2.id, hari: 'SENIN', jamMulai: '07:00', jamSelesai: '08:30' },
-  ]
+  // Ruang kelas utama per kelas (urutan kelasList): X-A, X-B, XI-A, XI-B, XII-A, XII-B
+  const ruangKelasUtama = [r5, r6, r3, r4, r1, r2]
+  const ruangLabKomputer = r7
+  const ruangLabIpa = r8
+  const ruangLabBahasa = r9
+  const ruangPerpus = r10
+
+  // Mapel yang memakai ruang khusus
+  const RUANG_KHUSUS: Record<string, number> = {
+    Informatika: ruangLabKomputer.id,
+    Fisika: ruangLabIpa.id,
+    Kimia: ruangLabIpa.id,
+    Biologi: ruangLabIpa.id,
+    'Bahasa Inggris': ruangLabBahasa.id,
+    'Bahasa Sunda': ruangLabBahasa.id,
+    'Literasi Perpustakaan': ruangPerpus.id,
+    Sejarah: ruangPerpus.id
+  }
+
+  // Mapel yang didampingi PTK pendamping (praktikum/lab)
+  const MAPEL_PENDAMPING = new Set(['Informatika', 'Fisika', 'Kimia', 'Biologi', 'Prakarya & Kewirausahaan', 'Dasar Program Keahlian'])
+
+  const MAPEL_PER_HARI: Record<string, string[]> = {
+    SENIN: ['Pendidikan Agama', 'Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Informatika'],
+    SELASA: ['PPKn', 'Fisika', 'Kimia', 'Sejarah', 'PJOK'],
+    RABU: ['Matematika', 'Bahasa Indonesia', 'Biologi', 'Ekonomi', 'Seni Budaya'],
+    KAMIS: ['Bahasa Inggris', 'Geografi', 'Prakarya & Kewirausahaan', 'Dasar Program Keahlian', 'Bahasa Sunda'],
+    JUMAT: ['Fisika', 'Kimia', 'Matematika', 'Bahasa Indonesia', 'Dasar Program Keahlian'],
+    SABTU: ['Pembinaan Karakter', 'Ekstrakurikuler', 'Literasi Perpustakaan']
+  }
+
+  const SLOT_PER_HARI: Record<string, { jamMulai: string; jamSelesai: string }[]> = {
+    SENIN: [
+      { jamMulai: '07:00', jamSelesai: '08:30' },
+      { jamMulai: '08:30', jamSelesai: '10:00' },
+      { jamMulai: '10:00', jamSelesai: '11:30' },
+      { jamMulai: '12:00', jamSelesai: '13:30' },
+      { jamMulai: '13:30', jamSelesai: '15:00' }
+    ],
+    SELASA: [
+      { jamMulai: '07:00', jamSelesai: '08:30' },
+      { jamMulai: '08:30', jamSelesai: '10:00' },
+      { jamMulai: '10:00', jamSelesai: '11:30' },
+      { jamMulai: '12:00', jamSelesai: '13:30' },
+      { jamMulai: '13:30', jamSelesai: '15:00' }
+    ],
+    RABU: [
+      { jamMulai: '07:00', jamSelesai: '08:30' },
+      { jamMulai: '08:30', jamSelesai: '10:00' },
+      { jamMulai: '10:00', jamSelesai: '11:30' },
+      { jamMulai: '12:00', jamSelesai: '13:30' },
+      { jamMulai: '13:30', jamSelesai: '15:00' }
+    ],
+    KAMIS: [
+      { jamMulai: '07:00', jamSelesai: '08:30' },
+      { jamMulai: '08:30', jamSelesai: '10:00' },
+      { jamMulai: '10:00', jamSelesai: '11:30' },
+      { jamMulai: '12:00', jamSelesai: '13:30' },
+      { jamMulai: '13:30', jamSelesai: '15:00' }
+    ],
+    JUMAT: [
+      { jamMulai: '07:00', jamSelesai: '08:30' },
+      { jamMulai: '08:30', jamSelesai: '10:00' },
+      { jamMulai: '10:00', jamSelesai: '11:30' },
+      { jamMulai: '12:00', jamSelesai: '13:30' },
+      { jamMulai: '13:30', jamSelesai: '15:00' }
+    ],
+    SABTU: [
+      { jamMulai: '07:00', jamSelesai: '08:30' },
+      { jamMulai: '08:30', jamSelesai: '10:00' },
+      { jamMulai: '10:00', jamSelesai: '11:30' }
+    ]
+  }
+
+  const HARI_URUTAN = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU']
+
+  const jadwalData: {
+    kelasIdx: number
+    mapel: string
+    guruIdx: number
+    ruanganId: number
+    hari: string
+    jamMulai: string
+    jamSelesai: string
+    ptkPendampingId: number | null
+  }[] = []
+
+  for (let k = 0; k < kelasList.length; k++) {
+    const offset = k // rotasi mapel agar jadwal tiap kelas berbeda
+    for (const hari of HARI_URUTAN) {
+      const mapels = MAPEL_PER_HARI[hari]
+      const slots = SLOT_PER_HARI[hari]
+      mapels.forEach((_m, s) => {
+        const mapel = mapels[(s + offset) % mapels.length]
+        const guruIdx = (k * 5 + s + HARI_URUTAN.indexOf(hari)) % gurus.length
+        const ruanganId = RUANG_KHUSUS[mapel] ?? ruangKelasUtama[k].id
+        // Hanya pakai pendamping yang aktif (28 pertama)
+        const ptkPendampingId = MAPEL_PENDAMPING.has(mapel)
+          ? ptkPendampingList[(k * 4 + s) % 28].id
+          : null
+        jadwalData.push({
+          kelasIdx: k,
+          mapel,
+          guruIdx,
+          ruanganId,
+          hari,
+          jamMulai: slots[s].jamMulai,
+          jamSelesai: slots[s].jamSelesai,
+          ptkPendampingId
+        })
+      })
+    }
+  }
 
   const jadwalList = await Promise.all(
     jadwalData.map(j =>
@@ -384,6 +491,7 @@ async function main() {
           mapel: j.mapel,
           guruId: gurus[j.guruIdx].id,
           ruanganId: j.ruanganId,
+          ptkPendampingId: j.ptkPendampingId,
           hari: j.hari as any,
           jamMulai: j.jamMulai,
           jamSelesai: j.jamSelesai
@@ -408,9 +516,14 @@ async function main() {
   let totalSesi = 0
   let totalRequests = 0
 
-  for (let ji = 0; ji < jadwalList.length; ji++) {
-    const jadwal = jadwalList[ji]
-    const kelas = kelasList[jadwalData[ji].kelasIdx]
+  // Ambil 1 jadwal per kelas sebagai demo sesi absensi (jadwal Senin slot pertama)
+  const slotsPerKelas = HARI_URUTAN.reduce((acc, h) => acc + SLOT_PER_HARI[h].length, 0)
+  const demoJadwalIdx = kelasList.map((_k, k) => k * slotsPerKelas)
+
+  for (let ji = 0; ji < demoJadwalIdx.length; ji++) {
+    const di = demoJadwalIdx[ji]
+    const jadwal = jadwalList[di]
+    const kelas = kelasList[jadwalData[di].kelasIdx]
 
     // Ambil semua murid di kelas ini
     const siswaDiKelas = await prisma.siswa.findMany({
@@ -418,7 +531,7 @@ async function main() {
       select: { id: true }
     })
 
-    // Sesinya: today (AKTIF untuk 3 jadwal, SELESAI untuk 3 lainnya)
+    // Sesinya: today (AKTIF untuk 3 kelas pertama, SELESAI untuk 3 lainnya)
     const sesiTanggal = ji < 3 ? today : yesterday
     const sesiStatus = ji < 3 ? 'AKTIF' : 'SELESAI'
 
@@ -427,7 +540,7 @@ async function main() {
         jadwalId: jadwal.id,
         tanggal: sesiTanggal,
         status: sesiStatus,
-        dibukaOleh: gurus[jadwalData[ji].guruIdx].id
+        dibukaOleh: gurus[jadwalData[di].guruIdx].id
       }
     })
     totalSesi++
@@ -442,7 +555,7 @@ async function main() {
             siswaId: ssw.id,
             status: randStatus,
             scannedAt: new Date(sesiTanggal.getTime() + 7 * 60 * 60 * 1000 + Math.random() * 2 * 60 * 60 * 1000),
-            approvedBy: gurus[jadwalData[ji].guruIdx].id,
+            approvedBy: gurus[jadwalData[di].guruIdx].id,
             approvedAt: new Date(sesiTanggal.getTime() + 8 * 60 * 60 * 1000)
           }
         })
@@ -450,7 +563,7 @@ async function main() {
       }
     }
 
-    // Jadwal 2 & 5 juga bikin sesi SELESAI tambahan (kemarin/lusa)
+    // Kelas 2 & 5 juga bikin sesi SELESAI tambahan (minggu lalu)
     const tambahanTanggal = ji === 1 || ji === 4 ? lastWeek : null
     if (tambahanTanggal) {
       const sesiLama = await prisma.sesiAbsensi.create({
@@ -458,7 +571,7 @@ async function main() {
           jadwalId: jadwal.id,
           tanggal: tambahanTanggal,
           status: 'SELESAI',
-          dibukaOleh: gurus[jadwalData[ji].guruIdx].id
+          dibukaOleh: gurus[jadwalData[di].guruIdx].id
         }
       })
       totalSesi++
@@ -471,7 +584,7 @@ async function main() {
             siswaId: ssw.id,
             status: randStatus,
             scannedAt: new Date(tambahanTanggal.getTime() + 7 * 60 * 60 * 1000 + Math.random() * 2 * 60 * 60 * 1000),
-            approvedBy: gurus[jadwalData[ji].guruIdx].id,
+            approvedBy: gurus[jadwalData[di].guruIdx].id,
             approvedAt: new Date(tambahanTanggal.getTime() + 8 * 60 * 60 * 1000)
           }
         })

@@ -33,58 +33,44 @@ const displayData = computed(() => history.value || [])
   <PTKLayout>
     <PageHeader title="Riwayat Absensi" description="Riwayat sesi absensi yang telah selesai" :show-back="false" />
 
-    <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="7" />
+    <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="5" />
 
     <div v-else class="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
-      <div class="overflow-x-auto scrollbar-thin">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700">
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Tanggal</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Mapel</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden sm:table-cell">Waktu</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden sm:table-cell">Kelas</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Total</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Hadir</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden md:table-cell">S/I/A</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Detail</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-            <tr v-for="item in displayData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
-              <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ new Date(item.tanggal).toLocaleDateString('id-ID') }}</td>
-              <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
-              <td class="px-4 py-3 text-center text-xs text-gray-500 dark:text-gray-400 hidden sm:table-cell">
-                {{ new Date(item.ditutupPada).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }}
-              </td>
-              <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.kelas }}</td>
-              <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.totalSiswa }}</td>
-              <td class="px-4 py-3 text-center">
-                <span class="font-medium text-green-600 dark:text-green-400">{{ item.hadir }}</span>
-              </td>
-              <td class="px-4 py-3 text-center hidden md:table-cell">
-                <span class="text-xs text-gray-500 dark:text-gray-400">
-                  {{ item.sakit }}/{{ item.izin }}/{{ item.alpha }}
-                </span>
-              </td>
-              <td class="px-4 py-3 text-center">
-                <NuxtLink :to="`/absensi/detail/${item.id}`"
-                  class="inline-flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">
-                  Lihat
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </NuxtLink>
-              </td>
-            </tr>
-            <tr v-if="displayData.length === 0">
-              <td colspan="7" class="px-4 py-16 text-center">
-                <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada riwayat absensi</p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700">
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Tanggal</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Mapel</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Kelas</th>
+            <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Hadir</th>
+            <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Detail</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+          <tr v-for="item in displayData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+            <td class="px-4 py-3 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ new Date(item.tanggal).toLocaleDateString('id-ID') }}</td>
+            <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100 truncate max-w-[10rem]">{{ item.mapel }}</td>
+            <td class="px-4 py-3 text-gray-600 dark:text-gray-300 truncate max-w-[6rem]">{{ item.kelas }}</td>
+            <td class="px-4 py-3 text-center">
+              <span class="font-medium text-green-600 dark:text-green-400">{{ item.hadir }}</span>
+            </td>
+            <td class="px-4 py-3 text-center">
+              <NuxtLink :to="`/absensi/detail/${item.id}`"
+                class="inline-flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium">
+                Lihat
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </NuxtLink>
+            </td>
+          </tr>
+          <tr v-if="displayData.length === 0">
+            <td colspan="5" class="px-4 py-16 text-center">
+              <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada riwayat absensi</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </PTKLayout>
 </template>

@@ -26,17 +26,33 @@ export default defineEventHandler(async (event) => {
     const siswa = await prisma.siswa.findUnique({
       where: { userId: user.id },
       include: {
-        kelas: { select: { id: true, nama: true } }
+        kelas: {
+          select: {
+            id: true,
+            nama: true,
+            waliKelas: { select: { id: true, nama: true } }
+          }
+        }
       }
     })
     if (siswa) {
+      const ptkPendamping = await prisma.ptkPendamping.findMany({
+        where: {
+          isActive: true,
+          jadwalPelajaran: { some: { kelasId: siswa.kelasId } }
+        },
+        select: { id: true, nama: true },
+        orderBy: { nama: 'asc' }
+      })
       return {
         ...user,
         nisn: siswa.nisn,
         namaSiswa: siswa.nama,
         kelas: siswa.kelas,
+        waliKelas: siswa.kelas.waliKelas,
         namaWali: siswa.namaWali,
-        kontakWali: siswa.kontakWali
+        kontakWali: siswa.kontakWali,
+        ptkPendamping
       }
     }
   }

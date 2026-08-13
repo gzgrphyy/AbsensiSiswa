@@ -161,9 +161,9 @@ async function handleChangePassword() {
       <form @submit.prevent="handleSave" class="space-y-5">
         <div class="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-6 items-center p-4 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-100 dark:border-slate-600">
           <div class="relative w-fit">
-            <div v-if="fotoPreview || profile?.foto"
+            <div v-if="fotoPreview || form.foto"
               class="w-28 h-28 rounded-xl overflow-hidden border-2 border-blue-200 dark:border-blue-800">
-              <img :src="fotoPreview || profile?.foto" class="w-full h-full object-cover" />
+              <img :src="fotoPreview || form.foto" class="w-full h-full object-cover" />
             </div>
             <div v-else
               class="w-28 h-28 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 text-4xl">
@@ -175,10 +175,12 @@ async function handleChangePassword() {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </label>
-            <button v-if="fotoPreview || form.foto" type="button" @click="removeFoto"
-              class="mt-2 text-[11px] text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 block mx-auto">
-              {{ t('admin.profil.hapusFoto') }}
-            </button>
+            <div class="flex justify-end">
+              <button v-if="fotoPreview || form.foto" type="button" @click="removeFoto"
+                class="mt-2 translate-x-[-29px] text-[11px] text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                {{ t('admin.profil.hapusFoto') }}
+              </button>
+             </div>
           </div>
           <div class="min-w-0 space-y-4">
             <BaseFormField :label="t('admin.profil.labelNama')" required>

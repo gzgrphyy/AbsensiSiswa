@@ -50,6 +50,11 @@ const statusCount = computed(() => {
 })
 
 const hasAnyStatus = computed(() => Object.values(statusCount.value).some(c => c > 0))
+
+const totalSiswa = computed(() => sesi.value?.allSiswa.length || 0)
+const persentaseHadir = computed(() =>
+  totalSiswa.value ? Math.round((statusCount.value.HADIR / totalSiswa.value) * 100) : 0
+)
 </script>
 
 <template>
@@ -102,6 +107,20 @@ const hasAnyStatus = computed(() => Object.values(statusCount.value).some(c => c
             <dt class="text-gray-500 dark:text-gray-400">Guru</dt>
             <dd class="font-semibold text-gray-900 dark:text-gray-100 truncate">{{ sesi.jadwal.guru.nama }}</dd>
           </div>
+          <div class="flex items-center justify-between gap-3">
+            <dt class="text-gray-500 dark:text-gray-400">Total Siswa</dt>
+            <dd class="font-semibold text-gray-900 dark:text-gray-100">{{ totalSiswa }}</dd>
+          </div>
+          <div class="flex items-center justify-between gap-3">
+            <dt class="text-gray-500 dark:text-gray-400">Persentase</dt>
+            <dd class="font-semibold text-gray-900 dark:text-gray-100">{{ persentaseHadir }}%</dd>
+          </div>
+          <div v-if="sesi.ditutupPada" class="flex items-center justify-between gap-3">
+            <dt class="text-gray-500 dark:text-gray-400">Ditutup pada</dt>
+            <dd class="font-semibold text-gray-900 dark:text-gray-100">
+              {{ new Date(sesi.ditutupPada).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) }}
+            </dd>
+          </div>
         </dl>
       </div>
 
@@ -145,11 +164,11 @@ const hasAnyStatus = computed(() => Object.values(statusCount.value).some(c => c
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700">
-                <th class="text-left px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Nama</th>
-                <th class="text-left px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">NISN</th>
-                <th class="text-center px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Status</th>
-                <th class="text-center px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">Keterangan</th>
-                <th class="text-center px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">Scan</th>
+                <th class="text-left px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Nama</th>
+                <th class="text-left px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden sm:table-cell">NISN</th>
+                <th class="text-center px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Status</th>
+                <th class="text-center px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden md:table-cell">Keterangan</th>
+                <th class="text-center px-3 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden md:table-cell">Scan</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
