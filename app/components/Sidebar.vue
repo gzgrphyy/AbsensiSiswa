@@ -129,10 +129,10 @@ function renderIcon(icon: string) {
     <!-- Profil Pengguna -->
     <div class="flex-shrink-0 border-b border-gray-200 dark:border-slate-700">
       <div :class="['flex items-center gap-2.5 py-2.5', collapsed ? 'justify-center px-0' : 'px-4']">
-        <div v-if="user?.foto" class="w-9 h-9 rounded-full overflow-hidden border border-primary-100 dark:border-primary-800 flex-shrink-0">
+        <div v-if="user?.foto" class="w-9 h-9 rounded-full overflow-hidden border border-[#C5E3F7] dark:border-[#04355C] flex-shrink-0">
           <img :src="user.foto" class="w-full h-full object-cover" />
         </div>
-        <div v-else class="w-9 h-9 rounded-full bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-xs  text-primary-600 dark:text-primary-300 border border-primary-100 dark:border-primary-800 flex-shrink-0">
+        <div v-else class="w-9 h-9 rounded-full bg-[#E8F4FC] dark:bg-[#032645]/40 flex items-center justify-center text-xs  text-[#08558A] dark:text-[#6DB5E5] border border-[#C5E3F7] dark:border-[#04355C] flex-shrink-0">
           {{ user?.nama?.charAt(0)?.toUpperCase() || 'U' }}
         </div>
         <div v-if="!collapsed" class="min-w-0">

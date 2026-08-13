@@ -65,7 +65,7 @@ onUnmounted(() => {
     <div class="px-3 sm:px-4 flex items-center justify-between h-[26px]">
       <!-- Left: Logo & App Name -->
       <NuxtLink to="/admin" class="flex items-center gap-1.5 min-w-0">
-        <div class="w-4 h-4 bg-primary-50 dark:bg-primary-900/40 flex items-center justify-center text-primary-600 dark:text-primary-300 text-[9px]  flex-shrink-0 overflow-hidden rounded-full border border-primary-100 dark:border-primary-800">
+        <div class="w-4 h-4 bg-[#E8F4FC] dark:bg-[#032645]/40 flex items-center justify-center text-[#08558A] dark:text-[#6DB5E5] text-[9px]  flex-shrink-0 overflow-hidden rounded-full border border-[#C5E3F7] dark:border-[#04355C]">
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain" />
           <span v-else>{{ t('app.aplikasiSkoria').charAt(0) }}</span>
         </div>

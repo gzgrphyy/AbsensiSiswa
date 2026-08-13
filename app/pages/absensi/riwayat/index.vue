@@ -40,14 +40,14 @@ const displayData = computed(() => history.value || [])
         <table class="w-full text-sm">
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700">
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Tanggal</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Mapel</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Waktu</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden sm:table-cell">Kelas</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Total</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Hadir</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider hidden md:table-cell">S/I/A</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs uppercase tracking-wider">Detail</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Tanggal</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Mapel</th>
+              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden sm:table-cell">Waktu</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden sm:table-cell">Kelas</th>
+              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Total</th>
+              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Hadir</th>
+              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden md:table-cell">S/I/A</th>
+              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Detail</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
