@@ -27,6 +27,7 @@ const adminMenus = computed<MenuItem[]>(() => [
     label: t('nav.dataMaster'), icon: 'master-data',
     children: [
       { label: t('nav.dataPtk'), to: '/admin/guru' },
+      { label: t('nav.dataPtkPendamping'), to: '/admin/ptk-pendamping' },
       { label: t('nav.dataMurid'), to: '/admin/siswa' },
       { label: t('nav.dataKelas'), to: '/admin/kelas' },
       { label: t('nav.tahunAjaran'), to: '/admin/tahun-ajaran' },

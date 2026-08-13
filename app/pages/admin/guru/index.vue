@@ -210,23 +210,13 @@ async function copyPassword() {
 
 <template>
   <AppLayout>
-    <PageHeader :title="t('admin.guru.title')" :description="t('admin.guru.desc')">
-      <template #actions>
-        <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 active:bg-blue-800 text-sm ">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          <span class="hidden sm:inline">{{ t('admin.guru.tambahPtk') }}</span>
-        </button>
-      </template>
-    </PageHeader>
+    <PageHeader :title="t('admin.guru.title')" :description="t('admin.guru.desc')" />
 
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
 
     <!-- Filter -->
-      <div class="flex items-center gap-3 mb-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div class="relative flex-1 max-w-xs">
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -234,7 +224,7 @@ async function copyPassword() {
           <input v-model="searchQuery" type="text" :placeholder="t('admin.guru.searchPlaceholder')"
             class="w-full pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
-        <div class="flex items-center justify-end ml-auto">
+        <div class="flex items-center gap-3">
         <label class="inline-flex items-center gap-2 cursor-pointer select-none group">
           <span class="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-colors">{{ t('admin.guru.tampilkanNonaktif') }}</span>
           <button
@@ -253,6 +243,13 @@ async function copyPassword() {
             />
           </button>
         </label>
+        <button @click="openCreate"
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 active:bg-blue-800 text-sm ">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="hidden sm:inline">{{ t('admin.guru.tambahPtk') }}</span>
+        </button>
       </div>
       </div>
 

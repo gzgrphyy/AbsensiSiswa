@@ -10,16 +10,18 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { kelasId, ruanganId, mapel, guruId, hari, jamMulai, jamSelesai } = result.data
+  const { kelasId, ruanganId, mapel, guruId, ptkPendampingId, hari, jamMulai, jamSelesai } = result.data
 
-  const [kelas, ruangan, guru] = await Promise.all([
+  const [kelas, ruangan, guru, pen] = await Promise.all([
     prisma.kelas.findUnique({ where: { id: kelasId } }),
     prisma.ruangan.findUnique({ where: { id: ruanganId } }),
-    prisma.user.findFirst({ where: { id: guruId, role: 'GURU' } })
+    prisma.user.findFirst({ where: { id: guruId, role: 'GURU' } }),
+    ptkPendampingId ? prisma.ptkPendamping.findUnique({ where: { id: ptkPendampingId } }) : Promise.resolve(null)
   ])
   if (!kelas) throw createError({ statusCode: 404, statusMessage: 'Kelas tidak ditemukan' })
   if (!ruangan) throw createError({ statusCode: 404, statusMessage: 'Ruangan tidak ditemukan' })
   if (!guru) throw createError({ statusCode: 404, statusMessage: 'Guru tidak ditemukan' })
+  if (ptkPendampingId && !pen) throw createError({ statusCode: 404, statusMessage: 'PTK pendamping tidak ditemukan' })
 
   const bentrok = await prisma.jadwalPelajaran.findMany({
     where: {
@@ -42,11 +44,21 @@ export default defineEventHandler(async (event) => {
   }
 
   return await prisma.jadwalPelajaran.create({
-    data: { kelasId, ruanganId, mapel, guruId, hari: hari as any, jamMulai, jamSelesai },
+    data: {
+      kelasId,
+      ruanganId,
+      mapel,
+      guruId,
+      ...(ptkPendampingId ? { ptkPendampingId } : {}),
+      hari: hari as any,
+      jamMulai,
+      jamSelesai
+    },
     include: {
       kelas: { select: { id: true, nama: true } },
       ruangan: { select: { id: true, nama: true } },
-      guru: { select: { id: true, nama: true, nip: true } }
+      guru: { select: { id: true, nama: true, nip: true } },
+      ptkPendamping: { select: { id: true, nama: true } }
     }
   })
 })

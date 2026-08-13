@@ -7,6 +7,7 @@ const NAMA_DEPAN_PRI = ['Agus', 'Bambang', 'Catur', 'Dedi', 'Eko', 'Fajar', 'Gun
 const NAMA_DEPAN_WANITA = ['Ayu', 'Dewi', 'Eka', 'Fitri', 'Gita', 'Hesti', 'Intan', 'Juwita', 'Kartika', 'Lestari', 'Maya', 'Nia', 'Ovi', 'Putri', 'Ratna', 'Sari', 'Tika', 'Umi', 'Vina', 'Wulan', 'Yuni', 'Zulaikha', 'Annisa', 'Citra', 'Dinda', 'Farah', 'Nabila', 'Salsabila', 'Zahra', 'Rahma']
 const NAMA_BELAKANG = ['Pratama', 'Santoso', 'Wijaya', 'Nugroho', 'Saputra', 'Hidayat', 'Kurniawan', 'Susanto', 'Setiawan', 'Ramadhan', 'Firdaus', 'Maulana', 'Purnama', 'Utami', 'Permata', 'Anggraini', 'Wulandari', 'Saputri', 'Gunawan', 'Haryanto', 'Subekti', 'Prasetyo']
 const GELAR_PTK = ['S.Pd.', 'M.Pd.', 'S.Kom.', 'S.Si.', 'S.E.', 'S.Pd.I.', 'M.T.']
+const KETERANGAN_PTK = ['Pendamping Mapel Matematika', 'Pendamping Mapel Bahasa Indonesia', 'Pendamping Mapel Bahasa Inggris', 'Pendamping Mapel Fisika', 'Pendamping Mapel Kimia', 'Pendamping Mapel Biologi', 'Pendamping Mapel Ekonomi', 'Pendamping Mapel Geografi', 'Pendamping Mapel Sejarah', 'Asisten Praktikum Lab Komputer', 'Asisten Praktikum Lab IPA', 'Pendamping Kelas Khusus', 'Pendamping Kegiatan Ekstrakurikuler', 'Pendamping Pembinaan Karakter', 'Pendamping Literasi Perpustakaan']
 
 function rand<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
@@ -26,6 +27,19 @@ function generatePtk(i: number) {
     email: `${slugify(namaDepan)}.${slugify(namaBelakang)}-${i}@sekolah.sch.id`,
     nomorHp1: `0812${String(10000000 + i).padStart(8, '0')}`,
     nomorHp2: Math.random() < 0.3 ? `0857${String(50000000 + i).padStart(8, '0')}` : null
+  }
+}
+
+function generatePtkPendamping(i: number) {
+  const pria = Math.random() < 0.5
+  const namaDepan = pria ? rand(NAMA_DEPAN_PRI) : rand(NAMA_DEPAN_WANITA)
+  const namaBelakang = rand(NAMA_BELAKANG)
+  return {
+    nama: `${namaDepan} ${namaBelakang}, ${rand(GELAR_PTK)}`,
+    nip: `1990${String(1000000000 + i).padStart(10, '0')}`,
+    nomorHp: Math.random() < 0.8 ? `0859${String(60000000 + i).padStart(8, '0')}` : null,
+    keterangan: rand(KETERANGAN_PTK),
+    isActive: i < 28
   }
 }
 
@@ -50,6 +64,7 @@ async function main() {
   await prisma.izin.deleteMany()
   await prisma.sesiAbsensi.deleteMany()
   await prisma.jadwalPelajaran.deleteMany()
+  await prisma.ptkPendamping.deleteMany()
   await prisma.siswa.deleteMany()
   await prisma.kelas.deleteMany()
   await prisma.ruangan.deleteMany()
@@ -140,6 +155,25 @@ async function main() {
   }
 
   console.log(`✓ ${gurus.length} PTK dibuat`)
+
+  // ============================================
+  // PTK PENDAMPING (30 data)
+  // ============================================
+  const ptkPendampingCount = 30
+  for (let i = 0; i < ptkPendampingCount; i++) {
+    const p = generatePtkPendamping(i)
+    await prisma.ptkPendamping.create({
+      data: {
+        nama: p.nama,
+        nip: p.nip,
+        nomorHp: p.nomorHp,
+        keterangan: p.keterangan,
+        isActive: p.isActive
+      }
+    })
+  }
+
+  console.log(`✓ ${ptkPendampingCount} PTK pendamping dibuat`)
 
   // ============================================
   // KELAS
@@ -413,6 +447,7 @@ async function main() {
   console.log('  GURU  : semua guru password: Guru123')
   console.log('  SISWA : semua siswa password: Siswa123')
   console.log(`  PTK   : ${gurus.length} orang`)
+  console.log(`  PTK Pendamping : ${ptkPendampingCount} orang`)
   console.log(`  Kelas : ${kelasList.length} kelas`)
   console.log(`  Murid : ${idx} siswa`)
   console.log(`  Ruangan: ${ruanganData.length} ruangan`)
