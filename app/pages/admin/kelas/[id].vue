@@ -31,8 +31,31 @@ const { data: kelas, pending, error } = useFetch<KelasDetail>(`/api/admin/kelas/
 })
 
 const semesterLabel = (s: string) => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
-const totalSiswa = computed(() => kelas.value?.siswa.length || 0)
+const allSiswa = computed(() => kelas.value?.siswa || [])
+const totalSiswa = computed(() => allSiswa.value.length)
 const totalJadwal = computed(() => kelas.value?._count.jadwalPelajaran || 0)
+
+const searchSiswa = ref('')
+const filteredSiswa = computed(() => {
+  const q = searchSiswa.value.trim().toLowerCase()
+  if (!q) return allSiswa.value
+  return allSiswa.value.filter(s =>
+    s.nama.toLowerCase().includes(q) ||
+    s.nisn.toLowerCase().includes(q) ||
+    (s.namaWali || '').toLowerCase().includes(q)
+  )
+})
+
+const page = ref(1)
+const pageSize = 10
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredSiswa.value.length / pageSize)))
+const visibleSiswa = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return filteredSiswa.value.slice(start, start + pageSize)
+})
+
+watch(searchSiswa, () => { page.value = 1 })
 </script>
 
 <template>
@@ -57,7 +80,7 @@ const totalJadwal = computed(() => kelas.value?._count.jadwalPelajaran || 0)
         <div class="flex items-center gap-3 mb-4">
           <div class="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex-shrink-0">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13v-1m4 1v-3m4 3V8M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
             </svg>
           </div>
           <div class="min-w-0 flex-1">
@@ -88,9 +111,18 @@ const totalJadwal = computed(() => kelas.value?._count.jadwalPelajaran || 0)
 
       <!-- Siswa Table -->
       <div class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
-        <div class="px-4 sm:px-6 py-3 border-b admin-accent-border flex items-center justify-between gap-3">
-          <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ t('admin.kelas.daftarMurid') }}</h2>
-          <span class="text-xs text-gray-400 dark:text-gray-500">{{ totalSiswa }} {{ t('admin.siswa.unitMurid') }}</span>
+        <div class="px-4 sm:px-6 py-3 border-b admin-accent-border flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ t('admin.kelas.daftarMurid') }}</h2>
+            <span class="text-xs text-gray-400 dark:text-gray-500">{{ totalSiswa }} {{ t('admin.siswa.unitMurid') }}</span>
+          </div>
+          <div class="relative w-full sm:w-56">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input v-model="searchSiswa" type="text" :placeholder="t('admin.siswa.searchPlaceholder')"
+              class="w-full pl-9 pr-3 py-1.5 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+          </div>
         </div>
         <div class="overflow-x-auto scrollbar-thin">
           <table class="w-full text-sm">
@@ -105,8 +137,8 @@ const totalJadwal = computed(() => kelas.value?._count.jadwalPelajaran || 0)
               </tr>
             </thead>
             <tbody class="divide-y admin-accent-divide">
-              <tr v-for="(s, idx) in kelas.siswa" :key="s.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
-                <td class="px-4 py-3 text-gray-400 dark:text-gray-500">{{ idx + 1 }}</td>
+              <tr v-for="(s, idx) in visibleSiswa" :key="s.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+                <td class="px-4 py-3 text-gray-400 dark:text-gray-500">{{ ((page - 1) * pageSize) + idx + 1 }}</td>
                 <td class="px-4 py-3">
                   <span class="text-gray-900 dark:text-gray-100">{{ s.nama }}</span>
                   <div class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ s.nisn }}</div>
@@ -120,16 +152,44 @@ const totalJadwal = computed(() => kelas.value?._count.jadwalPelajaran || 0)
                   </BaseBadge>
                 </td>
               </tr>
-              <tr v-if="kelas.siswa.length === 0">
+              <tr v-if="filteredSiswa.length === 0">
                 <td colspan="6" class="px-4 py-16 text-center">
                   <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
-                  <p class="text-gray-500 dark:text-gray-400">{{ t('admin.kelas.emptyMurid') }}</p>
+                  <p class="text-gray-500 dark:text-gray-400">{{ allSiswa.length === 0 ? t('admin.kelas.emptyMurid') : t('admin.kelas.emptySearch') }}</p>
                 </td>
               </tr>
             </tbody>
           </table>
+        </div>
+        <div v-if="filteredSiswa.length > pageSize" class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, filteredSiswa.length), total: filteredSiswa.length, unit: t('admin.siswa.unitMurid') }) }}
+          </p>
+          <div class="ml-auto flex items-center gap-2">
+            <button
+              @click="page--"
+              :disabled="page <= 1"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              {{ t('common.sebelumnya') }}
+            </button>
+            <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages }) }}</span>
+            <button
+              @click="page++"
+              :disabled="page >= totalPages"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {{ t('common.selanjutnya') }}
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </template>

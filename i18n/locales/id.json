@@ -220,6 +220,7 @@
       "colJadwal": "Jadwal Pelajaran",
       "daftarMurid": "Daftar Murid",
       "emptyMurid": "Belum ada murid di kelas ini",
+      "emptySearch": "Tidak ada murid yang cocok",
       "msgGagalDetail": "Gagal memuat detail kelas"
     },
     "jadwal": {
@@ -313,6 +314,7 @@
       "aktifkanTitle": "Aktifkan {name}",
       "hapusTitle": "Hapus {name}",
       "sedangAktif": "Sedang aktif",
+      "tambahAjaran": "Tambah Ajaran",
       "modalCreate": "Tambah Tahun Ajaran",
       "modalEdit": "Edit Tahun Ajaran",
       "labelNama": "Nama Tahun Ajaran",

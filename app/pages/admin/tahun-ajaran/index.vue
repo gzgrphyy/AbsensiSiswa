@@ -168,17 +168,17 @@ function promptDelete(item: TahunAjaran) {
 
 <template>
   <AppLayout>
-    <PageHeader :title="t('admin.tahunAjaran.title')" :description="t('admin.tahunAjaran.desc')">
-      <template #actions>
-        <button @click="openCreate"
-          class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 active:bg-primary-800 text-sm ">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          <span class="hidden sm:inline">{{ t('common.tambah') }}</span>
-        </button>
-      </template>
-    </PageHeader>
+    <PageHeader :title="t('admin.tahunAjaran.title')" :description="t('admin.tahunAjaran.desc')" />
+
+    <div class="flex flex-wrap items-center justify-end gap-3 mb-4">
+      <button @click="openCreate"
+        class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm ">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="hidden sm:inline">{{ t('admin.tahunAjaran.tambahAjaran') }}</span>
+      </button>
+    </div>
 
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />

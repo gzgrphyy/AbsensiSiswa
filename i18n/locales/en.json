@@ -220,6 +220,7 @@
       "colJadwal": "Class Schedule",
       "daftarMurid": "Student List",
       "emptyMurid": "No students in this class yet",
+      "emptySearch": "No matching students",
       "msgGagalDetail": "Failed to load class details"
     },
     "jadwal": {
@@ -313,6 +314,7 @@
       "aktifkanTitle": "Activate {name}",
       "hapusTitle": "Delete {name}",
       "sedangAktif": "Currently active",
+      "tambahAjaran": "Add Academic Year",
       "modalCreate": "Add Academic Year",
       "modalEdit": "Edit Academic Year",
       "labelNama": "Academic Year Name",
