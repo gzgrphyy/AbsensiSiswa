@@ -23,6 +23,8 @@ const hariLabel = (h: string) => t('hari.' + h)
 
 const searchQuery = ref('')
 const filterKelasId = ref<number | undefined>(undefined)
+const page = ref(1)
+const pageSize = 10
 
 const { data: jadwalList, pending, refresh } = useFetch<Jadwal[]>('/api/admin/jadwal-pelajaran', {
   immediate: true
@@ -37,6 +39,14 @@ const filteredJadwal = computed(() => {
   })
 })
 
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredJadwal.value.length / pageSize)))
+const visibleData = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return filteredJadwal.value.slice(start, start + pageSize)
+})
+
+watch([searchQuery, filterKelasId], () => { page.value = 1 })
+
 const showModal = ref(false)
 const editing = ref<Jadwal | null>(null)
 const form = ref({ mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0, ptkPendampingId: 0 })
@@ -46,6 +56,38 @@ const successMsg = ref('')
 const confirmDelete = ref<{ id: number; mapel: string } | null>(null)
 const confirmClose = ref(false)
 const dirtyForm = ref(false)
+
+// Aturan 1 pendamping = 1 mapel per kelas: peta pendamping -> kombinasi mapel|kelas yang dipakai
+const pendampingUsage = computed(() => {
+  const map = new Map<number, Set<string>>()
+  for (const j of jadwalList.value || []) {
+    if (!j.ptkPendamping?.id) continue
+    if (editing.value && j.id === editing.value.id) continue
+    const key = `${j.mapel}__${j.kelas.id}`
+    if (!map.has(j.ptkPendamping.id)) map.set(j.ptkPendamping.id, new Set())
+    map.get(j.ptkPendamping.id)!.add(key)
+  }
+  return map
+})
+
+const availablePendamping = computed(() => {
+  const mapel = form.value.mapel.trim()
+  const kelasId = form.value.kelasId
+  if (!mapel || !kelasId) return ptkPendampingList.value || []
+  const key = `${mapel}__${kelasId}`
+  return (ptkPendampingList.value || []).filter(p => {
+    const usage = pendampingUsage.value.get(p.id)
+    if (!usage || usage.size === 0) return true
+    return usage.has(key)
+  })
+})
+
+// Jika mapel/kelas berubah dan pendamping yang dipilih tidak lagi cocok, reset pilihan
+watch([() => form.value.mapel, () => form.value.kelasId], () => {
+  if (form.value.ptkPendampingId && !availablePendamping.value.some(p => p.id === form.value.ptkPendampingId)) {
+    form.value.ptkPendampingId = 0
+  }
+})
 
 function showError(msg: string) {
   errorMsg.value = msg
@@ -183,7 +225,7 @@ async function handleDelete() {
             </tr>
           </thead>
           <tbody class="divide-y admin-accent-divide">
-            <tr v-for="item in filteredJadwal" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+            <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
               <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
               <td class="px-4 py-3">
                 <BaseBadge variant="blue" size="sm">{{ hariLabel(item.hari) }}</BaseBadge>
@@ -218,6 +260,34 @@ async function handleDelete() {
             </tr>
           </tbody>
         </table>
+      </div>
+      <div v-if="filteredJadwal.length > pageSize" class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
+        <p class="text-xs text-gray-400 dark:text-gray-500">
+          {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, filteredJadwal.length), total: filteredJadwal.length, unit: t('admin.jadwal.unitJadwal') }) }}
+        </p>
+        <div class="ml-auto flex items-center gap-2">
+          <button
+            @click="page--"
+            :disabled="page <= 1"
+            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            {{ t('common.sebelumnya') }}
+          </button>
+          <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages }) }}</span>
+          <button
+            @click="page++"
+            :disabled="page >= totalPages"
+            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {{ t('common.selanjutnya') }}
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -281,8 +351,11 @@ async function handleDelete() {
           <select v-model="form.ptkPendampingId" @change="onFormChange"
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
             <option :value="0">{{ t('admin.jadwal.tanpaPendamping') }}</option>
-            <option v-for="p in ptkPendampingList" :key="p.id" :value="p.id">{{ p.nama }}</option>
+            <option v-for="p in availablePendamping" :key="p.id" :value="p.id">{{ p.nama }}</option>
           </select>
+          <p v-if="ptkPendampingList?.length && availablePendamping.length === 0" class="mt-1 text-xs text-amber-600 dark:text-amber-400">
+            {{ t('admin.jadwal.pendampingPenuh') }}
+          </p>
         </BaseFormField>
       </form>
       <template #footer>

@@ -252,7 +252,9 @@
       "msgBerhasilHapus": "Jadwal berhasil dihapus",
       "confirmDeleteTitle": "Hapus Jadwal",
       "confirmDeleteMsg": "Yakin ingin menghapus jadwal {mapel}?",
-      "searchPlaceholder": "Cari mata pelajaran..."
+      "searchPlaceholder": "Cari mata pelajaran...",
+      "unitJadwal": "jadwal",
+      "pendampingPenuh": "Semua PTK pendamping sudah mendampingi mapel/kelas lain. Hapus dulu pemakaiannya agar bisa dipilih."
     },
     "ptkPendamping": {
       "title": "Data PTK Pendamping",

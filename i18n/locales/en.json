@@ -252,7 +252,9 @@
       "msgBerhasilHapus": "Schedule deleted successfully",
       "confirmDeleteTitle": "Delete Schedule",
       "confirmDeleteMsg": "Are you sure you want to delete the {mapel} schedule?",
-      "searchPlaceholder": "Search subjects..."
+      "searchPlaceholder": "Search subjects...",
+      "unitJadwal": "schedules",
+      "pendampingPenuh": "All companion teachers are already assigned to another subject/class. Remove their current assignment first to select them."
     },
     "ptkPendamping": {
       "title": "Companion Teachers Data",

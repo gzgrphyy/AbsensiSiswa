@@ -389,7 +389,20 @@ async function main() {
   }
 
   // Mapel yang didampingi PTK pendamping (praktikum/lab)
-  const MAPEL_PENDAMPING = new Set(['Informatika', 'Fisika', 'Kimia', 'Biologi', 'Prakarya & Kewirausahaan', 'Dasar Program Keahlian'])
+  // 4 mapel × 6 kelas = 24 kombinasi, muat dalam 28 pendamping aktif
+  const MAPEL_PENDAMPING = new Set(['Informatika', 'Fisika', 'Kimia', 'Biologi'])
+
+  // Aturan: 1 pendamping = 1 mapel per kelas. Tiap (mapel, kelas) dapat pendamping unik.
+  const pendampingByMapelKelas = new Map<string, number>()
+  let pendampingCounter = 0
+  function getPendampingId(mapel: string, kelasIdx: number) {
+    const key = `${mapel}|${kelasIdx}`
+    if (!pendampingByMapelKelas.has(key)) {
+      pendampingByMapelKelas.set(key, pendampingCounter % 28)
+      pendampingCounter++
+    }
+    return ptkPendampingList[pendampingByMapelKelas.get(key)!].id
+  }
 
   const MAPEL_PER_HARI: Record<string, string[]> = {
     SENIN: ['Pendidikan Agama', 'Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Informatika'],
@@ -465,9 +478,8 @@ async function main() {
         const mapel = mapels[(s + offset) % mapels.length]
         const guruIdx = (k * 5 + s + HARI_URUTAN.indexOf(hari)) % gurus.length
         const ruanganId = RUANG_KHUSUS[mapel] ?? ruangKelasUtama[k].id
-        // Hanya pakai pendamping yang aktif (28 pertama)
         const ptkPendampingId = MAPEL_PENDAMPING.has(mapel)
-          ? ptkPendampingList[(k * 4 + s) % 28].id
+          ? getPendampingId(mapel, k)
           : null
         jadwalData.push({
           kelasIdx: k,
