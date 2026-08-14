@@ -17,13 +17,28 @@ const { t } = useI18n()
 
 const showInactive = ref(false)
 const searchQuery = ref('')
+const sortOrder = ref('')
 const page = ref(1)
 const pageSize = 10
 
-const totalPages = computed(() => Math.max(1, Math.ceil((data.value || []).length / pageSize)))
+function toggleSort() {
+  sortOrder.value = sortOrder.value === 'abjad' ? '' : 'abjad'
+  page.value = 1
+}
+
+// Urutan data: abjad = A-Z, default (off) = nama terpendek dari server
+const displayData = computed(() => {
+  const rows = data.value || []
+  if (sortOrder.value === 'abjad') {
+    return rows.slice().sort((a, b) => a.nama.localeCompare(b.nama))
+  }
+  return rows
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(displayData.value.length / pageSize)))
 const visibleData = computed(() => {
   const start = (page.value - 1) * pageSize
-  return (data.value || []).slice(start, start + pageSize)
+  return displayData.value.slice(start, start + pageSize)
 })
 
 watch([showInactive, searchQuery], () => { page.value = 1 })
@@ -217,12 +232,30 @@ async function copyPassword() {
 
     <!-- Filter -->
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <div class="relative flex-1 max-w-xs">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input v-model="searchQuery" type="text" :placeholder="t('admin.guru.searchPlaceholder')"
-            class="w-full pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="relative flex-1 max-w-xs">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input v-model="searchQuery" type="text" :placeholder="t('admin.guru.searchPlaceholder')"
+              class="w-full pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+          </div>
+          <button
+            role="switch"
+            :aria-checked="sortOrder === 'abjad'"
+            @click="toggleSort()"
+            :class="sortOrder === 'abjad'
+              ? 'bg-blue-600 text-white ring-1 ring-blue-300'
+              : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700'"
+            class="inline-flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            :title="t('admin.guru.namaAz')">
+            <span :class="sortOrder === 'abjad' ? 'bg-white/20' : 'bg-gray-200 dark:bg-slate-600'"
+              class="relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-200">
+              <span :class="sortOrder === 'abjad' ? 'translate-x-[18px]' : 'translate-x-[2px]'"
+                class="inline-block h-3.5 w-3.5 transform rounded-full bg-white dark:bg-slate-300 shadow-sm transition-all duration-200" />
+            </span>
+            <span>{{ t('admin.guru.namaAz') }}</span>
+          </button>
         </div>
         <div class="flex items-center gap-3">
         <label class="inline-flex items-center gap-2 cursor-pointer select-none group">
@@ -369,12 +402,13 @@ async function copyPassword() {
                   </div>
                 </td>
               </tr>
+
             </tbody>
           </table>
         </div>
-        <div v-if="(data || []).length > pageSize" class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
+        <div v-if="displayData.length > pageSize" class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
           <p class="text-xs text-gray-400 dark:text-gray-500">
-            {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, (data || []).length), total: (data || []).length, unit: t('admin.guru.unitPtk') }) }}
+            {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, displayData.length), total: displayData.length, unit: t('admin.guru.unitPtk') }) }}
           </p>
           <div class="ml-auto flex items-center gap-2">
             <button
