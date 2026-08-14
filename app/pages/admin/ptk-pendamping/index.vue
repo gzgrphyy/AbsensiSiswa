@@ -249,7 +249,7 @@ async function handleToggleActive() {
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.nomorHp || '-' }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.keterangan || '-' }}</td>
               <td class="px-4 py-3 text-center">
-                <BaseBadge :variant="item.isActive ? 'green' : 'gray'" size="sm" :dot="item.isActive" :pulse="item.isActive">
+                <BaseBadge :variant="item.isActive ? 'green' : 'gray'" size="sm" :dot="item.isActive">
                   {{ item.isActive ? t('admin.tahunAjaran.aktif') : t('admin.tahunAjaran.tidakAktif') }}
                 </BaseBadge>
               </td>

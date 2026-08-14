@@ -208,7 +208,6 @@ function aksiLabel(aksi: string) {
                     <BaseBadge
                       :variant="item.status === 'Aktif' ? 'green' : 'gray'"
                       :dot="item.status === 'Aktif'"
-                      :pulse="item.status === 'Aktif'"
                     >
                       {{ statusLabel(item.status) }}
                     </BaseBadge>

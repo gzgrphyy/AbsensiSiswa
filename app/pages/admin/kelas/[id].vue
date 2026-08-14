@@ -147,7 +147,7 @@ watch(searchSiswa, () => { page.value = 1 })
                 <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden md:table-cell">{{ s.nomorHp1 || s.nomorHp2 || '-' }}</td>
                 <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ s.namaWali || '-' }}</td>
                 <td class="px-4 py-3 text-center hidden xl:table-cell">
-                  <BaseBadge :variant="s.user?.isActive ? 'green' : 'gray'" size="sm" :dot="s.user?.isActive" :pulse="s.user?.isActive">
+                  <BaseBadge :variant="s.user?.isActive ? 'green' : 'gray'" size="sm" :dot="s.user?.isActive">
                     {{ s.user?.isActive ? t('admin.tahunAjaran.aktif') : t('admin.tahunAjaran.tidakAktif') }}
                   </BaseBadge>
                 </td>

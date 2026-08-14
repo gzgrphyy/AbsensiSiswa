@@ -254,7 +254,7 @@ function ruanganUrl(item: Ruangan) {
                   <span class="text-gray-600 dark:text-gray-300 ">{{ item._count.jadwalPelajaran }}</span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
-                  <BaseBadge :variant="item.sesiAktif ? 'green' : 'gray'" size="sm" :dot="item.sesiAktif" :pulse="item.sesiAktif">
+                  <BaseBadge :variant="item.sesiAktif ? 'green' : 'gray'" size="sm" :dot="item.sesiAktif">
                     {{ item.sesiAktif ? t('admin.ruangan.sesiAktif') : t('admin.ruangan.sesiTidakAda') }}
                   </BaseBadge>
                 </td>

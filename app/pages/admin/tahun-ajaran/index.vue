@@ -232,7 +232,7 @@ function promptDelete(item: TahunAjaran) {
                   <span class="text-gray-600 ">{{ item._count.kelas }}</span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
-                  <BaseBadge :variant="item.isActive ? 'green' : 'gray'" size="sm" :dot="item.isActive" :pulse="item.isActive">
+                  <BaseBadge :variant="item.isActive ? 'green' : 'gray'" size="sm" :dot="item.isActive">
                     {{ item.isActive ? t('admin.tahunAjaran.aktif') : t('admin.tahunAjaran.tidakAktif') }}
                   </BaseBadge>
                 </td>
