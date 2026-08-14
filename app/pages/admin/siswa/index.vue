@@ -17,13 +17,28 @@ const { t } = useI18n()
 
 const searchQuery = ref('')
 const filterKelas = ref(0)
+const sortOrder = ref('')
 const page = ref(1)
 const pageSize = 10
 
-const totalPages = computed(() => Math.max(1, Math.ceil((siswaList.value || []).length / pageSize)))
+function toggleSort() {
+  sortOrder.value = sortOrder.value === 'abjad' ? '' : 'abjad'
+  page.value = 1
+}
+
+// Urutan data: abjad = A-Z, default (off) = urutan dari server
+const displayData = computed(() => {
+  const rows = siswaList.value || []
+  if (sortOrder.value === 'abjad') {
+    return rows.slice().sort((a, b) => a.nama.localeCompare(b.nama))
+  }
+  return rows
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(displayData.value.length / pageSize)))
 const visibleData = computed(() => {
   const start = (page.value - 1) * pageSize
-  return (siswaList.value || []).slice(start, start + pageSize)
+  return displayData.value.slice(start, start + pageSize)
 })
 
 watch([searchQuery, filterKelas], () => { page.value = 1 })
@@ -205,6 +220,22 @@ async function copyPassword() {
           <option :value="0">{{ t('admin.jadwal.semuaKelas') }}</option>
           <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
+        <button
+          role="switch"
+          :aria-checked="sortOrder === 'abjad'"
+          @click="toggleSort()"
+          :class="sortOrder === 'abjad'
+            ? 'bg-blue-600 text-white ring-1 ring-blue-300'
+            : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700'"
+          class="inline-flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+          :title="t('admin.siswa.namaAz')">
+          <span :class="sortOrder === 'abjad' ? 'bg-white/20' : 'bg-gray-200 dark:bg-slate-600'"
+            class="relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-200">
+            <span :class="sortOrder === 'abjad' ? 'translate-x-[18px]' : 'translate-x-[2px]'"
+              class="inline-block h-3.5 w-3.5 transform rounded-full bg-white dark:bg-slate-300 shadow-sm transition-all duration-200" />
+          </span>
+          <span>{{ t('admin.siswa.namaAz') }}</span>
+        </button>
       </div>
       <button @click="openCreate"
         class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm ">
