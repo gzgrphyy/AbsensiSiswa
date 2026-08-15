@@ -5,7 +5,7 @@ interface Jadwal {
   hari: string
   jamMulai: string
   jamSelesai: string
-  kelas: { id: number; nama: string }
+  kelas: { id: number; nama: string; ptkPendamping?: { nama: string } | null }
   ruangan: { id: number; nama: string }
   guru: { id: number; nama: string }
 }
@@ -171,7 +171,7 @@ async function handleDelete() {
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
 
-    <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="7" />
+    <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="8" />
 
     <div v-else class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
       <div class="overflow-x-auto scrollbar-thin">
@@ -184,6 +184,7 @@ async function handleDelete() {
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.jadwal.colKelas') }}</th>
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.jadwal.colRuangan') }}</th>
                 <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">{{ t('admin.jadwal.colPtk') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden xl:table-cell">{{ t('admin.jadwal.colPtkPendamping') }}</th>
               <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
             </tr>
           </thead>
@@ -197,6 +198,7 @@ async function handleDelete() {
               <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.kelas.nama }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.ruangan.nama }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.guru.nama }}</td>
+              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden xl:table-cell">{{ item.kelas.ptkPendamping?.nama || '-' }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
                   <button @click="openEdit(item)" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-gray-100 rounded-md" :title="t('common.edit')">
@@ -213,7 +215,7 @@ async function handleDelete() {
               </td>
             </tr>
             <tr v-if="filteredJadwal.length === 0">
-              <td colspan="7" class="px-4 py-16 text-center">
+              <td colspan="8" class="px-4 py-16 text-center">
                 <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>

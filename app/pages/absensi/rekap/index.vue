@@ -142,59 +142,67 @@ const rataPersentase = computed(() =>
       </BaseCard>
 
       <BaseCard id="jadwal-minggu" class="mt-5 scroll-mt-24">
-        <div class="flex items-end justify-between mb-3">
+        <div class="flex items-end justify-between mb-4">
           <h2 class="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">Jadwal Minggu Ini</h2>
         </div>
 
-        <div
-          v-if="!hasWeeklyJadwal"
-          class="py-8 px-6 text-center"
-        >
+        <div v-if="!hasWeeklyJadwal" class="py-8 px-6 text-center">
           <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Belum ada jadwal untuk minggu ini.</p>
         </div>
 
-        <div
-          v-else
-          class="space-y-5"
-        >
+        <div v-else class="space-y-4">
           <template v-for="h in hariOrder" :key="h">
-            <section v-if="groupedJadwal[h] && groupedJadwal[h].length > 0" class="flex flex-col gap-2">
-              <div class="flex items-center gap-2">
-                <h3
-                  class="text-sm font-bold"
-                  :class="h === todayName ? 'text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300'"
-                >
-                  {{ hariLabels[h] }}
-                </h3>
-                <span class="text-xs font-medium text-gray-400 dark:text-gray-500">{{ hariDateLabel(h) }}</span>
-                <span
-                  v-if="h === todayName"
-                  class="text-[10px] font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 px-1.5 py-0.5 rounded-full"
-                >
-                  Hari ini
-                </span>
+            <div
+              v-if="groupedJadwal[h] && groupedJadwal[h].length > 0"
+              class="rounded-xl border overflow-hidden shadow-card dark:shadow-dark-card transition-shadow"
+              :class="h === todayName
+                ? 'border-primary-200 dark:border-primary-800 ring-2 ring-primary-500/30'
+                : 'border-gray-100 dark:border-slate-700'"
+            >
+              <div
+                class="flex items-center justify-between px-5 py-3.5 border-b"
+                :class="h === todayName
+                  ? 'border-primary-100 dark:border-primary-800 bg-primary-50 dark:bg-primary-900/20'
+                  : 'border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800'"
+              >
+                <div class="flex items-center gap-3">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ hariLabels[h] }}</h3>
+                      <span
+                        v-if="h === todayName"
+                        class="text-[10px] font-semibold text-primary-600 dark:text-primary-400 bg-white dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 px-1.5 py-0.5 rounded-full"
+                      >
+                        Hari ini
+                      </span>
+                    </div>
+                    <p class="text-xs text-gray-400 dark:text-gray-500">{{ hariDateLabel(h) }}</p>
+                  </div>
+                </div>
+                <BaseBadge variant="gray" size="sm">{{ groupedJadwal[h].length }} mapel</BaseBadge>
               </div>
 
-              <div
-                class="rounded-xl divide-y divide-gray-100 dark:divide-slate-700"
-                :class="h === todayName ? 'bg-primary-50/30 dark:bg-primary-900/10' : ''"
-              >
+              <div class="divide-y divide-gray-100 dark:divide-slate-700">
                 <div
                   v-for="ij in groupedJadwal[h]"
                   :key="ij.id"
-                  class="flex items-center gap-3 px-3.5 py-2.5"
+                  class="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors"
                 >
-                  <div class="w-16 flex-shrink-0 text-center">
-                    <p class="text-xs font-semibold text-gray-900 dark:text-gray-100 leading-none">{{ ij.jamMulai }}</p>
-                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-none">{{ ij.jamSelesai }}</p>
+                  <div class="text-center flex-shrink-0 w-16">
+                    <p class="text-xs font-bold text-gray-900 dark:text-gray-100 leading-none">{{ ij.jamMulai }}</p>
+                    <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1 leading-none">&ndash; {{ ij.jamSelesai }}</p>
                   </div>
+                  <div class="w-1 h-1 rounded-full bg-gray-300 dark:bg-slate-600 flex-shrink-0"></div>
                   <div class="min-w-0 flex-1">
                     <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ ij.mapel }}</h4>
                     <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ ij.kelas.nama }} · {{ ij.ruangan.nama }}</p>
                   </div>
+                  <div class="flex-shrink-0 hidden sm:block">
+                    <BaseBadge variant="blue" size="sm">{{ ij.kelas.nama }}</BaseBadge>
+                  </div>
                 </div>
               </div>
-            </section>
+            </div>
           </template>
         </div>
       </BaseCard>

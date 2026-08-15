@@ -28,6 +28,7 @@ const { data: riwayat, pending } = useFetch<RiwayatItem[]>('/api/siswa/riwayat',
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Tanggal</th>
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Mata Pelajaran</th>
               <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden sm:table-cell">Kelas</th>
+              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs hidden sm:table-cell">Jam</th>
               <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Status</th>
             </tr>
           </thead>
@@ -36,6 +37,9 @@ const { data: riwayat, pending } = useFetch<RiwayatItem[]>('/api/siswa/riwayat',
               <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ new Date(item.tanggal).toLocaleDateString('id-ID') }}</td>
               <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
               <td class="px-4 py-3 text-gray-600 dark:text-gray-400 hidden sm:table-cell">{{ item.kelas }}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 hidden sm:table-cell whitespace-nowrap">
+                {{ item.scannedAt ? new Date(item.scannedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-' }}
+              </td>
               <td class="px-4 py-3 text-center">
                 <BaseBadge :variant="statusBadgeVariant[item.status] || 'gray'">
                   {{ statusLabels[item.status] || item.status }}
@@ -43,7 +47,7 @@ const { data: riwayat, pending } = useFetch<RiwayatItem[]>('/api/siswa/riwayat',
               </td>
             </tr>
             <tr v-if="riwayat.length === 0">
-              <td colspan="4" class="px-4 py-16 text-center">
+              <td colspan="5" class="px-4 py-16 text-center">
                 <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada riwayat absensi</p>
               </td>
             </tr>

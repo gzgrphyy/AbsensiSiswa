@@ -59,25 +59,30 @@ function isActive(to: string) {
       <!-- Bar -->
       <div class="grid grid-cols-5 bg-white/95 dark:bg-slate-800/95 backdrop-blur border-t border-gray-200 dark:border-slate-700 shadow-[0_-6px_20px_rgb(0_0_0_/_0.05)] dark:shadow-[0_-6px_20px_rgb(0_0_0_/_0.35)]">
         <template v-for="item in items" :key="item.label">
-          <div v-if="item.fab" class="h-[52px]" aria-hidden="true" />
+          <div v-if="item.fab" class="h-[60px]" aria-hidden="true" />
           <NuxtLink
             v-else
             :to="item.to"
-            class="flex flex-col items-center justify-end gap-1 pt-2.5 h-[52px] pb-[calc(0.375rem+env(safe-area-inset-bottom))] active:bg-gray-50 dark:active:bg-slate-700/50 transition-colors"
+            class="relative flex flex-col items-center justify-end gap-1.5 pt-1.5 h-[60px] pb-[calc(0.375rem+env(safe-area-inset-bottom))] active:bg-gray-50 dark:active:bg-slate-700/50 transition-colors"
           >
             <span
-              class="w-9 h-6 flex items-center justify-center rounded-full"
-              :class="isActive(item.to) ? 'bg-primary-50 dark:bg-primary-900/40' : ''"
+              v-if="isActive(item.to)"
+              class="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-primary-500 dark:bg-primary-400"
+              aria-hidden="true"
+            />
+            <span
+              class="w-11 h-7 flex items-center justify-center rounded-full transition-colors"
+              :class="isActive(item.to) ? 'bg-primary-500 dark:bg-primary-500 text-white shadow-md shadow-primary-500/30' : ''"
             >
               <svg
-                class="w-5 h-5"
-                :class="isActive(item.to) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 dark:text-gray-500'"
+                class="w-6 h-6"
+                :class="isActive(item.to) ? 'text-white' : 'text-gray-400 dark:text-gray-500'"
                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" :d="item.icon" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
               </svg>
             </span>
-            <span class="text-[10px] leading-none" :class="isActive(item.to) ? 'text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-400 dark:text-gray-500'">
+            <span class="text-[11px] leading-none" :class="isActive(item.to) ? 'text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-400 dark:text-gray-500'">
               {{ item.label }}
             </span>
           </NuxtLink>

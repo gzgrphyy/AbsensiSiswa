@@ -242,6 +242,7 @@
       "colKelas": "Class",
       "colRuangan": "Room",
       "colPtk": "Teacher",
+      "colPtkPendamping": "Companion Teacher",
       "empty": "No class schedule yet",
       "modalCreate": "Add New Schedule",
       "modalEdit": "Edit Schedule",

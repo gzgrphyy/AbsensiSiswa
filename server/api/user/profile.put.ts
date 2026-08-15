@@ -8,6 +8,7 @@ const guruSchema = z.object({
 
 const siswaSchema = z.object({
   nama: z.preprocess(v => v === '' ? undefined : v, z.string().min(1).max(100).optional()),
+  email: z.string().email('Email tidak valid').max(150).optional(),
   namaWali: z.string().max(100).nullable().optional(),
   kontakWali: z.string().max(20).nullable().optional(),
   foto: z.string().nullable().optional()
@@ -71,6 +72,13 @@ export default defineEventHandler(async (event) => {
 
       const updateUser: Record<string, unknown> = {}
       if (parsed.foto !== undefined) updateUser.foto = parsed.foto
+      if (parsed.email) {
+        const existing = await prisma.user.findUnique({ where: { email: parsed.email } })
+        if (existing && existing.id !== user.id) {
+          throw createError({ statusCode: 400, statusMessage: 'Email sudah digunakan' })
+        }
+        updateUser.email = parsed.email
+      }
 
       if (Object.keys(updateUser).length > 0) {
         await prisma.user.update({ where: { id: user.id }, data: updateUser })

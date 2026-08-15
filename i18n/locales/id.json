@@ -242,6 +242,7 @@
       "colKelas": "Kelas",
       "colRuangan": "Ruangan",
       "colPtk": "PTK",
+      "colPtkPendamping": "PTK Pendamping",
       "empty": "Belum ada jadwal pelajaran",
       "modalCreate": "Tambah Jadwal Baru",
       "modalEdit": "Edit Jadwal",
