@@ -32,10 +32,9 @@ function isActive(to: string) {
           class="w-16 h-16 rounded-full bg-accent-500 text-primary-900 flex flex-col items-center justify-center gap-0.5 shadow-xl shadow-accent-500/50 ring-4 transition-transform duration-150 hover:scale-105 active:scale-95"
           :class="isActive('/siswa/scan') ? 'ring-primary-100 dark:ring-primary-900' : 'ring-white dark:ring-slate-900'"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
           </svg>
-          <span class="text-[9px] font-bold leading-none">Scan</span>
         </span>
       </NuxtLink>
 
@@ -49,17 +48,18 @@ function isActive(to: string) {
         <span
           class="w-16 h-16 rounded-full bg-gray-200 dark:bg-slate-600 text-gray-400 dark:text-gray-300 flex flex-col items-center justify-center gap-0.5 ring-4 ring-gray-100 dark:ring-slate-800 cursor-not-allowed"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
           </svg>
-          <span class="text-[9px] font-bold leading-none">Scan</span>
         </span>
       </span>
 
       <!-- Bar -->
       <div class="grid grid-cols-5 bg-white/95 dark:bg-slate-800/95 backdrop-blur border-t border-gray-200 dark:border-slate-700 shadow-[0_-6px_20px_rgb(0_0_0_/_0.05)] dark:shadow-[0_-6px_20px_rgb(0_0_0_/_0.35)]">
         <template v-for="item in items" :key="item.label">
-          <div v-if="item.fab" class="h-[60px]" aria-hidden="true" />
+          <div v-if="item.fab" class="flex flex-col items-center justify-end h-[60px] pb-[calc(0.375rem+env(safe-area-inset-bottom))]" aria-hidden="true">
+            <span class="text-[11px] leading-none" :class="isActive('/siswa/scan') ? 'text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-420 dark:text-gray-500'">Scan</span>
+          </div>
           <NuxtLink
             v-else
             :to="item.to"

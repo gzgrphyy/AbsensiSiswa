@@ -543,12 +543,23 @@ const statusLabels: Record<string, string> = {
           </svg>
           <div>
             <p class="text-sm font-medium text-blue-800 dark:text-blue-200">Tips Scan QR</p>
-            <ul class="mt-1 text-xs text-blue-700 dark:text-blue-300 space-y-1">
-              <li>&bull; Pastikan pencahayaan ruangan cukup.</li>
-              <li>&bull; Izinkan akses kamera pada browser.</li>
-              <li>&bull; Buka aplikasi melalui localhost (Laptop/PC) atau HTTPS (Smartphone). <span class="font-mono bg-white dark:bg-slate-700 px-1 rounded">localhost</span> atau pastikan browser sudah memberi izin kamera</li>
-              <li>&bull; Arahkan kamera ke bagian tengah QR Code. </li>
-              <li>&bull; Tunggu beberapa saat hingga QR Code terbaca otomatis.</li>
+<ul class="mt-1.5 space-y-1.5 text-xs text-blue-700 dark:text-blue-300">
+              <li class="flex items-start gap-2">
+                <span class="mt-1.5 w-1 h-1 rounded-full bg-blue-400 dark:bg-blue-500 flex-shrink-0"></span>
+                <span>Pastikan pencahayaan ruangan cukup.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-1.5 w-1 h-1 rounded-full bg-blue-400 dark:bg-blue-500 flex-shrink-0"></span>
+                <span>Izinkan akses kamera pada browser.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-1.5 w-1 h-1 rounded-full bg-blue-400 dark:bg-blue-500 flex-shrink-0"></span>
+                <span>Arahkan kamera ke bagian tengah QR Code.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="mt-1.5 w-1 h-1 rounded-full bg-blue-400 dark:bg-blue-500 flex-shrink-0"></span>
+                <span>Tunggu beberapa saat hingga QR Code terbaca otomatis.</span>
+              </li>
             </ul>
           </div>
         </div>

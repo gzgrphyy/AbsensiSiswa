@@ -55,6 +55,33 @@ const totalSiswa = computed(() => sesi.value?.allSiswa.length || 0)
 const persentaseHadir = computed(() =>
   totalSiswa.value ? Math.round((statusCount.value.HADIR / totalSiswa.value) * 100) : 0
 )
+
+const searchQuery = ref('')
+const statusFilter = ref('')
+const displaySiswa = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  const all = sesi.value?.allSiswa || []
+  let filtered = !q
+    ? all
+    : all.filter(s => s.nama.toLowerCase().includes(q) || s.nisn.toLowerCase().includes(q))
+  if (statusFilter.value) {
+    filtered = filtered.filter(s => statusOf(s) === statusFilter.value)
+  }
+  return [...filtered].sort((a, b) =>
+    a.nama.length - b.nama.length || a.nama.localeCompare(b.nama)
+  )
+})
+
+const page = ref(1)
+const pageSize = 10
+const totalPages = computed(() => Math.max(1, Math.ceil(displaySiswa.value.length / pageSize)))
+const visibleSiswa = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return displaySiswa.value.slice(start, start + pageSize)
+})
+
+watch([searchQuery, statusFilter], () => { page.value = 1 })
+watch(totalPages, () => { if (page.value > totalPages.value) page.value = totalPages.value })
 </script>
 
 <template>
@@ -158,6 +185,27 @@ const persentaseHadir = computed(() =>
         </div>
       </div>
 
+      <!-- Search & Filter -->
+      <div class="mb-3 flex flex-wrap items-center gap-2">
+        <div class="relative max-w-xs flex-1 min-w-[200px]">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input v-model="searchQuery" type="text" placeholder="Cari nama atau NISN..."
+            class="w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+        </div>
+        <select v-model="statusFilter"
+          class="px-3 py-2 border border-gray-200 dark:border-slate-700 rounded-xl text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+          <option value="">Semua Status</option>
+          <option value="HADIR">Hadir</option>
+          <option value="SAKIT">Sakit</option>
+          <option value="IZIN">Izin</option>
+          <option value="ALPHA">Alpha</option>
+          <option value="PENDING">Menunggu</option>
+          <option value="BELUM">Belum Absen</option>
+        </select>
+      </div>
+
       <!-- Siswa Table -->
       <div class="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
         <div class="overflow-x-auto scrollbar-thin">
@@ -172,7 +220,10 @@ const persentaseHadir = computed(() =>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-              <tr v-for="s in sesi.allSiswa" :key="s.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+              <tr v-if="displaySiswa.length === 0">
+                <td colspan="5" class="px-3 py-12 text-center text-sm text-gray-400 dark:text-gray-500">Tidak ada murid ditemukan</td>
+              </tr>
+              <tr v-for="s in visibleSiswa" :key="s.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-3 py-3">
                   <span class="font-medium text-gray-900 dark:text-gray-100">{{ s.nama }}</span>
                 </td>
@@ -210,6 +261,34 @@ const persentaseHadir = computed(() =>
               </tr>
             </tbody>
           </table>
+        </div>
+        <div v-if="displaySiswa.length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-100 dark:border-slate-700 flex items-center justify-between gap-3">
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            Menampilkan {{ ((page - 1) * pageSize) + 1 }}-{{ Math.min(page * pageSize, displaySiswa.length) }} dari {{ displaySiswa.length }} murid
+          </p>
+          <div class="ml-auto flex items-center gap-2">
+            <button
+              @click="page--"
+              :disabled="page <= 1"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              Sebelumnya
+            </button>
+            <span class="text-xs text-gray-400 dark:text-gray-500">Halaman {{ page }} dari {{ totalPages }}</span>
+            <button
+              @click="page++"
+              :disabled="page >= totalPages"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Selanjutnya
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </template>

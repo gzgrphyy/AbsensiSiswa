@@ -62,7 +62,7 @@ onMounted(() => {
               }">
               <div class="flex items-center gap-3">
                 <div class="w-2 h-2 rounded-full" :class="hari === todayHari ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'"></div>
-                <span class="font-semibold text-gray-900 dark:text-gray-100">{{ hariLabel[hari] || hari }}</span>
+                <span class="font-semibold text-gray-900 dark:text-gray-100 w-16 shrink-0">{{ hariLabel[hari] || hari }}</span>
                 <span class="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">{{ data.grouped[hari].length }} mapel</span>
               </div>
               <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': activeDay === hari }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -73,7 +73,7 @@ onMounted(() => {
             <div v-show="activeDay === hari" class="divide-y divide-gray-50 dark:divide-slate-700/50">
               <div v-for="item in data.grouped[hari]" :key="item.id"
                 class="px-5 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
-                <div class="flex items-center gap-4 min-w-0">
+                <div class="flex items-start gap-4 min-w-0">
                   <div class="text-center flex-shrink-0 w-14">
                     <p class="text-xs font-bold text-gray-900 dark:text-gray-100">{{ item.jamMulai }}</p>
                     <p class="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{{ item.jamSelesai }}</p>

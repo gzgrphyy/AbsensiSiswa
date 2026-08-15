@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
           select: {
             id: true,
             nama: true,
-            waliKelas: { select: { id: true, nama: true } }
+            waliKelas: { select: { id: true, nama: true, nomorHp1: true } }
           }
         }
       }
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
           isActive: true,
           kelasId: siswa.kelasId
         },
-        select: { id: true, nama: true },
+        select: { id: true, nama: true, nomorHp: true },
         orderBy: { nama: 'asc' }
       })
       return {

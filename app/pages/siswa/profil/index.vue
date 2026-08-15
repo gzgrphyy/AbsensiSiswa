@@ -9,10 +9,10 @@ interface ProfileData {
   nisn?: string
   namaSiswa?: string
   kelas?: { id: number; nama: string }
-  waliKelas?: { id: number; nama: string } | null
+  waliKelas?: { id: number; nama: string; nomorHp1?: string | null }
   namaWali?: string | null
   kontakWali?: string | null
-  ptkPendamping?: { id: number; nama: string }[]
+  ptkPendamping?: { id: number; nama: string; nomorHp?: string | null }[]
 }
 
 const { data: profile, refresh } = useFetch<ProfileData>('/api/user/profile', { immediate: true })
@@ -38,6 +38,10 @@ const fotoFile = ref<File | null>(null)
 const fotoPreview = ref<string | null>(null)
 const fotoUploading = ref(false)
 const showEditModal = ref(false)
+
+const hasWaliPendamping = computed(() =>
+  !!(profile.value?.namaWali || profile.value?.kontakWali || profile.value?.waliKelas || profile.value?.ptkPendamping?.length)
+)
 
 const pwErrorMsg = ref('')
 const pwSuccessMsg = ref('')
@@ -188,7 +192,7 @@ async function handleChangePassword() {
     <!-- Header Profil ala GoPay -->
     <BaseCard class="text-center">
       <div class="flex flex-col items-center">
-        <div class="relative">
+        <div>
           <div v-if="fotoPreview || profile?.foto"
             class="w-24 h-24 rounded-full overflow-hidden border-2 border-primary-200 dark:border-primary-800 shadow-md">
             <img :src="fotoPreview || profile?.foto" class="w-full h-full object-cover" />
@@ -197,17 +201,6 @@ async function handleChangePassword() {
             class="w-24 h-24 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center text-primary-700 dark:text-primary-300 text-4xl font-bold">
             {{ (profile?.namaSiswa || profile?.nama || 'S').charAt(0).toUpperCase() }}
           </div>
-          <button
-            type="button"
-            @click="openEditModal"
-            :title="'Ganti Profil'"
-            class="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-primary-500 hover:bg-primary-600 flex items-center justify-center cursor-pointer shadow-md border-2 border-white dark:border-slate-700 transition-colors"
-          >
-            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </button>
         </div>
 
         <h2 class="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">{{ profile?.namaSiswa || profile?.nama || '-' }}</h2>
@@ -227,74 +220,82 @@ async function handleChangePassword() {
       </div>
     </BaseCard>
 
-    <!-- Nama Wali -->
+    <!-- Wali & Pendamping -->
     <BaseCard class="mt-6">
       <div class="flex items-center gap-2 mb-4">
-        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+          <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
         </svg>
-        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Nama Wali</h3>
+        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Wali & Pendamping</h3>
       </div>
 
-      <div v-if="profile?.namaWali || profile?.kontakWali" class="flex flex-wrap gap-2">
-        <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-sm text-gray-800 dark:text-gray-200">
-          <span class="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
-            {{ (profile?.namaWali || '?').charAt(0).toUpperCase() }}
-          </span>
-          {{ profile?.namaWali || '-' }}
-        </span>
-        <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-sm text-gray-800 dark:text-gray-200">
-          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-          </svg>
-          {{ profile?.kontakWali || '-' }}
-        </span>
-      </div>
-      <p v-else class="text-sm text-gray-500 dark:text-gray-400">Belum ada data wali.</p>
-    </BaseCard>
+      <div v-if="hasWaliPendamping" class="divide-y-[0.5px] divide-gray-100 dark:divide-slate-700/60">
+        <!-- Wali murid -->
+        <div v-if="profile?.namaWali || profile?.kontakWali" class="flex items-center gap-3 py-3">
+          <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-400 dark:text-gray-500 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+              <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ profile?.namaWali || '-' }}</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500">Wali murid</p>
+          </div>
+          <a v-if="profile?.kontakWali" :href="'tel:' + profile.kontakWali" :title="profile.kontakWali"
+            class="flex-shrink-0 w-9 h-9 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+          </a>
+        </div>
 
-    <!-- PTK Kelas -->
-    <BaseCard class="mt-6">
-      <div class="flex items-center gap-2 mb-4">
-        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">PTK Wali Kelas</h3>
-      </div>
+        <!-- Wali kelas -->
+        <div v-if="profile?.waliKelas" class="flex items-center gap-3 py-3">
+          <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-400 dark:text-gray-500 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 19h-3a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v11a1 1 0 0 1 -1 1" />
+              <path d="M11 16m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v1a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ profile.waliKelas.nama }}</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500">Wali kelas</p>
+          </div>
+          <a v-if="profile?.waliKelas?.nomorHp1" :href="'tel:' + profile.waliKelas.nomorHp1" :title="profile.waliKelas.nomorHp1"
+            class="flex-shrink-0 w-9 h-9 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+          </a>
+        </div>
 
-      <div v-if="profile?.waliKelas" class="flex flex-wrap gap-2">
-        <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-sm text-gray-800 dark:text-gray-200">
-          <span class="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
-            {{ profile.waliKelas.nama.charAt(0).toUpperCase() }}
-          </span>
-          {{ profile.waliKelas.nama }}
-        </span>
+        <!-- Guru pendamping -->
+        <div v-for="p in profile?.ptkPendamping || []" :key="p.id" class="flex items-center gap-3 py-3">
+          <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-400 dark:text-gray-500 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+              <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ p.nama }}</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500">Guru pendamping</p>
+          </div>
+          <a v-if="p.nomorHp" :href="'tel:' + p.nomorHp" :title="p.nomorHp"
+            class="flex-shrink-0 w-9 h-9 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+          </a>
+        </div>
       </div>
-      <p v-else class="text-sm text-gray-500 dark:text-gray-400">Belum ada wali kelas untuk kelas kamu.</p>
-    </BaseCard>
-
-    <!-- PTK Pendamping Kelas -->
-    <BaseCard class="mt-6">
-      <div class="flex items-center gap-2 mb-4">
-        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">PTK Pendamping </h3>
-      </div>
-
-      <div v-if="profile?.ptkPendamping?.length" class="flex flex-wrap gap-2">
-        <span
-          v-for="p in profile.ptkPendamping"
-          :key="p.id"
-          class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-sm text-gray-800 dark:text-gray-200"
-        >
-          <span class="w-7 h-7 rounded-full bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
-            {{ p.nama.charAt(0).toUpperCase() }}
-          </span>
-          {{ p.nama }}
-        </span>
-      </div>
-      <p v-else class="text-sm text-gray-500 dark:text-gray-400">Belum ada PTK pendamping di kelas kamu.</p>
+      <p v-else class="text-sm text-gray-500 dark:text-gray-400">Belum ada data wali & pendamping.</p>
     </BaseCard>
 
     <!-- Ubah Password -->
