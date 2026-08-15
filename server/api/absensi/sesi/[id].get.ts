@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
   if (!sesi) {
     throw createError({ statusCode: 404, statusMessage: 'Sesi tidak ditemukan' })
   }
-  if (sesi.dibukaOleh !== user.id && user.role !== 'ADMIN') {
+  if (sesi.jadwal.guruId !== user.id && user.role !== 'ADMIN') {
     throw createError({ statusCode: 403, statusMessage: 'Akses ditolak' })
   }
 

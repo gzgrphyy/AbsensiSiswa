@@ -44,7 +44,7 @@ const adminMenus = computed<MenuItem[]>(() => [
 
 const guruMenus = computed<MenuItem[]>(() => [
   { label: t('nav.beranda'), to: '/absensi', icon: 'dashboard' },
-  { label: t('nav.bukaSesiKelas'), to: '/absensi', icon: 'sesi' },
+  { label: t('nav.scanQr'), to: '/absensi/scan', icon: 'scan' },
   { label: t('nav.riwayatAbsensi'), to: '/absensi/riwayat', icon: 'riwayat' },
   { label: t('nav.rekapAbsensi'), to: '/absensi/rekap', icon: 'rekap' },
   { label: t('nav.exportLaporan'), to: '/absensi/export', icon: 'export' },

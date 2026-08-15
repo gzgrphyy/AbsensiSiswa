@@ -12,10 +12,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Data murid tidak ditemukan' })
   }
 
-  const today = new Date(new Date().toISOString().split('T')[0])
+  const now = new Date()
 
-  const count = await prisma.sesiAbsensi.count({
-    where: { tanggal: today, jadwal: { kelasId: siswa.kelasId } }
+  const count = await prisma.jadwalPelajaran.count({
+    where: { kelasId: siswa.kelasId, hari: hariIni(now) as any }
   })
 
   return { adaSesi: count > 0 }

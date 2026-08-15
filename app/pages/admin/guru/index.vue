@@ -245,14 +245,14 @@ async function copyPassword() {
             :aria-checked="sortOrder === 'abjad'"
             @click="toggleSort()"
             :class="sortOrder === 'abjad'
-              ? 'bg-blue-600 text-white ring-1 ring-blue-300'
+              ? 'bg-blue-600 text-white ring-1 ring-blue-300 shadow-sm'
               : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700'"
-            class="inline-flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            :title="t('admin.guru.namaAz')">
-            <span :class="sortOrder === 'abjad' ? 'bg-white/20' : 'bg-gray-200 dark:bg-slate-600'"
-              class="relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-200">
-              <span :class="sortOrder === 'abjad' ? 'translate-x-[18px]' : 'translate-x-[2px]'"
-                class="inline-block h-3.5 w-3.5 transform rounded-full bg-white dark:bg-slate-300 shadow-sm transition-all duration-200" />
+            class="inline-flex items-center gap-2.5 pl-3 pr-4 h-[38px] rounded-lg text-sm font-medium transition-colors select-none"
+            :title="sortOrder === 'abjad' ? t('admin.guru.namaAz') : t('admin.guru.namaAzOff')">
+            <span :class="sortOrder === 'abjad' ? 'bg-white/25' : 'bg-gray-200 dark:bg-slate-600'"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-200">
+              <span :class="sortOrder === 'abjad' ? 'translate-x-[22px]' : 'translate-x-[3px]'"
+                class="inline-block h-5 w-5 transform rounded-full bg-white dark:bg-slate-300 shadow-md transition-all duration-200" />
             </span>
             <span>{{ t('admin.guru.namaAz') }}</span>
           </button>

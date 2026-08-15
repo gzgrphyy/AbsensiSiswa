@@ -38,7 +38,8 @@
   },
   "app": {
     "sistemAbsensi": "Absensi Waktu Nyata",
-    "aplikasiSkoria": "EduPresensi"
+    "aplikasiSkoria": "EduPresensi",
+    "aplikasiLabel": "Aplikasi"
   },
   "nav": {
     "beranda": "Beranda",
@@ -58,7 +59,7 @@
     "eksporLaporan": "Ekspor Laporan",
     "pengaturan": "Pengaturan",
     "profil": "Profil",
-    "bukaSesiKelas": "Buka Sesi Kelas",
+    "scanQr": "Scan QR",
     "riwayatAbsensi": "Riwayat Absensi",
     "exportLaporan": "Export Laporan",
     "pindaiQr": "Pindai QR",
@@ -94,6 +95,7 @@
       "searchPlaceholder": "Cari murid...",
       "tambahMurid": "Tambah Murid",
       "namaAz": "Nama (A\u2013Z)",
+      "namaAzOff": "Kembali ke urutan default",
       "colNisn": "NISN",
       "colWali": "Wali",
       "empty": "Belum ada data murid",
@@ -126,6 +128,7 @@
       "searchPlaceholder": "Cari PTK...",
       "tampilkanNonaktif": "Tampilkan nonaktif",
       "namaAz": "Nama (A\u2013Z)",
+      "namaAzOff": "Kembali ke urutan default",
       "colNama": "Nama",
       "colEmail": "Email",
       "colNip": "NIP",
@@ -270,6 +273,7 @@
       "desc": "Kelola data PTK pendamping",
       "tambah": "Tambah PTK Pendamping",
       "namaAz": "Nama (A\u2013Z)",
+      "namaAzOff": "Kembali ke urutan default",
       "colNama": "Nama",
       "colNip": "NIP",
       "colNoHp": "No. HP",

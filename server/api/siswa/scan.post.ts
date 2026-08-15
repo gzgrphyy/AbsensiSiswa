@@ -28,131 +28,37 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'QR Code tidak valid' })
   }
 
-  const now = new Date()
-  const today = now.toISOString().split('T')[0]
-  const todayDate = new Date(today)
-  const timeNow = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+  const checkin = await checkinSiswaRuangan(siswa, ruangan.id)
 
-  const activeSesi = await prisma.sesiAbsensi.findFirst({
-    where: {
-      status: 'AKTIF',
-      tanggal: todayDate,
-      jadwal: {
-        ruanganId: ruangan.id,
-        jamMulai: { lte: timeNow },
-        jamSelesai: { gte: timeNow }
-      }
-    },
-    include: {
-      jadwal: {
-        include: {
-          kelas: { select: { id: true, nama: true } },
-          guru: { select: { id: true, nama: true } }
-        }
-      }
-    }
-  })
-
-  if (!activeSesi) {
-    const allTodaySesi = await prisma.sesiAbsensi.findFirst({
-      where: {
-        status: 'AKTIF',
-        tanggal: todayDate,
-        jadwal: { ruanganId: ruangan.id }
-      },
-      include: { jadwal: true }
-    })
-
-    if (allTodaySesi) {
-      return {
-        success: false,
-        message: `Sesi di ruangan ini belum waktunya (jadwal: ${allTodaySesi.jadwal.jamMulai} - ${allTodaySesi.jadwal.jamSelesai})`,
-        ruangan: { id: ruangan.id, nama: ruangan.nama }
-      }
-    }
-
+  if (!checkin.success) {
+    const message = checkin.reason === 'ALL_DONE'
+      ? 'Sesi di ruangan ini hari ini sudah selesai.'
+      : 'Tidak ada jadwal kelasmu di ruangan ini hari ini.'
     return {
       success: false,
-      message: 'Tidak ada sesi aktif di ruangan ini saat ini',
+      message,
       ruangan: { id: ruangan.id, nama: ruangan.nama }
     }
   }
 
-  if (activeSesi.jadwal.kelasId !== siswa.kelasId) {
-    return {
-      success: false,
-      message: `Ruangan ini sedang digunakan oleh kelas ${activeSesi.jadwal.kelas.nama}. Anda bukan anggota kelas ini.`,
-      ruangan: { id: ruangan.id, nama: ruangan.nama },
-      sesi: {
-        id: activeSesi.id,
-        mapel: activeSesi.jadwal.mapel,
-        kelas: activeSesi.jadwal.kelas.nama
-      }
-    }
-  }
-
-  const existingRequest = await prisma.absensiRequest.findUnique({
-    where: {
-      sesiId_siswaId: {
-        sesiId: activeSesi.id,
-        siswaId: siswa.id
-      }
-    }
-  })
-
-  if (existingRequest) {
-    return {
-      success: true,
-      alreadyScanned: true,
-      message: `Kamu sudah melakukan absensi sebelumnya. Status: ${statusLabel(existingRequest.status)}`,
-      status: existingRequest.status,
-      scannedAt: existingRequest.scannedAt,
-      ruangan: { id: ruangan.id, nama: ruangan.nama },
-      sesi: {
-        id: activeSesi.id,
-        mapel: activeSesi.jadwal.mapel,
-        kelas: activeSesi.jadwal.kelas.nama,
-        jamMulai: activeSesi.jadwal.jamMulai,
-        jamSelesai: activeSesi.jadwal.jamSelesai,
-        guru: activeSesi.jadwal.guru.nama
-      }
-    }
-  }
-
-  const absensiRequest = await prisma.absensiRequest.create({
-    data: {
-      sesiId: activeSesi.id,
-      siswaId: siswa.id,
-      scannedAt: now,
-      status: 'PENDING'
-    }
-  })
-
+  const scannedAt = new Date()
   return {
     success: true,
-    alreadyScanned: false,
-    message: 'Absensi berhasil dikirim. Menunggu konfirmasi guru.',
-    status: absensiRequest.status,
-    scannedAt: absensiRequest.scannedAt,
+    alreadyScanned: checkin.alreadyScanned,
+    message: checkin.alreadyScanned
+      ? 'Kamu sudah absen di ruangan ini hari ini.'
+      : `Absensi tercatat untuk ${checkin.jumlahSesi} sesi pelajaran di ruangan ini hari ini. Menunggu konfirmasi guru.`,
+    status: 'PENDING',
+    scannedAt: scannedAt.toISOString(),
     ruangan: { id: ruangan.id, nama: ruangan.nama },
-    sesi: {
-      id: activeSesi.id,
-      mapel: activeSesi.jadwal.mapel,
-      kelas: activeSesi.jadwal.kelas.nama,
-      jamMulai: activeSesi.jadwal.jamMulai,
-      jamSelesai: activeSesi.jadwal.jamSelesai,
-      guru: activeSesi.jadwal.guru.nama
-    }
+    sesi: checkin.info
+      ? {
+          mapel: checkin.info.mapel,
+          kelas: checkin.info.kelas,
+          jamMulai: checkin.info.jamMulai,
+          jamSelesai: checkin.info.jamSelesai,
+          guru: checkin.info.guru
+        }
+      : null
   }
 })
-
-function statusLabel(s: string) {
-  const map: Record<string, string> = {
-    PENDING: 'Menunggu Konfirmasi',
-    HADIR: 'Hadir',
-    SAKIT: 'Sakit',
-    IZIN: 'Izin',
-    ALPHA: 'Alpha'
-  }
-  return map[s] || s
-}

@@ -31,6 +31,23 @@ const { user } = useUserSession()
 
 const { data, pending, error, refresh } = useFetch<DashboardData>('/api/siswa/dashboard')
 
+interface JadwalMingguanItem {
+  id: number
+  mapel: string
+  hari: string
+  jamMulai: string
+  jamSelesai: string
+}
+
+const { data: jadwalMingguan } = useFetch<{ hariOrder: string[]; grouped: Record<string, JadwalMingguanItem[]> }>('/api/siswa/jadwal', { immediate: true })
+
+const totalJadwalMinggu = computed(() =>
+  Object.values(jadwalMingguan.value?.grouped || {}).reduce((a, arr) => a + arr.length, 0)
+)
+const jumlahHariMinggu = computed(() =>
+  Object.keys(jadwalMingguan.value?.grouped || {}).length
+)
+
 const greeting = computed(() => {
   const h = new Date().getHours()
   if (h >= 5 && h < 12) return 'Selamat pagi'
@@ -225,6 +242,23 @@ onMounted(() => {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
         </svg>
         Belum ada sesi
+      </div>
+
+      <!-- Jadwal Minggu Ini -->
+      <div class="mt-4 rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-4 flex flex-col">
+        <p class="text-xs font-medium text-gray-400 dark:text-gray-500">Jadwal Minggu Ini</p>
+        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-1 truncate">
+          {{ totalJadwalMinggu > 0 ? `${totalJadwalMinggu} sesi · ${jumlahHariMinggu} hari` : 'Belum ada' }}
+        </p>
+        <NuxtLink
+          to="/siswa/jadwal"
+          class="mt-2 self-start inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+        >
+          Lihat
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </NuxtLink>
       </div>
 
       <!-- Recent history -->

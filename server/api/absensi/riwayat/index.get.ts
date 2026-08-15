@@ -1,12 +1,13 @@
 export default defineEventHandler(async (event) => {
   const user = (await getUserSession(event)).user!
+  await finalizeExpiredSesi()
 
-  const today = new Date(new Date().toISOString().split('T')[0])
+  const today = todayDate()
 
   const sesiList = await prisma.sesiAbsensi.findMany({
     where: {
-      dibukaOleh: user.id,
-      tanggal: { lte: today }
+      tanggal: { lte: today },
+      jadwal: { guruId: user.id }
     },
     include: {
       jadwal: {

@@ -21,8 +21,8 @@ export default defineEventHandler(async (event) => {
   if (!sesi) {
     throw createError({ statusCode: 404, statusMessage: 'Sesi tidak ditemukan' })
   }
-  if (sesi.dibukaOleh !== user.id) {
-    throw createError({ statusCode: 403, statusMessage: 'Anda tidak membuka sesi ini' })
+  if (sesi.jadwal.guruId !== user.id) {
+    throw createError({ statusCode: 403, statusMessage: 'Anda tidak mengampu sesi ini' })
   }
 
   const result = bodySchema.safeParse(await readBody(event))

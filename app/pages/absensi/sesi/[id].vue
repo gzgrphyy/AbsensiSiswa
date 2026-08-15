@@ -229,15 +229,14 @@ onMounted(() => {
                 <input type="checkbox"
                   :checked="entries.get(s.id)?.checked || false"
                   @change="toggleSiswa(s.id)"
-                  :disabled="sesi.status === 'SELESAI'"
-                  class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-primary-600 dark:bg-slate-700 focus:ring-primary-500 cursor-pointer disabled:cursor-not-allowed" />
+                  class="w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-primary-600 dark:bg-slate-700 focus:ring-primary-500 cursor-pointer" />
               </td>
               <td class="px-3 py-3">
                 <span class="font-medium text-gray-900 dark:text-gray-100">{{ s.nama }}</span>
               </td>
               <td class="px-3 py-3 text-gray-500 dark:text-gray-400 hidden sm:table-cell">{{ s.nisn }}</td>
               <td class="px-3 py-3 text-center">
-                <select v-if="sesi.status === 'AKTIF'"
+                <select
                   v-model="entries.get(s.id)!.status"
                   @change="onStatusChange(s.id)"
                   class="text-xs border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1 focus:ring-2 focus:ring-primary-500 bg-white dark:bg-slate-700 dark:text-gray-100 cursor-pointer">
@@ -247,16 +246,12 @@ onMounted(() => {
                   <option value="IZIN">Izin</option>
                   <option value="ALPHA">Alpha</option>
                 </select>
-                <BaseBadge v-else :variant="statusBadgeVariant[entries.get(s.id)?.status || '']">
-                  {{ statusLabels[entries.get(s.id)?.status || ''] || entries.get(s.id)?.status }}
-                </BaseBadge>
               </td>
               <td class="px-3 py-3 text-center hidden md:table-cell">
-                <input v-if="sesi.status === 'AKTIF'"
+                <input
                   v-model="entries.get(s.id)!.keterangan"
                   type="text" placeholder="-" maxlength="255"
                   class="w-full max-w-[120px] text-xs border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1 focus:ring-2 focus:ring-primary-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-300 dark:placeholder:text-gray-500" />
-                <span v-else class="text-xs text-gray-400 dark:text-gray-500">{{ s.request?.keterangan || '-' }}</span>
               </td>
               <td class="px-3 py-3 text-center hidden md:table-cell">
                 <span v-if="s.request" class="text-xs text-gray-400 dark:text-gray-500">
@@ -270,7 +265,7 @@ onMounted(() => {
       </div>
 
       <!-- Actions -->
-      <div v-if="sesi.status === 'AKTIF'" class="px-5 py-4 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-700/40 flex flex-col sm:flex-row sm:items-center gap-3">
+      <div class="px-5 py-4 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-700/40 flex flex-col sm:flex-row sm:items-center gap-3">
         <p class="text-sm text-gray-500 dark:text-gray-400">
           <strong class="text-gray-700 dark:text-gray-300">{{ entries.size }}</strong> murid —
           <strong class="text-green-600 dark:text-green-400">{{ statusCount.HADIR }}</strong> hadir
@@ -278,7 +273,7 @@ onMounted(() => {
         <button @click="submitKonfirmasi" :disabled="submitting"
           class="w-full sm:w-auto justify-center px-5 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-xl hover:bg-primary-600 active:bg-primary-700 disabled:opacity-50 inline-flex items-center gap-2 shadow-md shadow-primary-500/30 transition-colors">
           <svg v-if="submitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-          {{ submitting ? 'Menyimpan...' : 'Konfirmasi Kehadiran' }}
+          {{ submitting ? 'Menyimpan...' : sesi.status === 'SELESAI' ? 'Simpan Koreksi' : 'Konfirmasi Kehadiran' }}
         </button>
       </div>
     </div>

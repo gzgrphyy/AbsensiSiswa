@@ -1,5 +1,6 @@
 export default defineEventHandler(async (event) => {
-  const today = new Date(new Date().toISOString().split('T')[0])
+  const today = todayDate()
+  await finalizeExpiredSesi()
 
   const [ruangan, allTodaySesi] = await Promise.all([
     prisma.ruangan.findMany(),

@@ -13,10 +13,12 @@ export default defineEventHandler(async (event) => {
   }
 
   const now = new Date()
-  const today = new Date(now.toISOString().split('T')[0])
+  const today = todayDate()
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
 
-  const [todayRequests, monthHadir, monthSakit, monthIzin, monthAlpha, recentHistory, todaySesi] = await Promise.all([
+  await finalizeExpiredSesi()
+
+  const [todayRequests, monthHadir, monthSakit, monthIzin, monthAlpha, recentHistory, todayJadwalCount] = await Promise.all([
     prisma.absensiRequest.findMany({
       where: { siswaId: siswa.id, sesi: { tanggal: today } },
       include: {
@@ -79,9 +81,8 @@ export default defineEventHandler(async (event) => {
       orderBy: { scannedAt: 'desc' },
       take: 5
     }),
-    prisma.sesiAbsensi.findMany({
-      where: { tanggal: today, jadwal: { kelasId: siswa.kelasId } },
-      select: { id: true, status: true }
+    prisma.jadwalPelajaran.count({
+      where: { kelasId: siswa.kelasId, hari: hariIni(now) as any }
     })
   ])
 
@@ -97,7 +98,13 @@ export default defineEventHandler(async (event) => {
   }
 
   if (todayRequests.length > 0) {
-    const latest = todayRequests[0]
+    const tNow = timeToMinutes(currentTimeHHMM(now))
+    const inWindow = todayRequests.find((r) => {
+      const j = r.sesi.jadwal
+      const t = tNow
+      return t >= timeToMinutes(j.jamMulai) - TOLERANSI_MENIT && t <= timeToMinutes(j.jamSelesai) + TOLERANSI_MENIT
+    })
+    const latest = inWindow || todayRequests[0]
     const status = latest.status
     todayStatus = {
       state: status === 'ALPHA' ? 'ALPHA' : status === 'PENDING' ? 'PENDING' : 'PRESENT',
@@ -111,7 +118,7 @@ export default defineEventHandler(async (event) => {
     }
   } else {
     todayStatus = {
-      state: todaySesi.length === 0 ? 'NO_SESSION' : 'NOT_YET',
+      state: todayJadwalCount === 0 ? 'NO_SESSION' : 'NOT_YET',
       status: undefined
     }
   }

@@ -78,6 +78,7 @@ model User {
   kelasWali       Kelas[]           @relation("WaliKelas")
   jadwalPelajaran JadwalPelajaran[] @relation("GuruPengampu")
   sesiDibuka      SesiAbsensi[]     @relation("SesiDibukaOleh")
+  sesiPtkScan     SesiAbsensi[]     @relation("PtkScanner")
   approvedRequests AbsensiRequest[] @relation("ApprovedOleh")
   tanggapanIzin   Izin[]            @relation("PenanggapIzin")
   siswa           Siswa?
@@ -194,14 +195,17 @@ model SesiAbsensi {
   jadwalId   Int        @map("jadwal_id")
   tanggal    DateTime   @db.Date
   status     StatusSesi
-  dibukaOleh Int        @map("dibuka_oleh")
+  dibukaOleh Int?       @map("dibuka_oleh")
+  ptkScanAt  DateTime?  @map("ptk_scan_at")
+  ptkScanBy  Int?       @map("ptk_scan_by")
   createdAt  DateTime   @default(now()) @map("created_at")
   updatedAt  DateTime   @updatedAt @map("updated_at")
   ditutupPada DateTime? @map("ditutup_pada")
 
-  jadwal   JadwalPelajaran @relation(fields: [jadwalId], references: [id])
-  pembuka  User            @relation("SesiDibukaOleh", fields: [dibukaOleh], references: [id])
-  requests AbsensiRequest[]
+  jadwal    JadwalPelajaran @relation(fields: [jadwalId], references: [id])
+  pembuka   User?           @relation("SesiDibukaOleh", fields: [dibukaOleh], references: [id])
+  ptkScanner User?          @relation("PtkScanner", fields: [ptkScanBy], references: [id])
+  requests  AbsensiRequest[]
 
   @@unique([jadwalId, tanggal])
   @@map("sesi_absensi")

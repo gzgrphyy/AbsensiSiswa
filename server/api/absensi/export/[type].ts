@@ -1,13 +1,14 @@
 export default defineEventHandler(async (event) => {
   const type = event.context.params!.type
   const user = (await getUserSession(event)).user!
+  await finalizeExpiredSesi()
 
   switch (type) {
     case 'rekap-saya': {
       const sesiList = await prisma.sesiAbsensi.findMany({
         where: {
-          dibukaOleh: user.id,
-          status: 'SELESAI'
+          status: 'SELESAI',
+          jadwal: { guruId: user.id }
         },
         include: {
           jadwal: {

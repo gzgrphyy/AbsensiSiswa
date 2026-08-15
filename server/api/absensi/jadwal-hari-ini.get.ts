@@ -1,9 +1,11 @@
 export default defineEventHandler(async (event) => {
   const user = (await getUserSession(event)).user!
+  await finalizeExpiredSesi()
+
   const now = new Date()
   const days = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU']
   const todayHari = days[now.getDay()] as any
-  const timeNow = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+  const timeNow = currentTimeHHMM(now)
 
   const jadwals = await prisma.jadwalPelajaran.findMany({
     where: {
@@ -15,7 +17,7 @@ export default defineEventHandler(async (event) => {
       kelas: { select: { id: true, nama: true } },
       ruangan: { select: { id: true, nama: true, qrCode: true } },
       sesi: {
-        where: { tanggal: new Date(now.toISOString().split('T')[0]) },
+        where: { tanggal: todayDate() },
         select: { id: true, status: true }
       }
     }
@@ -23,7 +25,12 @@ export default defineEventHandler(async (event) => {
 
   return jadwals.map(j => ({
     ...j,
-    isWithinTime: j.jamMulai <= timeNow && timeNow <= j.jamSelesai,
+    isWithinTime: (() => {
+      const t = timeToMinutes(timeNow)
+      const start = timeToMinutes(j.jamMulai) - TOLERANSI_MENIT
+      const end = timeToMinutes(j.jamSelesai) + TOLERANSI_MENIT
+      return t >= start && t <= end
+    })(),
     activeSesi: j.sesi.find(s => s.status === 'AKTIF') || null,
     todaySesi: j.sesi[0] || null
   }))

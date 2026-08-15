@@ -45,7 +45,6 @@ const activeSesiList = ref<ActiveSesi[]>([])
 const loading = ref(true)
 const errorMsg = ref('')
 const successMsg = ref('')
-const openingSesi = ref<number | null>(null)
 const closingSesi = ref<number | null>(null)
 const confirmClose = ref<ActiveSesi | null>(null)
 const pendingIzinCount = ref(0)
@@ -113,20 +112,6 @@ async function fetchData() {
   }
 }
 
-async function bukaSesi(jadwalId: number) {
-  openingSesi.value = jadwalId
-  errorMsg.value = ''
-  try {
-    await $fetch('/api/absensi/sesi/buka', { method: 'POST', body: { jadwalId } })
-    showSuccess('Sesi berhasil dibuka')
-    await fetchData()
-  } catch (err: any) {
-    showError(err?.data?.statusMessage || 'Gagal membuka sesi')
-  } finally {
-    openingSesi.value = null
-  }
-}
-
 async function fetchPendingIzin() {
   try {
     const res = await $fetch<{ pendingCount: number }>('/api/absensi/izin')
@@ -178,6 +163,27 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
 
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
+
+    <!-- Scan QR Ruangan -->
+    <NuxtLink
+      to="/absensi/scan"
+      class="mb-4 group flex items-center gap-4 rounded-2xl border border-primary-200 dark:border-primary-800 border-l-4 border-l-primary-500 bg-primary-50/70 dark:bg-primary-900/20 p-4 transition-colors hover:bg-primary-100 dark:hover:bg-primary-900/30"
+    >
+      <div class="flex-shrink-0">
+        <span class="w-11 h-11 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center">
+          <svg class="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7V5a2 2 0 012-2h2m10 0h2a2 2 0 012 2v2m0 10v2a2 2 0 01-2 2h-2m-10 0H5a2 2 0 01-2-2v-2M7 12h4m2 0h.01M7 16h4m2 0h.01M7 8h.01M15 8h.01M15 12h.01M15 16h.01" />
+          </svg>
+        </span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-bold text-primary-800 dark:text-primary-300">Scan QR Ruangan</p>
+        <p class="text-xs text-primary-700/80 dark:text-primary-400/80 mt-0.5">Catat kehadiran PTK di ruangan</p>
+      </div>
+      <svg class="w-4 h-4 text-primary-500 flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </NuxtLink>
 
     <!-- Pengajuan Izin -->
     <NuxtLink
@@ -325,7 +331,7 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
             <div class="w-14 flex-shrink-0 text-center">
               <p class="text-[13px] font-bold text-gray-900 dark:text-gray-100 leading-none">{{ j.jamMulai }}</p>
               <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 leading-none">{{ j.jamSelesai }}</p>
-              <p v-if="j.isWithinTime && !j.todaySesi" class="text-[9px] font-bold text-primary-600 dark:text-primary-400 mt-1 leading-none animate-pulse">Buka</p>
+              <p v-if="j.isWithinTime && !j.todaySesi" class="text-[9px] font-bold text-primary-600 dark:text-primary-400 mt-1 leading-none animate-pulse">Scan</p>
               <p v-else-if="j.todaySesi?.status === 'SELESAI'" class="text-[9px] font-bold text-gray-400 dark:text-gray-500 mt-1 leading-none">Selesai</p>
             </div>
 
@@ -334,27 +340,28 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
               <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ j.kelas.nama }} · {{ j.ruangan.nama }}</p>
             </div>
 
-            <button
-              v-if="!j.todaySesi"
-              @click="bukaSesi(j.id)"
-              :disabled="openingSesi === j.id"
-              class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 active:bg-primary-700 disabled:opacity-50 inline-flex items-center gap-1.5 transition-colors"
-            >
-              <svg v-if="openingSesi === j.id" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-              {{ openingSesi === j.id ? 'Membuka...' : 'Buka Sesi' }}
-            </button>
-            <span
-              v-else-if="j.todaySesi.status === 'SELESAI'"
-              class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700/60 ring-1 ring-gray-200 dark:ring-slate-600"
-            >
-              Selesai
-            </span>
             <NuxtLink
-              v-else-if="j.activeSesi"
+              v-if="j.activeSesi"
               :to="`/absensi/sesi/${j.activeSesi.id}`"
-              class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 inline-flex items-center gap-1 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+              class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 active:bg-primary-700 inline-flex items-center gap-1 transition-colors shadow-sm shadow-primary-500/30"
+            >
+              Konfirmasi
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </NuxtLink>
+            <NuxtLink
+              v-else-if="j.todaySesi?.status === 'SELESAI'"
+              :to="`/absensi/sesi/${j.todaySesi.id}`"
+              class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-slate-700/60 ring-1 ring-gray-200 dark:ring-slate-600 inline-flex items-center gap-1 hover:bg-gray-200 dark:hover:bg-slate-600/60 transition-colors"
             >
               Lihat
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </NuxtLink>
+            <NuxtLink
+              v-else-if="j.isWithinTime"
+              to="/absensi/scan"
+              class="flex-shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 inline-flex items-center gap-1 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors"
+            >
+              Scan QR
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
             </NuxtLink>
           </div>

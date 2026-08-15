@@ -38,7 +38,8 @@
   },
   "app": {
     "sistemAbsensi": "Real-time Attendance",
-    "aplikasiSkoria": "EduPresensi"
+    "aplikasiSkoria": "EduPresensi",
+    "aplikasiLabel": "Application"
   },
   "nav": {
     "beranda": "Home",
@@ -58,7 +59,7 @@
     "eksporLaporan": "Export Reports",
     "pengaturan": "Settings",
     "profil": "Profile",
-    "bukaSesiKelas": "Open Class Session",
+    "scanQr": "Scan QR",
     "riwayatAbsensi": "Attendance History",
     "exportLaporan": "Export Reports",
     "pindaiQr": "Scan QR",
@@ -94,6 +95,7 @@
       "searchPlaceholder": "Search students...",
       "tambahMurid": "Add Student",
       "namaAz": "Name (A\u2013Z)",
+      "namaAzOff": "Back to default order",
       "colNisn": "NISN",
       "colWali": "Guardian",
       "empty": "No student data yet",
@@ -126,6 +128,7 @@
       "searchPlaceholder": "Search teachers...",
       "tampilkanNonaktif": "Show inactive",
       "namaAz": "Name (A\u2013Z)",
+      "namaAzOff": "Back to default order",
       "colNama": "Name",
       "colEmail": "Email",
       "colNip": "NIP",
@@ -270,6 +273,7 @@
       "desc": "Manage companion teachers data",
       "tambah": "Add Companion Teacher",
       "namaAz": "Name (A\u2013Z)",
+      "namaAzOff": "Back to default order",
       "colNama": "Name",
       "colNip": "NIP",
       "colNoHp": "Phone",

@@ -14,6 +14,10 @@ const today = computed(() => new Date().toLocaleDateString(locale.value === 'en'
 const now = ref(new Date())
 let clockTimer: ReturnType<typeof setInterval> | null = null
 
+const appBrandLabel = computed(() =>
+  isAdmin ? `${t('app.aplikasiLabel')} ${t('app.aplikasiSkoria')}` : t('app.aplikasiSkoria')
+)
+
 const currentTime = computed(() =>
   now.value.toLocaleTimeString(locale.value === 'en' ? 'en-GB' : 'id-ID', {
     hour: '2-digit',
@@ -77,7 +81,7 @@ async function handleLogout() {
             {{ t('app.aplikasiSkoria').charAt(0).toUpperCase() }}
           </div>
           <div class="hidden md:block">
-            <p class="text-sm  text-gray-900 dark:text-gray-100 leading-tight">{{ t('app.aplikasiSkoria') }}</p>
+            <p class="text-sm  text-gray-900 dark:text-gray-100 leading-tight">{{ appBrandLabel }}</p>
             <p class="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{{ t('app.sistemAbsensi') }}</p>
           </div>
         </div>

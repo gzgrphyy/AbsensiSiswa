@@ -11,13 +11,13 @@ export default defineEventHandler(async (event) => {
 
   const request = await prisma.absensiRequest.findUnique({
     where: { id },
-    include: { sesi: true }
+    include: { sesi: { include: { jadwal: { select: { guruId: true } } } } }
   })
   if (!request) {
     throw createError({ statusCode: 404, statusMessage: 'Request absensi tidak ditemukan' })
   }
-  if (request.sesi.dibukaOleh !== user.id) {
-    throw createError({ statusCode: 403, statusMessage: 'Anda tidak membuka sesi ini' })
+  if (request.sesi.jadwal.guruId !== user.id) {
+    throw createError({ statusCode: 403, statusMessage: 'Anda tidak mengampu sesi ini' })
   }
 
   const result = bodySchema.safeParse(await readBody(event))
