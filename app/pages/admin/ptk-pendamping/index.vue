@@ -1,6 +1,8 @@
 <script setup lang="ts">
 interface PtkPendamping {
   id: number
+  kelasId: number | null
+  kelas: { id: number; nama: string } | null
   nama: string
   nip: string | null
   nomorHp: string | null
@@ -8,10 +10,11 @@ interface PtkPendamping {
   isActive: boolean
   createdAt: string
   updatedAt: string
-  _count: { jadwalPelajaran: number }
 }
 
 const { t } = useI18n()
+
+const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin/kelas', { immediate: true })
 
 const showInactive = ref(false)
 const searchQuery = ref('')
@@ -50,7 +53,7 @@ const { data, pending, refresh } = useFetch<PtkPendamping[]>(() => {
 
 const showModal = ref(false)
 const editing = ref<PtkPendamping | null>(null)
-const form = ref({ nama: '', nip: '', nomorHp: '', keterangan: '' })
+const form = ref({ kelasId: 0, nama: '', nip: '', nomorHp: '', keterangan: '' })
 const saving = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
@@ -71,7 +74,7 @@ function showSuccess(msg: string) {
 
 function openCreate() {
   editing.value = null
-  form.value = { nama: '', nip: '', nomorHp: '', keterangan: '' }
+  form.value = { kelasId: 0, nama: '', nip: '', nomorHp: '', keterangan: '' }
   errorMsg.value = ''
   dirtyForm.value = false
   showModal.value = true
@@ -80,6 +83,7 @@ function openCreate() {
 function openEdit(item: PtkPendamping) {
   editing.value = item
   form.value = {
+    kelasId: item.kelas?.id || 0,
     nama: item.nama,
     nip: item.nip || '',
     nomorHp: item.nomorHp || '',
@@ -102,6 +106,7 @@ async function handleSave() {
 
   try {
     const body = {
+      kelasId: form.value.kelasId || null,
       nama: form.value.nama,
       nip: form.value.nip || null,
       nomorHp: form.value.nomorHp || null,
@@ -231,6 +236,7 @@ async function handleToggleActive() {
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.ptkPendamping.colNama') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.ptkPendamping.colKelas') }}</th>
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.ptkPendamping.colNip') }}</th>
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.ptkPendamping.colNoHp') }}</th>
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">{{ t('admin.ptkPendamping.colKeterangan') }}</th>
@@ -245,6 +251,10 @@ async function handleToggleActive() {
                 ? 'hover:bg-gray-50 dark:hover:bg-slate-700/30'
                 : 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 border-l-2 border-l-gray-300 dark:border-l-gray-600'">
               <td class="px-4 py-3  text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.isActive }">{{ item.nama }}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-300">
+                <span v-if="item.kelas">{{ item.kelas.nama }}</span>
+                <span v-else class="text-gray-400 dark:text-gray-500">-</span>
+              </td>
               <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.nip || '-' }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.nomorHp || '-' }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.keterangan || '-' }}</td>
@@ -281,7 +291,7 @@ async function handleToggleActive() {
               </td>
             </tr>
             <tr v-if="(data || []).length === 0">
-              <td colspan="6" class="px-4 py-16 text-center">
+              <td colspan="7" class="px-4 py-16 text-center">
                 <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -328,6 +338,15 @@ async function handleToggleActive() {
           <input v-model="form.nama" type="text" @input="onFormChange" required
             :placeholder="t('admin.ptkPendamping.placeholderNama')"
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+        </BaseFormField>
+
+        <BaseFormField :label="t('admin.ptkPendamping.labelKelas')">
+          <select v-model="form.kelasId" @change="onFormChange"
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+            <option :value="0">{{ t('admin.ptkPendamping.pilihKelas') }}</option>
+            <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
+          </select>
+          <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ t('admin.ptkPendamping.kelasHint') }}</p>
         </BaseFormField>
 
         <BaseFormField :label="t('admin.ptkPendamping.labelNip')">

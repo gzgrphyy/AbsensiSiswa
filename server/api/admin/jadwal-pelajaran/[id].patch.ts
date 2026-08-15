@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const existing = await prisma.jadwalPelajaran.findUnique({ where: { id } })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Jadwal pelajaran tidak ditemukan' })
 
-  const { kelasId, ruanganId, mapel, guruId, ptkPendampingId, hari, jamMulai, jamSelesai } = result.data
+  const { kelasId, ruanganId, mapel, guruId, hari, jamMulai, jamSelesai } = result.data
 
   if (kelasId) {
     const k = await prisma.kelas.findUnique({ where: { id: kelasId } })
@@ -30,10 +30,6 @@ export default defineEventHandler(async (event) => {
     const g = await prisma.user.findFirst({ where: { id: guruId, role: 'GURU' } })
     if (!g) throw createError({ statusCode: 404, statusMessage: 'Guru tidak ditemukan' })
   }
-  if (ptkPendampingId) {
-    const p = await prisma.ptkPendamping.findUnique({ where: { id: ptkPendampingId } })
-    if (!p) throw createError({ statusCode: 404, statusMessage: 'PTK pendamping tidak ditemukan' })
-  }
 
   const finalHari = hari ?? existing.hari
   const finalJamMulai = jamMulai ?? existing.jamMulai
@@ -41,32 +37,6 @@ export default defineEventHandler(async (event) => {
   const finalKelasId = kelasId ?? existing.kelasId
   const finalRuanganId = ruanganId ?? existing.ruanganId
   const finalGuruId = guruId ?? existing.guruId
-  const finalMapel = mapel ?? existing.mapel
-  const finalPtkPendampingId = ptkPendampingId !== undefined ? ptkPendampingId : existing.ptkPendampingId
-
-  // Aturan: 1 PTK pendamping hanya boleh mendampingi 1 mapel per kelas
-  if (finalPtkPendampingId) {
-    const pen = await prisma.ptkPendamping.findUnique({ where: { id: finalPtkPendampingId } })
-    if (!pen) throw createError({ statusCode: 404, statusMessage: 'PTK pendamping tidak ditemukan' })
-
-    const pemakaian = await prisma.jadwalPelajaran.findFirst({
-      where: {
-        ptkPendampingId: finalPtkPendampingId,
-        id: { not: id },
-        OR: [
-          { mapel: { not: finalMapel } },
-          { kelasId: { not: finalKelasId } }
-        ]
-      },
-      include: { kelas: { select: { nama: true } } }
-    })
-    if (pemakaian) {
-      throw createError({
-        statusCode: 409,
-        statusMessage: `PTK pendamping "${pen.nama}" sudah mendampingi ${pemakaian.mapel} kelas ${pemakaian.kelas.nama}. Satu pendamping hanya boleh mendampingi 1 mapel per kelas.`
-      })
-    }
-  }
 
   const bentrok = await prisma.jadwalPelajaran.findMany({
     where: {
@@ -96,7 +66,6 @@ export default defineEventHandler(async (event) => {
       ...(ruanganId !== undefined && { ruanganId }),
       ...(mapel !== undefined && { mapel }),
       ...(guruId !== undefined && { guruId }),
-      ...(ptkPendampingId !== undefined && { ptkPendampingId }),
       ...(hari !== undefined && { hari: hari as any }),
       ...(jamMulai !== undefined && { jamMulai }),
       ...(jamSelesai !== undefined && { jamSelesai })
@@ -104,8 +73,7 @@ export default defineEventHandler(async (event) => {
     include: {
       kelas: { select: { id: true, nama: true } },
       ruangan: { select: { id: true, nama: true } },
-      guru: { select: { id: true, nama: true, nip: true } },
-      ptkPendamping: { select: { id: true, nama: true } }
+      guru: { select: { id: true, nama: true, nip: true } }
     }
   })
 })

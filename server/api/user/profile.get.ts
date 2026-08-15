@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
       const ptkPendamping = await prisma.ptkPendamping.findMany({
         where: {
           isActive: true,
-          jadwalPelajaran: { some: { kelasId: siswa.kelasId } }
+          kelasId: siswa.kelasId
         },
         select: { id: true, nama: true },
         orderBy: { nama: 'asc' }

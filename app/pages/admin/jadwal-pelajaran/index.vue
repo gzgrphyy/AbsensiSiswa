@@ -8,14 +8,12 @@ interface Jadwal {
   kelas: { id: number; nama: string }
   ruangan: { id: number; nama: string }
   guru: { id: number; nama: string }
-  ptkPendamping?: { id: number; nama: string } | null
 }
 
 const { t } = useI18n()
 
 const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin/kelas', { immediate: true })
 const { data: guruList } = useFetch<{ id: number; nama: string }[]>('/api/admin/guru', { immediate: true })
-const { data: ptkPendampingList } = useFetch<{ id: number; nama: string }[]>('/api/admin/ptk-pendamping', { immediate: true })
 const { data: ruanganList } = useFetch<{ id: number; nama: string }[]>('/api/admin/ruangan', { immediate: true })
 
 const hariList = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU']
@@ -49,45 +47,13 @@ watch([searchQuery, filterKelasId], () => { page.value = 1 })
 
 const showModal = ref(false)
 const editing = ref<Jadwal | null>(null)
-const form = ref({ mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0, ptkPendampingId: 0 })
+const form = ref({ mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0 })
 const saving = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
 const confirmDelete = ref<{ id: number; mapel: string } | null>(null)
 const confirmClose = ref(false)
 const dirtyForm = ref(false)
-
-// Aturan 1 pendamping = 1 mapel per kelas: peta pendamping -> kombinasi mapel|kelas yang dipakai
-const pendampingUsage = computed(() => {
-  const map = new Map<number, Set<string>>()
-  for (const j of jadwalList.value || []) {
-    if (!j.ptkPendamping?.id) continue
-    if (editing.value && j.id === editing.value.id) continue
-    const key = `${j.mapel}__${j.kelas.id}`
-    if (!map.has(j.ptkPendamping.id)) map.set(j.ptkPendamping.id, new Set())
-    map.get(j.ptkPendamping.id)!.add(key)
-  }
-  return map
-})
-
-const availablePendamping = computed(() => {
-  const mapel = form.value.mapel.trim()
-  const kelasId = form.value.kelasId
-  if (!mapel || !kelasId) return ptkPendampingList.value || []
-  const key = `${mapel}__${kelasId}`
-  return (ptkPendampingList.value || []).filter(p => {
-    const usage = pendampingUsage.value.get(p.id)
-    if (!usage || usage.size === 0) return true
-    return usage.has(key)
-  })
-})
-
-// Jika mapel/kelas berubah dan pendamping yang dipilih tidak lagi cocok, reset pilihan
-watch([() => form.value.mapel, () => form.value.kelasId], () => {
-  if (form.value.ptkPendampingId && !availablePendamping.value.some(p => p.id === form.value.ptkPendampingId)) {
-    form.value.ptkPendampingId = 0
-  }
-})
 
 function showError(msg: string) {
   errorMsg.value = msg
@@ -101,7 +67,7 @@ function showSuccess(msg: string) {
 
 function openCreate() {
   editing.value = null
-  form.value = { mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0, ptkPendampingId: 0 }
+  form.value = { mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0 }
   errorMsg.value = ''
   dirtyForm.value = false
   showModal.value = true
@@ -116,8 +82,7 @@ function openEdit(item: Jadwal) {
     jamSelesai: item.jamSelesai,
     kelasId: item.kelas.id,
     ruanganId: item.ruangan.id,
-    guruId: item.guru.id,
-    ptkPendampingId: item.ptkPendamping?.id || 0
+    guruId: item.guru.id
   }
   errorMsg.value = ''
   dirtyForm.value = false
@@ -142,8 +107,7 @@ async function handleSave() {
       jamSelesai: form.value.jamSelesai,
       kelasId: form.value.kelasId,
       ruanganId: form.value.ruanganId,
-      guruId: form.value.guruId,
-      ptkPendampingId: form.value.ptkPendampingId > 0 ? form.value.ptkPendampingId : null
+      guruId: form.value.guruId
     }
 
     if (editing.value) {
@@ -220,7 +184,6 @@ async function handleDelete() {
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.jadwal.colKelas') }}</th>
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.jadwal.colRuangan') }}</th>
                 <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">{{ t('admin.jadwal.colPtk') }}</th>
-                <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden xl:table-cell">{{ t('admin.jadwal.colPtkPendamping') }}</th>
               <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
             </tr>
           </thead>
@@ -234,7 +197,6 @@ async function handleDelete() {
               <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.kelas.nama }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.ruangan.nama }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.guru.nama }}</td>
-              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden xl:table-cell">{{ item.ptkPendamping?.nama || '-' }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
                   <button @click="openEdit(item)" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-gray-100 rounded-md" :title="t('common.edit')">
@@ -251,7 +213,7 @@ async function handleDelete() {
               </td>
             </tr>
             <tr v-if="filteredJadwal.length === 0">
-              <td colspan="8" class="px-4 py-16 text-center">
+              <td colspan="7" class="px-4 py-16 text-center">
                 <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -347,16 +309,6 @@ async function handleDelete() {
           </BaseFormField>
         </div>
 
-        <BaseFormField :label="t('admin.jadwal.labelPtkPendamping')">
-          <select v-model="form.ptkPendampingId" @change="onFormChange"
-            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
-            <option :value="0">{{ t('admin.jadwal.tanpaPendamping') }}</option>
-            <option v-for="p in availablePendamping" :key="p.id" :value="p.id">{{ p.nama }}</option>
-          </select>
-          <p v-if="ptkPendampingList?.length && availablePendamping.length === 0" class="mt-1 text-xs text-amber-600 dark:text-amber-400">
-            {{ t('admin.jadwal.pendampingPenuh') }}
-          </p>
-        </BaseFormField>
       </form>
       <template #footer>
         <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md">{{ t('common.batal') }}</button>

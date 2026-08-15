@@ -10,38 +10,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { kelasId, ruanganId, mapel, guruId, ptkPendampingId, hari, jamMulai, jamSelesai } = result.data
+  const { kelasId, ruanganId, mapel, guruId, hari, jamMulai, jamSelesai } = result.data
 
-  const [kelas, ruangan, guru, pen] = await Promise.all([
+  const [kelas, ruangan, guru] = await Promise.all([
     prisma.kelas.findUnique({ where: { id: kelasId } }),
     prisma.ruangan.findUnique({ where: { id: ruanganId } }),
-    prisma.user.findFirst({ where: { id: guruId, role: 'GURU' } }),
-    ptkPendampingId ? prisma.ptkPendamping.findUnique({ where: { id: ptkPendampingId } }) : Promise.resolve(null)
+    prisma.user.findFirst({ where: { id: guruId, role: 'GURU' } })
   ])
   if (!kelas) throw createError({ statusCode: 404, statusMessage: 'Kelas tidak ditemukan' })
   if (!ruangan) throw createError({ statusCode: 404, statusMessage: 'Ruangan tidak ditemukan' })
   if (!guru) throw createError({ statusCode: 404, statusMessage: 'Guru tidak ditemukan' })
-  if (ptkPendampingId && !pen) throw createError({ statusCode: 404, statusMessage: 'PTK pendamping tidak ditemukan' })
-
-  // Aturan: 1 PTK pendamping hanya boleh mendampingi 1 mapel per kelas
-  if (ptkPendampingId) {
-    const pemakaian = await prisma.jadwalPelajaran.findFirst({
-      where: {
-        ptkPendampingId,
-        OR: [
-          { mapel: { not: mapel } },
-          { kelasId: { not: kelasId } }
-        ]
-      },
-      include: { kelas: { select: { nama: true } } }
-    })
-    if (pemakaian) {
-      throw createError({
-        statusCode: 409,
-        statusMessage: `PTK pendamping "${pen!.nama}" sudah mendampingi ${pemakaian.mapel} kelas ${pemakaian.kelas.nama}. Satu pendamping hanya boleh mendampingi 1 mapel per kelas.`
-      })
-    }
-  }
 
   const bentrok = await prisma.jadwalPelajaran.findMany({
     where: {
@@ -69,7 +47,6 @@ export default defineEventHandler(async (event) => {
       ruanganId,
       mapel,
       guruId,
-      ...(ptkPendampingId ? { ptkPendampingId } : {}),
       hari: hari as any,
       jamMulai,
       jamSelesai
@@ -77,8 +54,7 @@ export default defineEventHandler(async (event) => {
     include: {
       kelas: { select: { id: true, nama: true } },
       ruangan: { select: { id: true, nama: true } },
-      guru: { select: { id: true, nama: true, nip: true } },
-      ptkPendamping: { select: { id: true, nama: true } }
+      guru: { select: { id: true, nama: true, nip: true } }
     }
   })
 })

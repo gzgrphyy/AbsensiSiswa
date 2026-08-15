@@ -4,14 +4,14 @@ export default defineEventHandler(async (event) => {
 
   const existing = await prisma.ptkPendamping.findUnique({
     where: { id },
-    include: { _count: { select: { jadwalPelajaran: true } } }
+    include: { kelas: { select: { nama: true } } }
   })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'PTK pendamping tidak ditemukan' })
 
-  if (existing._count.jadwalPelajaran > 0) {
+  if (existing.kelasId) {
     throw createError({
       statusCode: 400,
-      statusMessage: `PTK pendamping "${existing.nama}" masih digunakan di ${existing._count.jadwalPelajaran} jadwal pelajaran. Hapus jadwal terlebih dahulu.`
+      statusMessage: `PTK pendamping "${existing.nama}" masih mendampingi kelas ${existing.kelas?.nama}. Hapus dulu pendampingan kelasnya.`
     })
   }
 

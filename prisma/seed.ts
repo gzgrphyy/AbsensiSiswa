@@ -246,6 +246,15 @@ async function main() {
 
   console.log(`✓ ${kelasList.length} kelas dibuat`)
 
+  // Assign 1 PTK pendamping per kelas (1-1)
+  for (let i = 0; i < kelasList.length; i++) {
+    await prisma.ptkPendamping.update({
+      where: { id: ptkPendampingList[i].id },
+      data: { kelasId: kelasList[i].id }
+    })
+  }
+  console.log(`✓ ${kelasList.length} PTK pendamping di-assign ke kelas`)
+
   // ============================================
   // RUANGAN
   // ============================================
@@ -388,22 +397,6 @@ async function main() {
     Sejarah: ruangPerpus.id
   }
 
-  // Mapel yang didampingi PTK pendamping (praktikum/lab)
-  // 4 mapel × 6 kelas = 24 kombinasi, muat dalam 28 pendamping aktif
-  const MAPEL_PENDAMPING = new Set(['Informatika', 'Fisika', 'Kimia', 'Biologi'])
-
-  // Aturan: 1 pendamping = 1 mapel per kelas. Tiap (mapel, kelas) dapat pendamping unik.
-  const pendampingByMapelKelas = new Map<string, number>()
-  let pendampingCounter = 0
-  function getPendampingId(mapel: string, kelasIdx: number) {
-    const key = `${mapel}|${kelasIdx}`
-    if (!pendampingByMapelKelas.has(key)) {
-      pendampingByMapelKelas.set(key, pendampingCounter % 28)
-      pendampingCounter++
-    }
-    return ptkPendampingList[pendampingByMapelKelas.get(key)!].id
-  }
-
   const MAPEL_PER_HARI: Record<string, string[]> = {
     SENIN: ['Pendidikan Agama', 'Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Informatika'],
     SELASA: ['PPKn', 'Fisika', 'Kimia', 'Sejarah', 'PJOK'],
@@ -466,7 +459,6 @@ async function main() {
     hari: string
     jamMulai: string
     jamSelesai: string
-    ptkPendampingId: number | null
   }[] = []
 
   for (let k = 0; k < kelasList.length; k++) {
@@ -478,9 +470,6 @@ async function main() {
         const mapel = mapels[(s + offset) % mapels.length]
         const guruIdx = (k * 5 + s + HARI_URUTAN.indexOf(hari)) % gurus.length
         const ruanganId = RUANG_KHUSUS[mapel] ?? ruangKelasUtama[k].id
-        const ptkPendampingId = MAPEL_PENDAMPING.has(mapel)
-          ? getPendampingId(mapel, k)
-          : null
         jadwalData.push({
           kelasIdx: k,
           mapel,
@@ -488,8 +477,7 @@ async function main() {
           ruanganId,
           hari,
           jamMulai: slots[s].jamMulai,
-          jamSelesai: slots[s].jamSelesai,
-          ptkPendampingId
+          jamSelesai: slots[s].jamSelesai
         })
       })
     }
@@ -503,7 +491,6 @@ async function main() {
           mapel: j.mapel,
           guruId: gurus[j.guruIdx].id,
           ruanganId: j.ruanganId,
-          ptkPendampingId: j.ptkPendampingId,
           hari: j.hari as any,
           jamMulai: j.jamMulai,
           jamSelesai: j.jamSelesai
