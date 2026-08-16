@@ -187,7 +187,6 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
 
     <!-- Pengajuan Izin -->
     <NuxtLink
-      v-if="pendingIzinCount > 0"
       to="/absensi/izin"
       class="mb-4 group flex items-center gap-4 rounded-2xl border border-amber-200 dark:border-amber-800 border-l-4 border-l-amber-400 bg-amber-50/70 dark:bg-amber-900/20 p-4 transition-colors hover:bg-amber-100 dark:hover:bg-amber-900/30"
     >
@@ -197,13 +196,15 @@ const totalSiswaScan = computed(() => activeSesiList.value.reduce((sum, s) => su
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
         </span>
-        <span class="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
+        <span v-if="pendingIzinCount > 0" class="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center shadow-sm">
           {{ pendingIzinCount }}
         </span>
       </div>
       <div class="flex-1 min-w-0">
         <p class="text-sm font-bold text-amber-800 dark:text-amber-300">Pengajuan Izin / Sakit</p>
-        <p class="text-xs text-amber-700/80 dark:text-amber-400/80 mt-0.5">Ada {{ pendingIzinCount }} pengajuan menunggu persetujuan</p>
+        <p class="text-xs text-amber-700/80 dark:text-amber-400/80 mt-0.5">
+          {{ pendingIzinCount > 0 ? `Ada ${pendingIzinCount} pengajuan menunggu persetujuan` : 'Lihat riwayat izin/sakit murid' }}
+        </p>
       </div>
       <svg class="w-4 h-4 text-amber-500 flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

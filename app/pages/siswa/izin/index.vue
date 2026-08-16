@@ -56,7 +56,13 @@ function dateLabel(tanggal: string) {
 }
 
 function fullDateLabel(tanggal: string) {
-  return new Date(`${tanggal}T00:00:00`).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(tanggal) ? new Date(`${tanggal}T00:00:00`) : new Date(tanggal)
+  return d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function waktuLabel(t: string | null) {
+  if (!t) return ''
+  return new Date(t).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
 function showError(msg: string) {
@@ -190,12 +196,12 @@ const formError = computed(() => {
               :class="isDisabledDate(opt.tanggal)
                 ? 'border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-700/40 text-gray-300 dark:text-gray-600 cursor-not-allowed'
                 : form.tanggal === opt.tanggal
-                  ? 'border-primary-500 bg-primary-500 text-white shadow-md shadow-primary-500/30'
+                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
                   : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:border-primary-300 dark:hover:border-primary-700'"
             >
-              <span class="text-[10px] font-semibold uppercase tracking-wide leading-none" :class="form.tanggal === opt.tanggal && !isDisabledDate(opt.tanggal) ? 'text-white/80' : ''">{{ dateLabel(opt.tanggal).weekday }}</span>
+              <span class="text-[10px] font-semibold uppercase tracking-wide leading-none" :class="form.tanggal === opt.tanggal && !isDisabledDate(opt.tanggal) ? 'text-primary-600 dark:text-primary-400' : ''">{{ dateLabel(opt.tanggal).weekday }}</span>
               <span class="text-lg font-bold leading-tight mt-0.5">{{ dateLabel(opt.tanggal).day }}</span>
-              <span class="text-[9px] leading-none mt-0.5" :class="form.tanggal === opt.tanggal && !isDisabledDate(opt.tanggal) ? 'text-white/80' : 'text-gray-400 dark:text-gray-500'">{{ dateLabel(opt.tanggal).month }}</span>
+              <span class="text-[9px] leading-none mt-0.5" :class="form.tanggal === opt.tanggal && !isDisabledDate(opt.tanggal) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 dark:text-gray-500'">{{ dateLabel(opt.tanggal).month }}</span>
             </button>
           </div>
 
@@ -216,8 +222,14 @@ const formError = computed(() => {
                 ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500'
                 : 'border-gray-200 dark:border-slate-600 text-gray-600 dark:text-gray-400 hover:border-amber-300 dark:hover:border-amber-700'"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <path d="M17 3l4 4" />
+                <path d="M19 5l-4.5 4.5" />
+                <path d="M11.5 6.5l6 6" />
+                <path d="M16.5 11.5l-6.5 6.5h-4v-4l6.5 -6.5" />
+                <path d="M7.5 12.5l1.5 1.5" />
+                <path d="M10.5 9.5l1.5 1.5" />
+                <path d="M3 21l3 -3" />
               </svg>
               Sakit
             </button>
@@ -229,8 +241,12 @@ const formError = computed(() => {
                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 ring-1 ring-blue-500'
                 : 'border-gray-200 dark:border-slate-600 text-gray-600 dark:text-gray-400 hover:border-blue-300 dark:hover:border-blue-700'"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <path d="M9 5h9a2 2 0 0 1 2 2v9m-.184 3.839a2 2 0 0 1 -1.816 1.161h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 1.158 -1.815" />
+                <path d="M16 3v4" />
+                <path d="M8 3v1" />
+                <path d="M4 11h7m4 0h5" />
+                <path d="M3 3l18 18" />
               </svg>
               Izin
             </button>
@@ -258,7 +274,7 @@ const formError = computed(() => {
             Bukti <span class="text-gray-400 dark:text-gray-500 font-normal">(opsional — surat / foto)</span>
           </label>
 
-          <div v-if="!form.bukti" class="flex items-center gap-3">
+          <div v-if="!form.bukti">
             <input ref="buktiInput" type="file" accept="image/*" class="hidden" @change="handleBuktiUpload" />
             <button
               type="button"
@@ -275,7 +291,7 @@ const formError = computed(() => {
               </svg>
               {{ uploading ? 'Mengunggah...' : 'Unggah Bukti' }}
             </button>
-            <span class="text-xs text-gray-400 dark:text-gray-500">PNG, JPG, WebP. Maks 10MB.</span>
+            <p class="mt-1.5 text-xs text-gray-400 dark:text-gray-500">PNG, JPG, WebP. Maks 10MB.</p>
           </div>
 
           <div v-else class="flex items-center gap-3">
@@ -306,52 +322,38 @@ const formError = computed(() => {
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
-          <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-          </svg>
           Kirim Pengajuan
         </button>
       </div>
     </div>
 
     <!-- Riwayat Pengajuan -->
-    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
-      <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-700">
-        <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100">Riwayat Pengajuan</h2>
-      </div>
+    <section>
+      <h2 class="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-3">Riwayat Pengajuan</h2>
 
       <LoadingSkeleton v-if="pendingRiwayat" type="table" :rows="3" :columns="3" />
 
-      <div v-else-if="riwayat && riwayat.length === 0" class="px-5 py-10 text-center">
-        <div class="w-12 h-12 rounded-full bg-gray-50 dark:bg-slate-700/50 flex items-center justify-center mx-auto mb-3">
-          <svg class="w-6 h-6 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
-        </div>
+      <div v-else-if="riwayat && riwayat.length === 0" class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card px-5 py-8 text-center">
         <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Belum ada pengajuan izin</p>
       </div>
 
-      <div v-else class="divide-y divide-gray-100 dark:divide-slate-700">
+      <div v-else class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card overflow-hidden divide-y divide-gray-100 dark:divide-slate-700">
         <div v-for="item in riwayat" :key="item.id" class="px-5 py-4">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
-              <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                {{ new Date(item.tanggal).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) }}
+              <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ fullDateLabel(item.tanggal) }}</p>
+              <p v-if="item.keterangan" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{{ item.keterangan }}</p>
+              <p v-if="item.penanggap && item.diresponPada" class="text-[11px] text-gray-400 dark:text-gray-500 mt-1.5">
+                Diproses oleh {{ item.penanggap }} · {{ waktuLabel(item.diresponPada) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">{{ item.keterangan }}</p>
             </div>
-            <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
-              <div class="flex items-center gap-1.5">
-                <BaseBadge :variant="item.jenis === 'SAKIT' ? 'amber' : 'blue'" size="sm">
-                  {{ jenisIzinLabels[item.jenis] || item.jenis }}
-                </BaseBadge>
-                <BaseBadge :variant="statusIzinBadgeVariant[item.status] || 'gray'" size="sm">
-                  {{ statusIzinLabels[item.status] || item.status }}
-                </BaseBadge>
-              </div>
-              <span v-if="item.penanggap && item.status !== 'PENDING'" class="text-[10px] text-gray-400 dark:text-gray-500">
-                oleh {{ item.penanggap }}
-              </span>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <BaseBadge variant="gray" size="sm">
+                {{ jenisIzinLabels[item.jenis] || item.jenis }}
+              </BaseBadge>
+              <BaseBadge :variant="statusIzinBadgeVariant[item.status] || 'gray'" size="sm">
+                {{ statusIzinLabels[item.status] || item.status }}
+              </BaseBadge>
             </div>
           </div>
           <div v-if="item.bukti" class="mt-3">
@@ -365,6 +367,6 @@ const formError = computed(() => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   </StudentLayout>
 </template>

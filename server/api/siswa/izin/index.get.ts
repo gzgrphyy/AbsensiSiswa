@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
 
   return list.map(i => ({
     id: i.id,
-    tanggal: i.tanggal,
+    tanggal: i.tanggal.toISOString().split('T')[0],
     jenis: i.jenis,
     keterangan: i.keterangan,
     bukti: i.bukti,

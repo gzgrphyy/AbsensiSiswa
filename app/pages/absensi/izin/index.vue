@@ -22,7 +22,7 @@ interface IzinItem {
 }
 
 interface IzinData {
-  kelasWali: { id: number; nama: string }[]
+  isWaliKelas: boolean
   pendingCount: number
   pending: IzinItem[]
   history: IzinItem[]
@@ -104,23 +104,23 @@ async function tolak(item: IzinItem) {
 
     <template v-else>
       <!-- Statistik -->
-      <div class="grid grid-cols-3 gap-3 mb-5">
-        <div class="rounded-2xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4">
-          <p class="text-xs font-medium text-amber-700 dark:text-amber-300">Pending</p>
-          <p class="text-2xl font-extrabold text-amber-700 dark:text-amber-300 mt-1 leading-none">{{ counts.pending }}</p>
+      <div class="flex items-center divide-x divide-gray-200 dark:divide-slate-700 rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card mb-5">
+        <div v-if="data.isWaliKelas" class="flex-1 px-4 py-3">
+          <p class="text-xs font-medium text-gray-400 dark:text-gray-500">Menunggu</p>
+          <p class="text-2xl font-extrabold text-amber-600 dark:text-amber-400 mt-0.5 leading-none">{{ counts.pending }}</p>
         </div>
-        <div class="rounded-2xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 p-4">
-          <p class="text-xs font-medium text-green-700 dark:text-green-300">Disetujui</p>
-          <p class="text-2xl font-extrabold text-green-700 dark:text-green-300 mt-1 leading-none">{{ counts.disetujui }}</p>
+        <div class="flex-1 px-4 py-3">
+          <p class="text-xs font-medium text-gray-400 dark:text-gray-500">Disetujui</p>
+          <p class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 mt-0.5 leading-none">{{ counts.disetujui }}</p>
         </div>
-        <div class="rounded-2xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4">
-          <p class="text-xs font-medium text-red-700 dark:text-red-300">Ditolak</p>
-          <p class="text-2xl font-extrabold text-red-700 dark:text-red-300 mt-1 leading-none">{{ counts.ditolak }}</p>
+        <div class="flex-1 px-4 py-3">
+          <p class="text-xs font-medium text-gray-400 dark:text-gray-500">Ditolak</p>
+          <p class="text-2xl font-extrabold text-gray-900 dark:text-gray-100 mt-0.5 leading-none">{{ counts.ditolak }}</p>
         </div>
       </div>
 
       <!-- Pending -->
-      <section class="mb-6">
+      <section v-if="data.isWaliKelas" class="mb-6">
         <h2 class="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-3">Menunggu Persetujuan</h2>
 
         <div v-if="data?.pending.length === 0" class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card px-5 py-8 text-center">
@@ -131,7 +131,7 @@ async function tolak(item: IzinItem) {
           <div
             v-for="item in data.pending"
             :key="item.id"
-            class="rounded-2xl border border-gray-200 dark:border-slate-700 border-l-4 border-l-amber-400 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-5"
+            class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card p-5"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0">
@@ -139,10 +139,9 @@ async function tolak(item: IzinItem) {
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">NISN {{ item.siswa.nisn }} · Kelas {{ item.kelas }}</p>
               </div>
               <div class="flex items-center gap-1.5 flex-shrink-0">
-                <BaseBadge :variant="item.jenis === 'SAKIT' ? 'amber' : 'blue'" size="sm">
+                <BaseBadge variant="gray" size="sm">
                   {{ jenisIzinLabels[item.jenis] || item.jenis }}
                 </BaseBadge>
-                <BaseBadge variant="amber" size="sm" pulse>{{ statusIzinLabels.PENDING }}</BaseBadge>
               </div>
             </div>
 
@@ -170,7 +169,7 @@ async function tolak(item: IzinItem) {
                 type="button"
                 :disabled="actingId === item.id"
                 @click="setujui(item)"
-                class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-green-500 rounded-xl hover:bg-green-600 active:bg-green-700 disabled:opacity-50 transition-colors shadow-md shadow-green-500/30 inline-flex items-center justify-center gap-1.5"
+                class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 active:bg-slate-700 dark:bg-white dark:text-slate-900 dark:hover:bg-gray-100 dark:active:bg-gray-200 disabled:opacity-50 transition-colors rounded-xl inline-flex items-center justify-center gap-1.5"
               >
                 <svg v-if="actingId === item.id" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -185,7 +184,7 @@ async function tolak(item: IzinItem) {
                 type="button"
                 :disabled="actingId === item.id"
                 @click="confirmTolak = item"
-                class="px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/30 disabled:opacity-50 transition-colors inline-flex items-center gap-1.5"
+                class="px-4 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl disabled:opacity-50 transition-colors inline-flex items-center gap-1.5"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -217,7 +216,7 @@ async function tolak(item: IzinItem) {
                 </p>
               </div>
               <div class="flex items-center gap-1.5 flex-shrink-0">
-                <BaseBadge :variant="item.jenis === 'SAKIT' ? 'amber' : 'blue'" size="sm">
+                <BaseBadge variant="gray" size="sm">
                   {{ jenisIzinLabels[item.jenis] || item.jenis }}
                 </BaseBadge>
                 <BaseBadge :variant="statusIzinBadgeVariant[item.status] || 'gray'" size="sm">

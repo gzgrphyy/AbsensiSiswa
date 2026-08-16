@@ -4,12 +4,18 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'Akses ditolak' })
   }
 
-  const kelasWali = await prisma.kelas.findMany({
-    where: { waliKelasId: user.id },
-    select: { id: true, nama: true },
+  const kelas = await prisma.kelas.findMany({
+    where: {
+      OR: [
+        { waliKelasId: user.id },
+        { jadwalPelajaran: { some: { guruId: user.id } } }
+      ]
+    },
+    select: { id: true, nama: true, waliKelasId: true },
     orderBy: { nama: 'asc' }
   })
-  const kelasIds = kelasWali.map(k => k.id)
+  const kelasIds = kelas.map(k => k.id)
+  const isWaliKelas = kelas.some(k => k.waliKelasId === user.id)
 
   const izins = await prisma.izin.findMany({
     where: { siswa: { kelasId: { in: kelasIds } } },
@@ -19,7 +25,7 @@ export default defineEventHandler(async (event) => {
           id: true,
           nisn: true,
           nama: true,
-          kelas: { select: { id: true, nama: true } }
+          kelas: { select: { id: true, nama: true, waliKelasId: true } }
         }
       },
       penanggap: { select: { id: true, nama: true } }
@@ -41,10 +47,14 @@ export default defineEventHandler(async (event) => {
     penanggap: i.penanggap?.nama ?? null
   })
 
+  const pending = izins.filter(
+    i => i.status === 'PENDING' && i.siswa.kelas.waliKelasId === user.id
+  )
+
   return {
-    kelasWali,
-    pendingCount: izins.filter(i => i.status === 'PENDING').length,
-    pending: izins.filter(i => i.status === 'PENDING').map(mapItem),
+    isWaliKelas,
+    pendingCount: pending.length,
+    pending: pending.map(mapItem),
     history: izins.filter(i => i.status !== 'PENDING').map(mapItem)
   }
 })
