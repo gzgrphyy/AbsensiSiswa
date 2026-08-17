@@ -33,9 +33,12 @@ export default defineEventHandler(async (event) => {
   if (!checkin.success) {
     const message = checkin.reason === 'ALL_DONE'
       ? 'Sesi di ruangan ini hari ini sudah selesai.'
-      : 'Tidak ada jadwal kelasmu di ruangan ini hari ini.'
+      : checkin.reason === 'ALREADY_SCANNED'
+        ? 'Kamu sudah absen di ruangan ini hari ini.'
+        : 'Tidak ada jadwal kelasmu di ruangan ini hari ini.'
     return {
       success: false,
+      blocked: checkin.reason === 'ALREADY_SCANNED',
       message,
       ruangan: { id: ruangan.id, nama: ruangan.nama }
     }

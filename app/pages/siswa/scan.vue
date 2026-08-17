@@ -10,6 +10,7 @@ const scanComplete = ref(false)
 const manualCode = ref('')
 const result = ref<{
   success: boolean
+  blocked?: boolean
   alreadyScanned?: boolean
   message: string
   status?: string
@@ -470,11 +471,14 @@ const statusLabels: Record<string, string> = {
 
         <template v-if="result">
           <div class="text-center py-4">
-            <div :class="result.success ? 'bg-green-100 dark:bg-green-900/40' : 'bg-red-100 dark:bg-red-900/40'"
+            <div :class="result.success ? 'bg-green-100 dark:bg-green-900/40' : result.blocked ? 'bg-amber-100 dark:bg-amber-900/40' : 'bg-red-100 dark:bg-red-900/40'"
               class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
             >
               <svg v-if="result.success" class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <svg v-else-if="result.blocked" class="w-8 h-8 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <svg v-else class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -482,7 +486,7 @@ const statusLabels: Record<string, string> = {
             </div>
 
             <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-              {{ result.success ? 'Absensi Berhasil!' : 'Absensi Gagal' }}
+              {{ result.success ? 'Absensi Berhasil!' : result.blocked ? 'Sudah Absen' : 'Absensi Gagal' }}
             </h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">{{ result.message }}</p>
 
@@ -529,7 +533,7 @@ const statusLabels: Record<string, string> = {
                 :disabled="submitting"
                 class="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 active:bg-primary-700 transition-colors disabled:opacity-50"
               >
-                {{ result.success ? 'Scan Lagi' : 'Coba Lagi' }}
+                {{ result.success || result.blocked ? 'Scan Lagi' : 'Coba Lagi' }}
               </button>
             </div>
           </div>

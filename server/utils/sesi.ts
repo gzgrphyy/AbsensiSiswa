@@ -142,6 +142,16 @@ export async function checkinSiswaRuangan(
     return { success: false, reason: 'NO_SCHEDULE' }
   }
 
+  const sesiIds = jadwals.flatMap(j => j.sesi.map(s => s.id))
+  if (sesiIds.length > 0) {
+    const already = await prisma.absensiRequest.findFirst({
+      where: { siswaId: siswa.id, sesiId: { in: sesiIds } }
+    })
+    if (already) {
+      return { success: false, reason: 'ALREADY_SCANNED' }
+    }
+  }
+
   const hasActive = jadwals.some(j => j.sesi.length === 0 || j.sesi.some(s => s.status === 'AKTIF'))
   if (!hasActive) {
     return { success: false, reason: 'ALL_DONE' }
