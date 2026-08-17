@@ -3,7 +3,7 @@ import { z } from 'zod'
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
 const bodySchema = z.object({
-  tanggal: z.string().regex(DATE_RE, 'Format tanggal tidak valid'),
+  tanggal: z.array(z.string().regex(DATE_RE, 'Format tanggal tidak valid')).min(1, 'Pilih minimal satu tanggal').max(14, 'Maksimal 14 tanggal dalam satu pengajuan'),
   jenis: z.enum(['SAKIT', 'IZIN']),
   keterangan: z.string().trim().max(255).optional().or(z.literal('')),
   bukti: z.string().trim().max(255).optional().or(z.literal(''))
@@ -28,38 +28,51 @@ export default defineEventHandler(async (event) => {
   const { tanggal, jenis } = result.data
   const keterangan = result.data.keterangan || null
   const bukti = result.data.bukti || null
-  const target = new Date(tanggal)
-
-  const hari = hariFromDateKey(tanggal) as 'SENIN' | 'SELASA' | 'RABU' | 'KAMIS' | 'JUMAT' | 'SABTU' | 'MINGGU'
-
-  const jadwals = await prisma.jadwalPelajaran.findMany({
-    where: { kelasId: siswa.kelasId, hari },
-    select: { jamSelesai: true }
-  })
-  if (jadwals.length === 0) {
-    throw createError({ statusCode: 400, statusMessage: 'Tidak ada jadwal pelajaran pada tanggal tersebut' })
-  }
-
   const now = new Date()
   const todayKey = formatDateKey(now)
-  if (tanggal <= todayKey) {
-    const timeNow = now.toTimeString().slice(0, 5)
-    const masihBerjalan = jadwals.some(j => j.jamSelesai >= timeNow)
-    if (!masihBerjalan) {
-      throw createError({ statusCode: 400, statusMessage: 'Sesi kelas pada tanggal ini sudah selesai semua' })
+  const timeNow = now.toTimeString().slice(0, 5)
+
+  function labelTanggal(t: string) {
+    return new Date(`${t}T00:00:00`).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' })
+  }
+
+  const conflicts: string[] = []
+  for (const t of tanggal) {
+    const hari = hariFromDateKey(t) as 'SENIN' | 'SELASA' | 'RABU' | 'KAMIS' | 'JUMAT' | 'SABTU' | 'MINGGU'
+
+    const jadwals = await prisma.jadwalPelajaran.findMany({
+      where: { kelasId: siswa.kelasId, hari },
+      select: { jamSelesai: true }
+    })
+    if (jadwals.length === 0) {
+      throw createError({ statusCode: 400, statusMessage: `Tidak ada jadwal pelajaran pada ${labelTanggal(t)}` })
     }
+
+    if (t <= todayKey) {
+      const masihBerjalan = jadwals.some(j => j.jamSelesai >= timeNow)
+      if (!masihBerjalan) {
+        throw createError({ statusCode: 400, statusMessage: `Sesi kelas pada ${labelTanggal(t)} sudah selesai semua` })
+      }
+    }
+
+    const existing = await prisma.izin.findUnique({
+      where: { siswaId_tanggal: { siswaId: siswa.id, tanggal: new Date(t) } }
+    })
+    if (existing) conflicts.push(labelTanggal(t))
+  }
+  if (conflicts.length > 0) {
+    throw createError({ statusCode: 400, statusMessage: `Sudah ada pengajuan untuk tanggal: ${conflicts.join(', ')}` })
   }
 
-  const existing = await prisma.izin.findUnique({
-    where: { siswaId_tanggal: { siswaId: siswa.id, tanggal: target } }
+  const created = await prisma.izin.createMany({
+    data: tanggal.map(t => ({
+      siswaId: siswa.id,
+      tanggal: new Date(t),
+      jenis,
+      keterangan,
+      bukti
+    }))
   })
-  if (existing) {
-    throw createError({ statusCode: 400, statusMessage: 'Sudah ada pengajuan untuk tanggal tersebut' })
-  }
 
-  const izin = await prisma.izin.create({
-    data: { siswaId: siswa.id, tanggal: target, jenis, keterangan, bukti }
-  })
-
-  return { success: true, data: izin }
+  return { success: true, count: created.count }
 })

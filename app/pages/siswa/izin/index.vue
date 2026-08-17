@@ -27,8 +27,8 @@ interface RiwayatItem {
 const { data: options, refresh: refreshOptions } = useFetch<IzinData>('/api/siswa/izin/options', { immediate: true })
 const { data: riwayat, pending: pendingRiwayat, refresh: refreshRiwayat } = useFetch<RiwayatItem[]>('/api/siswa/izin', { immediate: true })
 
-const form = ref<{ tanggal: string; jenis: string; keterangan: string; bukti: string | null }>({
-  tanggal: '',
+const form = ref<{ tanggal: string[]; jenis: string; keterangan: string; bukti: string | null }>({
+  tanggal: [],
   jenis: 'IZIN',
   keterangan: '',
   bukti: null
@@ -80,7 +80,13 @@ function pickJenis(jenis: string) {
 }
 
 function pickTanggal(tanggal: string) {
-  if (!isDisabledDate(tanggal)) form.value.tanggal = tanggal
+  if (isDisabledDate(tanggal)) return
+  const idx = form.value.tanggal.indexOf(tanggal)
+  if (idx >= 0) {
+    form.value.tanggal.splice(idx, 1)
+  } else {
+    form.value.tanggal.push(tanggal)
+  }
 }
 
 async function handleBuktiUpload(event: Event) {
@@ -113,7 +119,7 @@ function clearBukti() {
 }
 
 async function submit() {
-  if (!form.value.tanggal) {
+  if (form.value.tanggal.length === 0) {
     showError('Pilih tanggal terlebih dahulu')
     return
   }
@@ -139,12 +145,12 @@ async function submit() {
       }
     })
     showSuccess('Pengajuan izin berhasil dikirim. Menunggu persetujuan wali kelas.')
-    form.value.tanggal = ''
+    form.value.tanggal = []
     form.value.keterangan = ''
     form.value.bukti = null
     await Promise.all([refreshOptions(), refreshRiwayat()])
     const available = eligibleDates.value.find(d => !isDisabledDate(d.tanggal))
-    if (available) form.value.tanggal = available.tanggal
+    if (available) form.value.tanggal = [available.tanggal]
   } catch (err: any) {
     showError(err?.data?.statusMessage || 'Gagal mengirim pengajuan')
   } finally {
@@ -153,7 +159,7 @@ async function submit() {
 }
 
 const formError = computed(() => {
-  if (!form.value.tanggal) return 'Pilih tanggal pengajuan'
+  if (form.value.tanggal.length === 0) return 'Pilih tanggal pengajuan'
   if (!form.value.jenis) return 'Pilih jenis izin'
   if (!form.value.keterangan.trim()) return 'Isi keterangan alasan izin'
   return ''
@@ -171,7 +177,7 @@ const formError = computed(() => {
     <div class="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden mb-5">
       <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-700">
         <h2 class="text-sm font-bold text-gray-900 dark:text-gray-100">Ajukan Izin / Sakit</h2>
-        <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Hanya untuk hari yang sesi kelasnya masih berjalan / belum selesai semua</p>
+        <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Bisa pilih beberapa hari sekaligus. Hanya untuk hari yang sesi kelasnya masih berjalan / belum selesai semua</p>
       </div>
 
       <div class="px-5 py-4 space-y-5">
@@ -195,17 +201,35 @@ const formError = computed(() => {
               class="flex-shrink-0 flex flex-col items-center justify-center w-16 h-16 rounded-xl border transition-colors"
               :class="isDisabledDate(opt.tanggal)
                 ? 'border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-700/40 text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                : form.tanggal === opt.tanggal
+                : form.tanggal.includes(opt.tanggal)
                   ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
                   : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:border-primary-300 dark:hover:border-primary-700'"
             >
-              <span class="text-[10px] font-semibold uppercase tracking-wide leading-none" :class="form.tanggal === opt.tanggal && !isDisabledDate(opt.tanggal) ? 'text-primary-600 dark:text-primary-400' : ''">{{ dateLabel(opt.tanggal).weekday }}</span>
+              <span class="text-[10px] font-semibold uppercase tracking-wide leading-none" :class="form.tanggal.includes(opt.tanggal) && !isDisabledDate(opt.tanggal) ? 'text-primary-600 dark:text-primary-400' : ''">{{ dateLabel(opt.tanggal).weekday }}</span>
               <span class="text-lg font-bold leading-tight mt-0.5">{{ dateLabel(opt.tanggal).day }}</span>
-              <span class="text-[9px] leading-none mt-0.5" :class="form.tanggal === opt.tanggal && !isDisabledDate(opt.tanggal) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 dark:text-gray-500'">{{ dateLabel(opt.tanggal).month }}</span>
+              <span class="text-[9px] leading-none mt-0.5" :class="form.tanggal.includes(opt.tanggal) && !isDisabledDate(opt.tanggal) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 dark:text-gray-500'">{{ dateLabel(opt.tanggal).month }}</span>
             </button>
           </div>
 
-          <p v-if="form.tanggal" class="mt-2 text-xs text-primary-600 dark:text-primary-400 font-medium">{{ fullDateLabel(form.tanggal) }}</p>
+          <div v-if="form.tanggal.length" class="mt-2 flex flex-wrap gap-1.5">
+            <span
+              v-for="t in form.tanggal"
+              :key="t"
+              class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-primary-50 dark:bg-primary-900/40 border border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-300 text-xs font-medium"
+            >
+              {{ fullDateLabel(t) }}
+              <button
+                type="button"
+                @click="pickTanggal(t)"
+                class="text-primary-500 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-200 transition-colors"
+                title="Hapus tanggal"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          </div>
         </div>
 
         <!-- Jenis -->
