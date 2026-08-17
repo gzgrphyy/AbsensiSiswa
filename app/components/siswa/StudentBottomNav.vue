@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
+const { user } = useUserSession()
 const { adaSesi } = useSesiHariIni()
 
 const scanDisabled = computed(() => adaSesi.value === false)
@@ -9,7 +10,7 @@ const items = [
   { label: 'Riwayat', to: '/siswa/riwayat', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
   { label: 'Scan', to: '/siswa/scan', fab: true },
   { label: 'Izin', to: '/siswa/izin', icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' },
-  { label: 'Profil', to: '/siswa/profil', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' }
+  { label: 'Profil', to: '/siswa/profil', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', avatar: true }
 ]
 
 function isActive(to: string) {
@@ -66,22 +67,49 @@ function isActive(to: string) {
             class="relative flex flex-col items-center justify-end gap-1.5 pt-1.5 h-[60px] pb-[calc(0.375rem+env(safe-area-inset-bottom))] active:bg-gray-50 dark:active:bg-slate-700/50 transition-colors"
           >
             <span
-              v-if="isActive(item.to)"
+              v-if="isActive(item.to) && !item.avatar"
               class="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-1 rounded-full bg-primary-500 dark:bg-primary-400"
               aria-hidden="true"
             />
-            <span
-              class="w-11 h-7 flex items-center justify-center rounded-full transition-colors"
-              :class="isActive(item.to) ? 'bg-primary-500 dark:bg-primary-500 text-white shadow-md shadow-primary-500/30' : ''"
-            >
-              <svg
-                class="w-6 h-6"
-                :class="isActive(item.to) ? 'text-white' : 'text-gray-400 dark:text-gray-500'"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            <template v-if="!item.avatar">
+              <span
+                class="w-11 h-7 flex items-center justify-center rounded-full transition-colors"
+                :class="isActive(item.to) ? 'bg-primary-500 dark:bg-primary-500 text-white shadow-md shadow-primary-500/30' : ''"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
-              </svg>
-            </span>
+                <svg
+                  class="w-6 h-6"
+                  :class="isActive(item.to) ? 'text-white' : 'text-gray-400 dark:text-gray-500'"
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon" />
+                </svg>
+              </span>
+            </template>
+            <template v-else>
+              <span class="w-11 h-7 flex items-center justify-center">
+                <span class="relative w-6 h-6">
+                  <img
+                    v-if="user?.foto"
+                    :src="user.foto"
+                    :alt="user?.nama || 'Profil'"
+                    class="w-6 h-6 rounded-full object-cover transition-all"
+                    :class="isActive(item.to) ? '' : 'opacity-60 grayscale'"
+                  />
+                  <span
+                    v-else
+                    class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors"
+                    :class="isActive(item.to) ? 'bg-primary-500 text-white' : 'bg-gray-200 dark:bg-slate-600 text-gray-400 dark:text-gray-500'"
+                  >
+                    {{ (user?.nama || 'P').charAt(0).toUpperCase() }}
+                  </span>
+                  <span
+                    v-if="isActive(item.to)"
+                    class="absolute -inset-[3px] rounded-full border-2 border-primary-500 dark:border-primary-400"
+                    aria-hidden="true"
+                  />
+                </span>
+              </span>
+            </template>
             <span class="text-[11px] leading-none" :class="isActive(item.to) ? 'text-primary-600 dark:text-primary-400 font-semibold' : 'text-gray-400 dark:text-gray-500'">
               {{ item.label }}
             </span>
