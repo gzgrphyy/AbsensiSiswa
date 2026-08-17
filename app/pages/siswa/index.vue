@@ -149,6 +149,10 @@ onMounted(() => {
               <dt class="text-green-700/80 dark:text-green-300/80">Kelas</dt>
               <dd class="font-semibold text-green-900 dark:text-green-100">{{ data.todayStatus.kelas || data.siswa.kelas.nama }}</dd>
             </div>
+            <div v-if="data.todayStatus.ruangan" class="flex items-center justify-between gap-3">
+              <dt class="text-green-700/80 dark:text-green-300/80">Ruangan</dt>
+              <dd class="font-semibold text-green-900 dark:text-green-100">{{ data.todayStatus.ruangan }}</dd>
+            </div>
             <div v-if="data.todayStatus.mapel" class="flex items-center justify-between gap-3">
               <dt class="text-green-700/80 dark:text-green-300/80">Mata pelajaran</dt>
               <dd class="font-semibold text-green-900 dark:text-green-100 truncate">{{ data.todayStatus.mapel }}</dd>
@@ -170,7 +174,7 @@ onMounted(() => {
             </div>
           </div>
           <p class="text-sm text-amber-800 dark:text-amber-200">
-            {{ data.todayStatus.mapel }} — {{ data.todayStatus.kelas }} {{ data.todayStatus.jamMulai ? `(${data.todayStatus.jamMulai}-${data.todayStatus.jamSelesai})` : '' }}
+            {{ data.todayStatus.mapel }} — {{ data.todayStatus.kelas }}{{ data.todayStatus.ruangan ? ` · ${data.todayStatus.ruangan}` : '' }} {{ data.todayStatus.jamMulai ? `(${data.todayStatus.jamMulai}-${data.todayStatus.jamSelesai})` : '' }}
           </p>
         </template>
 

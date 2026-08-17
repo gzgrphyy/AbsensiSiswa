@@ -111,6 +111,10 @@ function removeFoto() {
   form.foto = null
 }
 
+function sanitizeKontakWali() {
+  form.kontakWali = form.kontakWali.replace(/\D/g, '')
+}
+
 async function handleSave() {
   saving.value = true
   errorMsg.value = ''
@@ -413,7 +417,7 @@ async function handleChangePassword() {
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
         <BaseFormField label="Kontak Wali">
-          <input v-model="form.kontakWali" type="text" placeholder="Nomor HP wali"
+          <input v-model="form.kontakWali" type="tel" placeholder="Nomor HP wali" @input="sanitizeKontakWali"
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
       </form>
