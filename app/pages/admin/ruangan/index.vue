@@ -256,9 +256,9 @@ function printQR() {
   const waves = `
     <div class="waves">
       <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-        <path d="M0,70 C240,100 480,46 720,60 C960,74 1200,104 1440,64 L1440,120 L0,120 Z" fill="#123B6D"/>
-        <path d="M0,88 C240,116 480,66 720,80 C960,94 1200,120 1440,84 L1440,120 L0,120 Z" fill="#2563A8"/>
-        <path d="M0,70 C240,100 480,46 720,60 C960,74 1200,104 1440,64" fill="none" stroke="#F5C400" stroke-width="8" stroke-linecap="round"/>
+        <path d="M0,78 C160,118 320,42 560,56 C800,70 960,118 1160,92 C1300,76 1400,96 1440,72 L1440,120 L0,120 Z" fill="#123B6D"/>
+        <path d="M0,94 C180,120 360,62 580,74 C800,86 980,120 1180,104 C1320,94 1400,108 1440,92 L1440,120 L0,120 Z" fill="#2563A8"/>
+        <path d="M0,78 C160,118 320,42 560,56 C800,70 960,118 1160,92 C1300,76 1400,96 1440,72" fill="none" stroke="#FFC400" stroke-width="5" stroke-linecap="round"/>
       </svg>
     </div>`
 
@@ -282,15 +282,18 @@ function printQR() {
   const body = isLandscape
     ? `<div class="body landscape-body">
         <div class="col-left">
-          <div class="welcome">${welcome}</div>
+          ${schoolGroup}
+          <h1 class="welcome">${welcome}</h1>
           <div class="badge">${room}</div>
-          <div class="instruction">${scanText}</div>
-          <div class="scan-btn"><span class="scan-dot"></span>${scanHere}</div>
-          ${featureRow}
           ${appBrand}
+          ${featureRow}
+          <p class="instruction">${scanText}</p>
         </div>
         <div class="col-right">
-          <div class="qr-box">${qrSvg.value}</div>
+          <div class="qr-container">
+            <div class="qr-tab"><span class="scan-dot"></span>${scanHere}</div>
+            <div class="qr-box">${qrSvg.value}</div>
+          </div>
         </div>
       </div>`
     : `<div class="body portrait-body">
@@ -318,50 +321,61 @@ body{background:#ffffff;color:#123B6D}
 .page{width:${pageW}mm;height:${pageH}mm;padding:7mm}
 .card{position:relative;width:100%;height:100%;background:#ffffff;border:1.5px solid #123B6D;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
 .stripe-band{position:relative;flex-shrink:0;height:40px;background:#123B6D;background-image:repeating-linear-gradient(-45deg,rgba(37,99,168,0.18) 0 6px,rgba(37,99,168,0) 6px 12px);border-radius:12px 12px 0 0}
-.stripe-band::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:#F5C400}
+.stripe-band::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:#FFC400}
 .is-landscape .stripe-band{height:38px}
 .school-group{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:0 16px}
-.school-logo{width:28px;height:28px;object-fit:contain;flex-shrink:0}
+.school-logo{width:45px;height:45px;object-fit:contain;flex-shrink:0}
 .school-name{font-weight:600;letter-spacing:0.05em;color:#123B6D;font-size:9.5pt;line-height:1.25;text-align:left}
 .school-name span{display:block}
-.is-landscape .school-group{margin-top:13mm;gap:4mm}
-.is-landscape .school-logo{width:13mm;height:13mm}
-.is-landscape .school-name{font-size:12px;line-height:1.2}
+.is-landscape .school-group{margin:0;gap:4mm}
+.is-landscape .school-logo{width:12mm;height:12mm}
+.is-landscape .school-name{font-size:12.7px;line-height:1.25}
 .body{flex:1;padding:0 30px;display:flex;align-items:center}
 .welcome{font-weight:700;color:#123B6D;text-align:center;font-size:30pt;line-height:1.1}
-.is-landscape .welcome{font-size:26px}
+.is-landscape .welcome{font-size:36px;line-height:1.1;text-align:left;letter-spacing:0.01em;white-space:nowrap}
 .badge{display:inline-flex;align-items:center;justify-content:center;min-width:84px;height:38px;padding:0 16px;border:1.5px solid #123B6D;border-radius:999px;background:#ffffff;font-weight:600;color:#123B6D;font-size:16pt;line-height:1;text-align:center}
-.is-landscape .badge{font-size:18px;height:36px;min-width:0}
+.is-landscape .badge{font-size:21px;height:38px;min-width:0;border-radius:10px;letter-spacing:0.06em}
 .qr-frame{position:relative;width:310px;height:310px;border:1.5px solid #123B6D;border-radius:16px;background:#ffffff;padding:0;display:flex;align-items:center;justify-content:center}
 .qr-frame .qr-box{width:100%;height:100%;padding:26px;border:none;border-radius:16px;display:flex;align-items:center;justify-content:center}
 .qr-box{background:#ffffff;border:1px solid #D9E0E8;border-radius:16px;padding:24px;display:flex;align-items:center;justify-content:center}
 .qr-box svg{width:100%;height:100%;display:block}
 .scan-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:162px;height:40px;background:#123B6D;color:#ffffff;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border-radius:999px;font-size:10.5pt;line-height:1}
-.scan-dot{width:5px;height:5px;border-radius:999px;background:#F5C400;flex-shrink:0}
+.scan-dot{width:5px;height:5px;border-radius:999px;background:#FFC400;flex-shrink:0}
 .qr-frame .scan-btn{position:absolute;top:-20px;left:50%;transform:translateX(-50%);z-index:2}
-.is-landscape .scan-btn{font-size:12px;min-width:0;height:38px;padding:0 16px;width:auto}
+.is-landscape .scan-btn{width:auto;min-width:150px;height:44px;padding:0 30px;font-size:13px;letter-spacing:0.16em;gap:9px;border-radius:999px}
+.is-landscape .scan-dot{width:8px;height:8px}
 .feature-row{display:flex;justify-content:center;gap:48px}
 .feature{display:flex;flex-direction:column;align-items:center;gap:5px;color:#123B6D}
 .feature .icon{width:22px;height:22px}
 .feature .icon svg{width:100%;height:100%}
 .feature .label{font-weight:500;font-size:9pt;color:#123B6D;text-align:center}
-.is-landscape .feature-row{gap:8mm}
-.is-landscape .feature .label{font-size:10px}
+.is-landscape .feature-row{justify-content:flex-start;gap:9mm}
+.is-landscape .feature{flex-direction:column;align-items:center;gap:2mm}
+.is-landscape .feature .icon{width:30px;height:30px;color:#2563A8}
+.is-landscape .feature .label{font-size:12px;font-weight:500;text-align:center}
 .instruction{color:#6B7280;text-align:center;font-size:9.5pt;line-height:1.5;max-width:100%}
-.is-landscape .instruction{font-size:11px;max-width:82mm}
+.is-landscape .instruction{font-size:12.7px;max-width:92mm;text-align:left}
 .app-brand{display:flex;align-items:center;justify-content:center;gap:8px}
-.app-logo{width:30px;height:30px;object-fit:contain;flex-shrink:0}
+.app-logo{width:45px;height:45px;object-fit:contain;flex-shrink:0}
 .app-text{display:flex;flex-direction:column;align-items:flex-start;line-height:1.25}
 .app-label{font-weight:400;font-size:8.5pt;color:#6B7280}
 .app-name{font-weight:700;font-size:14pt;color:#123B6D;letter-spacing:0.01em}
+.is-landscape .app-brand{gap:3mm}
+.is-landscape .app-logo{width:12mm;height:12mm}
+.is-landscape .app-label{font-size:11.3px}
+.is-landscape .app-name{font-size:18.7px}
 .footer-wrap{flex-shrink:0}
 .waves{height:52px}
 .waves svg{width:100%;height:100%;display:block}
-.is-landscape .waves{height:24mm}
-.landscape-body{gap:8mm}
-.landscape-body .col-left{flex:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5mm}
-.landscape-body .col-right{flex:1;display:flex;justify-content:center}
-.is-landscape .qr-box{width:68mm;height:68mm;padding:5mm}
+.is-landscape .waves{height:18mm}
+.landscape-body{gap:7mm}
+.is-landscape .body{padding:0 9mm}
+.landscape-body .col-left{flex:1.25;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2.5mm}
+.landscape-body .col-right{flex:1;display:flex;justify-content:center;align-items:center}
+.qr-container{position:relative;width:72mm;height:74mm;background:#F9FAFC;border:1.5px solid #123B6D;border-radius:30px;padding:7mm 6mm 5mm;display:flex;align-items:center;justify-content:center}
+.qr-tab{position:absolute;top:-13px;left:50%;transform:translateX(-50%);z-index:2;display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 20px;background:#123B6D;color:#ffffff;font-weight:700;font-size:14px;letter-spacing:0.14em;text-transform:uppercase;border-radius:999px;line-height:1;white-space:nowrap}
+.qr-tab .scan-dot{width:7px;height:7px}
+.is-landscape .qr-container .qr-box{width:56mm;height:56mm;padding:4mm;background:#ffffff;border:1px solid #D9E0E8;border-radius:20px}
 .portrait-body{flex-direction:column;justify-content:center}
 .portrait-body > *{margin-top:12px}
 .portrait-body .welcome{margin-top:16px}
@@ -373,7 +387,7 @@ body{background:#ffffff;color:#123B6D}
 </style></head>
 <body><div class="page ${isLandscape ? 'is-landscape' : 'is-portrait'}"><div class="card">
 <div class="stripe-band"></div>
-${schoolGroup}
+${isLandscape ? '' : schoolGroup}
 ${body}
 ${footer}
 </div></div></body></html>`
@@ -586,7 +600,7 @@ function ruanganUrl(item: Ruangan) {
 
       <!-- Modal QR Code -->
       <Transition name="modal">
-        <div v-if="showQR" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click="showQR = null">
+        <div v-if="showQR" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="showQR = null">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="showQR = null"></div>
           <div class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600 text-center">
             <button @click="showQR = null" class="absolute top-3 right-3 p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
