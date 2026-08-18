@@ -59,7 +59,7 @@ onMounted(() => {
 
       <BaseCard>
         <div class="overflow-x-auto scrollbar-thin">
-          <table class="w-full text-sm">
+          <table class="w-full text-xs">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colRuangan') }}</th>

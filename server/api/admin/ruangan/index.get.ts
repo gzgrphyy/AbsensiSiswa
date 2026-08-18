@@ -19,6 +19,7 @@ export default defineEventHandler(async () => {
         nama: true,
         jenis: true,
         qrCode: true,
+        kelas: { select: { id: true, nama: true } },
         createdAt: true,
         updatedAt: true,
         _count: { select: { jadwalPelajaran: true } }

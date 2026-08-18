@@ -2,6 +2,7 @@
 interface Ruangan {
   id: number
   nama: string
+  kelas: { id: number; nama: string } | null
   jenis: string
   qrCode: string
   sesiAktif: boolean
@@ -12,15 +13,18 @@ interface Ruangan {
 
 const { t } = useI18n()
 
-const jenisOptions = ['KELAS', 'LAB', 'PERPUSTAKAAN', 'AULA', 'LAINNYA']
-
-function jenisLabel(jenis: string) {
-  return t(`admin.ruangan.jenis.${jenis}`)
-}
-
 const { data, pending, refresh } = useFetch<Ruangan[]>('/api/admin/ruangan', { immediate: true })
+const { data: kelasList } = useFetch<{ id: number; nama: string; tahunAjaran: { isActive: boolean } }[]>('/api/admin/kelas', { immediate: true })
+
+// Dropdown kelas: hanya kelas dari tahun ajaran aktif
+const kelasOptions = computed(() =>
+  (kelasList.value || [])
+    .filter(k => k.tahunAjaran.isActive)
+    .map(k => ({ id: k.id, nama: k.nama }))
+)
+
 const searchQuery = ref('')
-const filterJenis = ref('')
+const filterKategori = ref('')
 
 // Auto-refresh tiap 15 detik agar status sesi selalu ter-update
 onMounted(() => {
@@ -31,20 +35,22 @@ onMounted(() => {
 const filteredData = computed(() => {
   if (!data.value) return []
   let result = data.value
-  if (filterJenis.value) {
-    result = result.filter(r => r.jenis === filterJenis.value)
+  if (filterKategori.value === 'KELAS') {
+    result = result.filter(r => r.jenis === 'KELAS')
+  } else if (filterKategori.value === 'RUANGAN') {
+    result = result.filter(r => r.jenis !== 'KELAS')
   }
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase()
-    result = result.filter(r => r.nama.toLowerCase().includes(q) || r.qrCode.toLowerCase().includes(q))
+    result = result.filter(r => r.nama.toLowerCase().includes(q) || r.qrCode.toLowerCase().includes(q) || (r.kelas?.nama || '').toLowerCase().includes(q))
   }
   return result
 })
 
 const page = ref(1)
-const pageSize = 5
+const pageSize = 10
 
-watch([searchQuery, filterJenis], () => { page.value = 1 })
+watch([searchQuery, filterKategori], () => { page.value = 1 })
 
 const totalPages = computed(() => Math.max(1, Math.ceil(filteredData.value.length / pageSize)))
 const visibleData = computed(() => {
@@ -54,7 +60,10 @@ const visibleData = computed(() => {
 
 const showModal = ref(false)
 const editing = ref<Ruangan | null>(null)
-const form = ref({ nama: '', jenis: 'KELAS' })
+const form = ref({ nama: '', kelasId: 0 })
+
+const isKelasJenis = computed(() => form.value.kelasId > 0)
+const selectedKelas = computed(() => kelasOptions.value.find(k => k.id === form.value.kelasId))
 const saving = ref(false)
 const confirmDelete = ref<Ruangan | null>(null)
 const showQR = ref<Ruangan | null>(null)
@@ -102,13 +111,13 @@ function showSuccess(msg: string) {
 
 function openCreate() {
   editing.value = null
-  form.value = { nama: '', jenis: 'KELAS' }
+  form.value = { nama: '', kelasId: 0 }
   showModal.value = true
 }
 
 function openEdit(item: Ruangan) {
   editing.value = item
-  form.value = { nama: item.nama, jenis: item.jenis }
+  form.value = { nama: item.nama, kelasId: item.kelas?.id || 0 }
   showModal.value = true
 }
 
@@ -120,19 +129,29 @@ function handleCloseClick() {
 }
 
 async function handleSave() {
+  // Pilih salah satu: isi nama ruangan (lab/perpus) ATAU pilih kelas
+  const namaAkhir = isKelasJenis.value ? (selectedKelas.value?.nama || '') : form.value.nama
+  const jenisAkhir = isKelasJenis.value ? 'KELAS' : 'LAINNYA'
+  const kelasIdAkhir = isKelasJenis.value ? form.value.kelasId : null
+
+  if (!namaAkhir.trim()) {
+    showError(t('admin.ruangan.msgWajibIsi'))
+    return
+  }
   saving.value = true
   errorMsg.value = ''
   try {
     if (editing.value) {
       const body: Record<string, unknown> = {}
-      if (form.value.nama !== editing.value.nama) body.nama = form.value.nama
-      if (form.value.jenis !== editing.value.jenis) body.jenis = form.value.jenis
+      if (namaAkhir !== editing.value.nama) body.nama = namaAkhir
+      if (jenisAkhir !== editing.value.jenis) body.jenis = jenisAkhir
+      if (kelasIdAkhir !== (editing.value.kelas?.id || null)) body.kelasId = kelasIdAkhir
       if (Object.keys(body).length === 0) { showModal.value = false; return }
       const { error } = await useFetch(`/api/admin/ruangan/${editing.value.id}`, { method: 'PATCH', body })
       if (error.value) { showError(error.value.statusMessage || t('admin.ruangan.msgGagalSimpan')); return }
       showSuccess(t('admin.ruangan.msgBerhasilEdit'))
     } else {
-      const { error } = await useFetch('/api/admin/ruangan', { method: 'POST', body: form.value })
+      const { error } = await useFetch('/api/admin/ruangan', { method: 'POST', body: { nama: namaAkhir, jenis: jenisAkhir, kelasId: kelasIdAkhir } })
       if (error.value) { showError(error.value.statusMessage || t('admin.ruangan.msgGagalSimpan')); return }
       showSuccess(t('admin.ruangan.msgBerhasilTambah'))
     }
@@ -201,10 +220,11 @@ function ruanganUrl(item: Ruangan) {
           <input v-model="searchQuery" type="text" :placeholder="t('admin.ruangan.searchPlaceholder')"
             class="w-40 sm:w-56 pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
-        <select v-model="filterJenis"
+        <select v-model="filterKategori"
           class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option value="">{{ t('admin.ruangan.semuaJenis') }}</option>
-          <option v-for="j in jenisOptions" :key="j" :value="j">{{ jenisLabel(j) }}</option>
+          <option value="">{{ t('admin.ruangan.kategoriSemua') }}</option>
+          <option value="RUANGAN">{{ t('admin.ruangan.kategoriRuangan') }}</option>
+          <option value="KELAS">{{ t('admin.ruangan.kategoriKelas') }}</option>
         </select>
       </div>
       <button @click="openCreate"
@@ -231,11 +251,11 @@ function ruanganUrl(item: Ruangan) {
 
       <div v-else class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="w-full text-sm">
+          <table class="w-full text-xs">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.ruangan.colRuangan') }}</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.ruangan.colJenis') }}</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.ruangan.colKelas') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.ruangan.colJadwal') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.ruangan.colStatusSesi') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.ruangan.colQr') }}</th>
@@ -245,10 +265,10 @@ function ruanganUrl(item: Ruangan) {
             <tbody class="divide-y admin-accent-divide">
               <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 sm:px-6 py-4">
-                  <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
+                  <span class=" text-gray-900 dark:text-gray-100">{{ item.jenis === 'KELAS' ? '-' : item.nama }}</span>
                 </td>
-                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
-                  <BaseBadge :variant="item.jenis === 'KELAS' ? 'blue' : item.jenis === 'LAB' ? 'purple' : item.jenis === 'PERPUSTAKAAN' ? 'amber' : 'gray'" size="sm">{{ jenisLabel(item.jenis) }}</BaseBadge>
+                <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
+                  <span class="text-gray-600 dark:text-gray-300 ">{{ item.kelas?.nama || '-' }}</span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
                   <span class="text-gray-600 dark:text-gray-300 ">{{ item._count.jadwalPelajaran }}</span>
@@ -342,15 +362,17 @@ function ruanganUrl(item: Ruangan) {
             </div>
             <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.ruangan.labelNama') }}</label>
-                <input v-model="form.nama" type="text" @input="onFormChange" :placeholder="t('admin.ruangan.placeholderNama')"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.ruangan.labelRuangan') }}</label>
+                <input v-model="form.nama" type="text" @input="onFormChange" :disabled="isKelasJenis" :placeholder="t('admin.ruangan.placeholderNama')"
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500 disabled:opacity-50 disabled:cursor-not-allowed" />
+                <p v-if="isKelasJenis" class="mt-1.5 text-xs text-gray-400 dark:text-gray-500">{{ t('admin.ruangan.infoNamaKelas') }}</p>
               </div>
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.ruangan.labelJenis') }}</label>
-                <select v-model="form.jenis" @change="onFormChange"
+                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.ruangan.labelKelas') }}</label>
+                <select v-model="form.kelasId" @change="onFormChange"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700">
-                  <option v-for="j in jenisOptions" :key="j" :value="j">{{ jenisLabel(j) }}</option>
+                  <option :value="0">{{ t('common.tidakAda') }}</option>
+                  <option v-for="k in kelasOptions" :key="k.id" :value="k.id">{{ k.nama }}</option>
                 </select>
               </div>
               <Transition name="fade">

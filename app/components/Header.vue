@@ -56,11 +56,11 @@ async function handleLogout() {
       <NuxtLink v-if="isAdmin" to="/admin" class="flex items-center gap-2.5 min-w-0 flex-shrink-0">
         <div class="w-9 h-9 bg-[#E8F4FC] dark:bg-[#032645]/40 flex items-center justify-center text-[#08558A] dark:text-[#6DB5E5] text-sm  overflow-hidden flex-shrink-0 rounded-full border border-[#C5E3F7] dark:border-[#04355C]">
           <img v-if="pengaturan?.logoSekolahPath" :src="pengaturan.logoSekolahPath" class="w-full h-full object-contain p-1" />
-          <span v-else class="text-[10px]  text-center leading-tight px-1">SMK</span>
+          <span v-else class="text-[11px]  text-center leading-tight px-1">SMK</span>
         </div>
         <div class="min-w-0 hidden md:block">
           <p class="text-sm  text-gray-900 dark:text-gray-100 truncate leading-tight">{{ pengaturan?.namaSekolah || 'SMK Negeri 4 Bandung' }}</p>
-          <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ t('app.sistemAbsensi') }}</p>
+          <p class="text-[11px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ t('app.sistemAbsensi') }}</p>
         </div>
       </NuxtLink>
 
@@ -75,14 +75,14 @@ async function handleLogout() {
 
         <div class="flex items-center gap-2.5">
           <div v-if="pengaturan?.iconPath" class="w-8 h-8 bg-[#E8F4FC] dark:bg-[#032645]/40 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center border border-[#C5E3F7] dark:border-[#04355C]">
-            <img :src="pengaturan.iconPath" class="w-full h-full object-contain p-1" />
+            <img :src="pengaturan.iconPath" class="w-full h-full object-contain p-01" />
           </div>
           <div v-else class="w-8 h-8 rounded-full bg-[#E8F4FC] dark:bg-[#032645]/40 flex items-center justify-center text-xs  text-[#08558A] dark:text-[#6DB5E5] border border-[#C5E3F7] dark:border-[#04355C] flex-shrink-0">
             {{ t('app.aplikasiSkoria').charAt(0).toUpperCase() }}
           </div>
           <div class="hidden md:block">
             <p class="text-sm  text-gray-900 dark:text-gray-100 leading-tight">{{ appBrandLabel }}</p>
-            <p class="text-[10px] text-gray-400 dark:text-gray-500 leading-tight">{{ t('app.sistemAbsensi') }}</p>
+            <p class="text-[11px] text-gray-400 dark:text-gray-500 leading-tight">{{ t('app.sistemAbsensi') }}</p>
           </div>
         </div>
 

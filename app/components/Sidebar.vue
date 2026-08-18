@@ -137,7 +137,7 @@ function renderIcon(icon: string) {
         </div>
         <div v-if="!collapsed" class="min-w-0">
           <p class="text-sm  text-gray-900 dark:text-gray-100 truncate leading-tight">{{ user?.nama || t('common.pengguna') }}</p>
-          <p class="text-[10px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ roleLabel[user?.role] || user?.role }}</p>
+          <p class="text-[11px] text-gray-400 dark:text-gray-500 truncate leading-tight">{{ roleLabel[user?.role] || user?.role }}</p>
         </div>
       </div>
     </div>
@@ -150,7 +150,7 @@ function renderIcon(icon: string) {
           <button
             @click="toggleGroup(item.icon)"
             :class="[
-              'w-full flex items-center gap-2.5 py-2 text-sm  transition-all duration-150',
+              'w-full flex items-center gap-2.5 py-2 text-xs  transition-all duration-150',
               collapsed ? 'justify-center px-0' : 'px-3',
               isChildActive(item.children)
                 ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
@@ -172,7 +172,7 @@ function renderIcon(icon: string) {
               :key="child.to"
               :to="child.to"
               :class="[
-                'flex items-center gap-2 px-3 py-1.5 text-sm transition-all duration-150',
+                'flex items-center gap-2 px-3 py-1.5 text-xs transition-all duration-150',
                 route.path === child.to
                   ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 '
                   : 'text-gray-500 dark:text-gray-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400',
@@ -190,7 +190,7 @@ function renderIcon(icon: string) {
           v-else
           :to="item.to"
           :class="[
-            'w-full flex items-center gap-2.5 py-2 text-sm  transition-all duration-150',
+            'w-full flex items-center gap-2.5 py-2 text-xs  transition-all duration-150',
             collapsed ? 'justify-center px-0' : 'px-3',
             isActive(item.to)
               ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'

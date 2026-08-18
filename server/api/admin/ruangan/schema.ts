@@ -2,12 +2,16 @@ import { z } from 'zod'
 
 const jenisEnum = z.enum(['KELAS', 'LAB', 'PERPUSTAKAAN', 'AULA', 'LAINNYA'])
 
+const kelasIdSchema = z.number().int().positive().nullable().optional()
+
 export const createRuanganSchema = z.object({
   nama: z.string().min(1, 'Nama ruangan wajib diisi').max(100),
+  kelasId: kelasIdSchema,
   jenis: jenisEnum.default('KELAS')
 })
 
 export const updateRuanganSchema = z.object({
   nama: z.string().min(1, 'Nama ruangan wajib diisi').max(100).optional(),
+  kelasId: kelasIdSchema,
   jenis: jenisEnum.optional()
 })

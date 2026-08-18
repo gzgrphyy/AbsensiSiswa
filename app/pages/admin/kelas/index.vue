@@ -220,7 +220,7 @@ async function handleDelete() {
 
     <div v-else class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
       <div class="overflow-x-auto scrollbar-thin">
-        <table class="w-full text-sm">
+        <table class="w-full text-xs">
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.kelas.colNama') }}</th>
@@ -233,7 +233,7 @@ async function handleDelete() {
           <tbody class="divide-y admin-accent-divide">
             <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
               <td class="px-4 py-3">
-                <NuxtLink :to="`/admin/kelas/${item.id}`" class="text-gray-900 dark:text-gray-100 font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors" :title="t('admin.kelas.lihatDetail')">
+                <NuxtLink :to="`/admin/kelas/${item.id}`" class="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" :title="t('admin.kelas.lihatDetail')">
                   {{ item.nama }}
                 </NuxtLink>
               </td>

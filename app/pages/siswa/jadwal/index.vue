@@ -27,6 +27,10 @@ const todayHari = computed(() => {
   return days[new Date().getDay()]
 })
 
+const todayLabel = computed(() =>
+  new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+)
+
 const activeDay = ref('')
 
 function toggleDay(hari: string) {
@@ -51,6 +55,13 @@ onMounted(() => {
     <LoadingSkeleton v-if="pending" type="text" :rows="8" />
 
     <template v-else-if="data && Object.keys(data.grouped).length > 0">
+      <div class="inline-flex items-center gap-1.5 text-xs font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-full px-3 py-1 mb-3">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        Hari ini &middot; {{ todayLabel }}
+      </div>
+
       <div class="space-y-3">
         <div v-for="hari in data.hariOrder" :key="hari">
           <div v-if="data.grouped[hari]" class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
@@ -61,7 +72,8 @@ onMounted(() => {
                 'bg-primary-50 dark:bg-primary-900/20': hari === todayHari
               }">
               <div class="flex items-center gap-3">
-                <div class="w-2 h-2 rounded-full" :class="hari === todayHari ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'"></div>
+                <div v-if="hari === todayHari" class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-primary-500 text-white text-[10px] font-semibold leading-none">Hari ini</div>
+                <div v-else class="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600"></div>
                 <span class="font-semibold text-gray-900 dark:text-gray-100 w-16 shrink-0">{{ hariLabel[hari] || hari }}</span>
                 <span class="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">{{ data.grouped[hari].length }} mapel</span>
               </div>

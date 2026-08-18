@@ -147,7 +147,7 @@ function aksiLabel(aksi: string) {
             </div>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full text-xs">
               <thead>
                 <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                   <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colNama') }}</th>
@@ -164,7 +164,7 @@ function aksiLabel(aksi: string) {
                   </td>
                 </tr>
                 <tr v-if="data.topAlpha.length === 0">
-                  <td colspan="3" class="px-4 py-12 text-center text-gray-400 dark:text-gray-500 text-sm">{{ t('common.belumAdaData') }}</td>
+                  <td colspan="3" class="px-4 py-12 text-center text-gray-400 dark:text-gray-500 text-xs">{{ t('common.belumAdaData') }}</td>
                 </tr>
               </tbody>
             </table>
@@ -192,7 +192,7 @@ function aksiLabel(aksi: string) {
             <BaseBadge variant="green" dot size="sm">{{ data.monitoring.filter(r => r.status === 'Aktif').length }} {{ t('admin.beranda.unitAktif') }}</BaseBadge>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full text-xs">
               <thead>
                 <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                   <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider">{{ t('admin.beranda.colRuangan') }}</th>
@@ -216,7 +216,7 @@ function aksiLabel(aksi: string) {
                   <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell truncate max-w-[10rem]" :title="item.ptk">{{ item.ptk }}</td>
                 </tr>
                 <tr v-if="data.monitoring.length === 0">
-                  <td colspan="4" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500 text-sm">{{ t('common.belumAdaData') }}</td>
+                  <td colspan="4" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500 text-xs">{{ t('common.belumAdaData') }}</td>
                 </tr>
               </tbody>
             </table>
@@ -245,7 +245,7 @@ function aksiLabel(aksi: string) {
           <span class="text-xs text-gray-400 dark:text-gray-200  bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-lg">{{ data.aktivitasTerbaru.length }} {{ t('admin.beranda.unitAktivitas') }}</span>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm">
+          <table class="w-full text-xs">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 py-3  text-gray-500 dark:text-gray-400 text-xs tracking-wider w-20">{{ t('admin.beranda.colWaktu') }}</th>
@@ -267,7 +267,7 @@ function aksiLabel(aksi: string) {
                 <td class="px-5 py-3 text-gray-700 dark:text-gray-300">{{ item.detail }}</td>
               </tr>
               <tr v-if="data.aktivitasTerbaru.length === 0">
-                <td colspan="3" class="px-4 py-12 text-center text-gray-400 dark:text-gray-500 text-sm">{{ t('admin.beranda.emptyAktivitas') }}</td>
+                <td colspan="3" class="px-4 py-12 text-center text-gray-400 dark:text-gray-500 text-xs">{{ t('admin.beranda.emptyAktivitas') }}</td>
               </tr>
             </tbody>
           </table>

@@ -69,12 +69,12 @@ onUnmounted(() => {
           <img v-if="pengaturan?.iconPath" :src="pengaturan.iconPath" class="w-full h-full object-contain" />
           <span v-else>{{ t('app.aplikasiSkoria').charAt(0) }}</span>
         </div>
-        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ t('app.aplikasiLabel') }} {{ t('app.aplikasiSkoria') }}</span>
+        <span class="text-[11px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ t('app.aplikasiLabel') }} {{ t('app.aplikasiSkoria') }}</span>
       </NuxtLink>
 
       <!-- Right: Language & Developer Profile -->
       <div class="flex items-center gap-3">
-        <span class="text-[10px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ t('miniNavbar.ta') }} {{ pengaturan?.tahunAjaran || '—' }} · {{ semesterLabel }}</span>
+        <span class="text-[11px]  text-gray-600 dark:text-gray-400 truncate hidden sm:inline">{{ t('miniNavbar.ta') }} {{ pengaturan?.tahunAjaran || '—' }} · {{ semesterLabel }}</span>
 
         <!-- Theme Toggle -->
         <button

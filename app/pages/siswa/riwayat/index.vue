@@ -12,6 +12,33 @@ interface RiwayatItem {
 }
 
 const { data: riwayat, pending } = useFetch<RiwayatItem[]>('/api/siswa/riwayat', { immediate: true })
+
+const searchQuery = ref('')
+const filterStatus = ref('')
+const page = ref(1)
+const pageSize = 10
+
+const statusOptions = ['HADIR', 'SAKIT', 'IZIN', 'ALPHA', 'PENDING']
+
+const filteredData = computed(() => {
+  const rows = riwayat.value || []
+  const q = searchQuery.value.trim().toLowerCase()
+  return rows.filter(r => {
+    if (filterStatus.value && r.status !== filterStatus.value) return false
+    if (!q) return true
+    const tanggal = new Date(r.tanggal).toLocaleDateString('id-ID').toLowerCase()
+    const status = (statusLabels[r.status] || r.status).toLowerCase()
+    return r.mapel.toLowerCase().includes(q) || r.kelas.toLowerCase().includes(q) || status.includes(q) || tanggal.includes(q)
+  })
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredData.value.length / pageSize)))
+const visibleData = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return filteredData.value.slice(start, start + pageSize)
+})
+
+watch([searchQuery, filterStatus], () => { page.value = 1 })
 </script>
 
 <template>
@@ -20,40 +47,85 @@ const { data: riwayat, pending } = useFetch<RiwayatItem[]>('/api/siswa/riwayat',
 
     <LoadingSkeleton v-if="pending" type="table" :rows="5" :columns="4" />
 
-    <div v-else class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
-      <div class="overflow-x-auto scrollbar-thin">
-        <table class="w-full text-sm">
-          <thead>
-            <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Tanggal</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Mata Pelajaran</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Kelas</th>
-              <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Jam</th>
-              <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Status</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-            <tr v-for="item in riwayat" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
-              <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ new Date(item.tanggal).toLocaleDateString('id-ID') }}</td>
-              <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
-              <td class="px-4 py-3 text-gray-600 dark:text-gray-400">{{ item.kelas }}</td>
-              <td class="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                {{ item.scannedAt ? new Date(item.scannedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-' }}
-              </td>
-              <td class="px-4 py-3 text-center">
-                <BaseBadge :variant="statusBadgeVariant[item.status] || 'gray'">
-                  {{ statusLabels[item.status] || item.status }}
-                </BaseBadge>
-              </td>
-            </tr>
-            <tr v-if="riwayat.length === 0">
-              <td colspan="5" class="px-4 py-16 text-center">
-                <p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada riwayat absensi</p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <template v-else>
+      <div class="flex flex-wrap items-center gap-2 mb-4">
+        <div class="relative max-w-xs flex-1 min-w-[180px]">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input v-model="searchQuery" type="text" placeholder="Cari..."
+            class="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+        </div>
+        <select v-model="filterStatus"
+          class="px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+          <option value="">Semua Status</option>
+          <option v-for="s in statusOptions" :key="s" :value="s">{{ statusLabels[s] || s }}</option>
+        </select>
       </div>
-    </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 shadow-card dark:shadow-dark-card overflow-hidden">
+        <div class="overflow-x-auto scrollbar-thin">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Tanggal</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Mata Pelajaran</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Kelas</th>
+                <th class="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Jam</th>
+                <th class="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-300 text-xs">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+              <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ new Date(item.tanggal).toLocaleDateString('id-ID') }}</td>
+                <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.mapel }}</td>
+                <td class="px-4 py-3 text-gray-600 dark:text-gray-400">{{ item.kelas }}</td>
+                <td class="px-4 py-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                  {{ item.scannedAt ? new Date(item.scannedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-' }}
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <BaseBadge :variant="statusBadgeVariant[item.status] || 'gray'">
+                    {{ statusLabels[item.status] || item.status }}
+                  </BaseBadge>
+                </td>
+              </tr>
+              <tr v-if="filteredData.length === 0">
+                <td colspan="5" class="px-4 py-16 text-center">
+                  <p class="text-gray-500 dark:text-gray-400 font-medium">{{ searchQuery || filterStatus ? 'Tidak ada hasil yang cocok' : 'Belum ada riwayat absensi' }}</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-if="filteredData.length > pageSize" class="px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-slate-700 flex items-center justify-between gap-3">
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            Menampilkan {{ ((page - 1) * pageSize) + 1 }}-{{ Math.min(page * pageSize, filteredData.length) }} dari {{ filteredData.length }}
+          </p>
+          <div class="ml-auto flex items-center gap-2">
+            <button
+              @click="page--"
+              :disabled="page <= 1"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              Sebelumnya
+            </button>
+            <span class="text-xs text-gray-400 dark:text-gray-500">Halaman {{ page }} dari {{ totalPages }}</span>
+            <button
+              @click="page++"
+              :disabled="page >= totalPages"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Selanjutnya
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </template>
   </StudentLayout>
 </template>

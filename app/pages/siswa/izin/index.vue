@@ -311,7 +311,7 @@ const formError = computed(() => {
                   ? 'bg-primary-500 border-primary-600 text-white shadow-md shadow-primary-500/30'
                   : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:border-primary-300 dark:hover:border-primary-700'"
             >
-              <span class="text-[10px] font-semibold uppercase tracking-wide leading-none">{{ dateLabel(opt.tanggal).weekday }}</span>
+              <span class="text-[10px] font-semibold tracking-wide leading-none">{{ dateLabel(opt.tanggal).weekday }}</span>
               <span class="text-lg font-bold leading-tight mt-0.5">{{ dateLabel(opt.tanggal).day }}</span>
               <span class="text-[9px] leading-none mt-0.5" :class="form.tanggal.includes(opt.tanggal) && !isDisabledDate(opt.tanggal) ? 'text-white/80' : 'text-gray-400 dark:text-gray-500'">{{ dateLabel(opt.tanggal).month }}</span>
 
@@ -577,25 +577,37 @@ const formError = computed(() => {
 
       <div v-else class="rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-card dark:shadow-dark-card overflow-hidden divide-y divide-gray-100 dark:divide-slate-700">
         <div v-for="item in riwayat" :key="item.id" class="px-5 py-4">
-          <div class="flex items-start justify-between gap-3">
-            <div class="min-w-0">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2 min-w-0">
               <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ fullDateLabel(item.tanggal) }}</p>
-              <p v-if="item.keterangan" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{{ item.keterangan }}</p>
-              <p v-if="item.penanggap && item.diresponPada" class="text-[11px] text-gray-400 dark:text-gray-500 mt-1.5">
-                Diproses oleh {{ item.penanggap }} · {{ waktuLabel(item.diresponPada) }}
-              </p>
-            </div>
-            <div class="flex items-center gap-1.5 flex-shrink-0">
-              <BaseBadge variant="gray" size="sm">
+              <span class="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 dark:bg-slate-700 text-[10px] font-semibold text-gray-500 dark:text-gray-400">
                 {{ jenisIzinLabels[item.jenis] || item.jenis }}
-              </BaseBadge>
-              <BaseBadge :variant="statusIzinBadgeVariant[item.status] || 'gray'" size="sm">
-                {{ statusIzinLabels[item.status] || item.status }}
-              </BaseBadge>
+              </span>
             </div>
+            <BaseBadge :variant="statusIzinBadgeVariant[item.status] || 'gray'" size="sm" class="flex-shrink-0">
+              {{ statusIzinLabels[item.status] || item.status }}
+            </BaseBadge>
           </div>
-          <div v-if="item.bukti" class="mt-3">
-            <a :href="item.bukti" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline">
+
+          <p v-if="item.keterangan" class="text-xs text-gray-500 dark:text-gray-400 mt-1.5 truncate">{{ item.keterangan }}</p>
+
+          <div class="mt-3 pt-2.5 border-t border-gray-100 dark:border-slate-700 flex items-start justify-between gap-3">
+            <div class="min-w-0 text-[11px] text-gray-400 dark:text-gray-500 leading-tight">
+              <template v-if="item.status === 'PENDING'">
+                <p>Menunggu persetujuan wali kelas</p>
+              </template>
+              <template v-else-if="item.penanggap && item.diresponPada">
+                <p class="truncate">Diproses oleh {{ item.penanggap }}</p>
+                <p class="truncate">{{ waktuLabel(item.diresponPada) }}</p>
+              </template>
+            </div>
+            <a
+              v-if="item.bukti"
+              :href="item.bukti"
+              target="_blank"
+              rel="noopener"
+              class="shrink-0 inline-flex items-center gap-1.5 text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline"
+            >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
