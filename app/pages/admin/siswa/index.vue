@@ -92,6 +92,23 @@ const displayData = computed(() => {
 })
 
 const totalPages = computed(() => Math.max(1, Math.ceil(displayData.value.length / pageSize)))
+
+// Nomor halaman untuk lompat langsung (pakai elipsis jika halaman banyak)
+const pageNumbers = computed<(number | '...')[]>(() => {
+  const total = totalPages.value
+  const current = page.value
+  const set = new Set<number>([1, total, current - 1, current, current + 1])
+  const sorted = [...set].filter(n => n >= 1 && n <= total).sort((a, b) => a - b)
+  const result: (number | '...')[] = []
+  let prev = 0
+  for (const n of sorted) {
+    if (n - prev > 1) result.push('...')
+    result.push(n)
+    prev = n
+  }
+  return result
+})
+
 const visibleData = computed(() => {
   const start = (page.value - 1) * pageSize
   return displayData.value.slice(start, start + pageSize)
@@ -443,7 +460,21 @@ async function copyPassword() {
             </svg>
             {{ t('common.sebelumnya') }}
           </button>
-          <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages }) }}</span>
+          <div class="flex items-center gap-1">
+            <template v-for="(n, i) in pageNumbers" :key="i">
+              <button
+                v-if="n !== '...'"
+                @click="page = n"
+                :disabled="n === page"
+                :class="n === page
+                  ? 'w-7 h-7 rounded-md text-xs  text-white bg-primary-600 ring-1 ring-primary-600 cursor-default'
+                  : 'w-7 h-7 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors'"
+              >
+                {{ n }}
+              </button>
+              <span v-else class="px-0.5 text-xs text-gray-400 dark:text-gray-500 select-none">&hellip;</span>
+            </template>
+          </div>
           <button
             @click="page++"
             :disabled="page >= totalPages"
