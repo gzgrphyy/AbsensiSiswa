@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
       })
     },
     include: {
-      user: { select: { id: true, nama: true, email: true, isActive: true } },
+      user: { select: { id: true, nama: true, email: true, isActive: true, foto: true, jenisKelamin: true } },
       kelas: { select: { id: true, nama: true } }
     }
   })

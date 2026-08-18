@@ -67,32 +67,6 @@ function jenisKelaminLabel(jk: string | null) {
   return ''
 }
 
-function jenisKelaminBadgeClass(jk: string | null, isActive: boolean): string {
-  if (!isActive) return 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
-  if (jk === 'PEREMPUAN') return 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300'
-  return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-}
-
-// Foto profil dummy untuk data PTK yang belum punya foto asli (dibedakan laki-laki/perempuan)
-const dummyAvatarsLaki = [
-  '/images/avatars/laki-1.svg',
-  '/images/avatars/laki-2.svg',
-  '/images/avatars/laki-3.svg',
-]
-
-const dummyAvatarsPerempuan = [
-  '/images/avatars/perempuan-1.svg',
-  '/images/avatars/perempuan-2.svg',
-  '/images/avatars/perempuan-3.svg',
-]
-
-function dummyAvatar(seed: string, jenisKelamin: string | null): string {
-  const list = jenisKelamin === 'PEREMPUAN' ? dummyAvatarsPerempuan : dummyAvatarsLaki
-  let hash = 0
-  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
-  return list[hash % list.length]
-}
-
 const guruParams = computed(() => {
   const params = new URLSearchParams()
   if (showInactive.value) params.set('showInactive', 'true')
@@ -114,7 +88,7 @@ const rows = computed<Row[]>(() => {
       jenis: 'PTK',
       id: g.id,
       nama: g.nama,
-      foto: g.foto || dummyAvatar(g.nama, g.jenisKelamin),
+      foto: g.foto,
       email: g.email,
       nip: g.nip,
       nomorHp: g.nomorHp1,
@@ -129,7 +103,7 @@ const rows = computed<Row[]>(() => {
       jenis: 'PENDAMPING',
       id: p.id,
       nama: p.nama,
-      foto: dummyAvatar(p.nama, p.jenisKelamin),
+      foto: null,
       email: null,
       nip: p.nip,
       nomorHp: p.nomorHp,
@@ -234,13 +208,6 @@ function openEdit(item: Row) {
 
 function onFormChange() {
   dirtyForm.value = true
-}
-
-// NIP maksimal 18 digit, hanya angka
-function onNipInput(event: Event) {
-  const target = event.target as HTMLInputElement
-  form.value.nip = target.value.replace(/\D/g, '').slice(0, 18)
-  onFormChange()
 }
 
 function handleCloseClick() {
@@ -540,18 +507,8 @@ async function copyPassword() {
                       <span class="text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.isActive }">
                         {{ item.nama }}
                       </span>
-                      <div v-if="item.jenisKelamin" class="mt-0.5">
-                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium" :class="jenisKelaminBadgeClass(item.jenisKelamin, item.isActive)">
-                          <svg v-if="item.jenisKelamin === 'PEREMPUAN'" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="5" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 17v6M9 20h6" />
-                          </svg>
-                          <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <circle cx="12" cy="5" r="3" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8v5a7 7 0 11-14 0V8" />
-                          </svg>
-                          {{ jenisKelaminLabel(item.jenisKelamin) }}
-                        </span>
+                      <div v-if="item.jenisKelamin" class="text-xs text-gray-400 dark:text-gray-500" :class="{ 'text-gray-300 dark:text-gray-600': !item.isActive }">
+                        {{ jenisKelaminLabel(item.jenisKelamin) }}
                       </div>
                       <div v-if="item.jenis === 'PTK'" class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ item.email }}</div>
                     </div>
@@ -741,7 +698,7 @@ async function copyPassword() {
                 <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">
                   {{ t('admin.guru.labelNip') }} <span class="text-red-500">*</span>
                 </label>
-                <input v-model="form.nip" type="text" @input="onNipInput" required maxlength="18" inputmode="numeric"
+                <input v-model="form.nip" type="text" @input="onFormChange" required
                   :placeholder="t('admin.guru.placeholderNip')"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>

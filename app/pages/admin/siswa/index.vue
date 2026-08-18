@@ -9,7 +9,7 @@ interface Siswa {
   namaWali: string | null
   kontakWali: string | null
   kelas: { id: number; nama: string }
-  user: { email: string; isActive: boolean }
+  user: { email: string; isActive: boolean; foto: string | null; jenisKelamin: string | null }
   createdAt: string
 }
 
@@ -17,6 +17,7 @@ const { t } = useI18n()
 
 const searchQuery = ref('')
 const filterKelas = ref(0)
+const filterJenjang = ref('')
 const sortOrder = ref('')
 const page = ref(1)
 const pageSize = 10
@@ -26,9 +27,64 @@ function toggleSort() {
   page.value = 1
 }
 
+function initials(nama: string) {
+  const parts = nama.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return '?'
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
+}
+
+// Foto profil dummy untuk data murid yang belum punya foto asli (dibedakan laki-laki/perempuan)
+const dummyAvatarsLaki = [
+  '/images/avatars/laki-1.svg',
+  '/images/avatars/laki-2.svg',
+  '/images/avatars/laki-3.svg',
+]
+
+const dummyAvatarsPerempuan = [
+  '/images/avatars/perempuan-1.svg',
+  '/images/avatars/perempuan-2.svg',
+  '/images/avatars/perempuan-3.svg',
+]
+
+function dummyAvatar(seed: string, jenisKelamin: string | null): string {
+  const list = jenisKelamin === 'PEREMPUAN' ? dummyAvatarsPerempuan : dummyAvatarsLaki
+  let hash = 0
+  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
+  return list[hash % list.length]
+}
+
+function jenisKelaminLabel(jk: string | null) {
+  if (jk === 'LAKI_LAKI') return t('admin.guru.jenisKelaminL')
+  if (jk === 'PEREMPUAN') return t('admin.guru.jenisKelaminP')
+  return ''
+}
+
+function jenisKelaminBadgeClass(jk: string | null, isActive: boolean): string {
+  if (!isActive) return 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+  if (jk === 'PEREMPUAN') return 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300'
+  return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+}
+
+function jenjangOf(nama: string) {
+  return (nama.match(/^[IVXLCDM]+/)?.[0] || '').toUpperCase()
+}
+
+const jenjangList = computed(() => {
+  const set = new Set<string>()
+  for (const s of siswaList.value || []) {
+    const j = jenjangOf(s.kelas?.nama || '')
+    if (j) set.add(j)
+  }
+  return [...set].sort()
+})
+
 // Urutan data: abjad = A-Z, default (off) = urutan dari server
 const displayData = computed(() => {
-  const rows = siswaList.value || []
+  let rows = siswaList.value || []
+  if (filterJenjang.value) {
+    rows = rows.filter(s => jenjangOf(s.kelas?.nama || '') === filterJenjang.value)
+  }
   if (sortOrder.value === 'abjad') {
     return rows.slice().sort((a, b) => a.nama.localeCompare(b.nama))
   }
@@ -41,7 +97,7 @@ const visibleData = computed(() => {
   return displayData.value.slice(start, start + pageSize)
 })
 
-watch([searchQuery, filterKelas], () => { page.value = 1 })
+watch([searchQuery, filterKelas, filterJenjang], () => { page.value = 1 })
 
 const { data: siswaList, pending, refresh } = useFetch<Siswa[]>(() => {
   const params = new URLSearchParams()
@@ -53,11 +109,12 @@ const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin
 
 const showModal = ref(false)
 const editing = ref<Siswa | null>(null)
-const form = ref({ nama: '', nisn: '', email: '', kelasId: 0, namaWali: '', kontakWali: '', nomorHp1: '', nomorHp2: '' })
+const form = ref({ nama: '', nisn: '', email: '', kelasId: 0, jenisKelamin: '', namaWali: '', kontakWali: '', nomorHp1: '', nomorHp2: '' })
 const saving = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
 const confirmDelete = ref<{ id: number; nama: string } | null>(null)
+const waliDetail = ref<Siswa | null>(null)
 const confirmClose = ref(false)
 const dirtyForm = ref(false)
 const generatedPassword = ref('')
@@ -77,7 +134,7 @@ function showSuccess(msg: string) {
 
 function openCreate() {
   editing.value = null
-  form.value = { nama: '', nisn: '', email: '', kelasId: 0, namaWali: '', kontakWali: '', nomorHp1: '', nomorHp2: '' }
+  form.value = { nama: '', nisn: '', email: '', kelasId: 0, jenisKelamin: '', namaWali: '', kontakWali: '', nomorHp1: '', nomorHp2: '' }
   errorMsg.value = ''
   dirtyForm.value = false
   showModal.value = true
@@ -90,6 +147,7 @@ function openEdit(item: Siswa) {
     nisn: item.nisn,
     email: item.user.email,
     kelasId: item.kelasId,
+    jenisKelamin: item.user.jenisKelamin || '',
     namaWali: item.namaWali || '',
     kontakWali: item.kontakWali || '',
     nomorHp1: item.nomorHp1 || '',
@@ -102,6 +160,12 @@ function openEdit(item: Siswa) {
 
 function onFormChange() { dirtyForm.value = true }
 
+function onNisnInput(event: Event) {
+  const target = event.target as HTMLInputElement
+  form.value.nisn = target.value.replace(/\D/g, '').slice(0, 10)
+  onFormChange()
+}
+
 function handleCloseClick() {
   showModal.value = false
 }
@@ -110,6 +174,11 @@ async function handleSave() {
   saving.value = true
   errorMsg.value = ''
 
+  if (!form.value.nama.trim()) { showError('Nama lengkap wajib diisi'); saving.value = false; return }
+  if (!form.value.jenisKelamin) { showError('Jenis kelamin wajib diisi'); saving.value = false; return }
+  if (!/^[0-9]{10}$/.test(form.value.nisn)) { showError('NISN harus tepat 10 digit angka'); saving.value = false; return }
+  if (form.value.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.value.email)) { showError('Format email tidak valid'); saving.value = false; return }
+
   try {
     if (editing.value) {
       const body: Record<string, unknown> = {}
@@ -117,6 +186,7 @@ async function handleSave() {
       if (form.value.nisn !== editing.value.nisn) body.nisn = form.value.nisn
       if (form.value.email !== editing.value.user.email) body.email = form.value.email
       if (form.value.kelasId !== editing.value.kelasId) body.kelasId = form.value.kelasId
+      if ((form.value.jenisKelamin || null) !== (editing.value.user.jenisKelamin || null)) body.jenisKelamin = form.value.jenisKelamin || null
       if (form.value.namaWali !== (editing.value.namaWali || '')) body.namaWali = form.value.namaWali || null
       if (form.value.kontakWali !== (editing.value.kontakWali || '')) body.kontakWali = form.value.kontakWali || null
       if (form.value.nomorHp1 !== (editing.value.nomorHp1 || '')) body.nomorHp1 = form.value.nomorHp1 || null
@@ -135,6 +205,7 @@ async function handleSave() {
           nisn: form.value.nisn,
           email: form.value.email,
           kelasId: form.value.kelasId,
+          jenisKelamin: form.value.jenisKelamin || undefined,
           namaWali: form.value.namaWali || undefined,
           kontakWali: form.value.kontakWali || undefined,
           nomorHp1: form.value.nomorHp1 || undefined,
@@ -156,6 +227,10 @@ async function handleSave() {
 
 function promptDelete(item: Siswa) {
   confirmDelete.value = { id: item.id, nama: item.nama }
+}
+
+function openWaliDetail(item: Siswa) {
+  waliDetail.value = item
 }
 
 async function handleDelete() {
@@ -215,6 +290,11 @@ async function copyPassword() {
           <input v-model="searchQuery" type="text" :placeholder="t('admin.siswa.searchPlaceholder')"
             class="w-40 sm:w-56 pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
+        <select v-model="filterJenjang"
+          class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">{{ t('admin.siswa.semuaJenjang') }}</option>
+          <option v-for="j in jenjangList" :key="j" :value="j">{{ j }}</option>
+        </select>
         <select v-model="filterKelas"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="0">{{ t('admin.jadwal.semuaKelas') }}</option>
@@ -258,11 +338,11 @@ async function copyPassword() {
         <table class="w-full text-xs">
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.guru.colNama') }}</th>
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.siswa.colNisn') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.siswa.colNamaLengkap') }}</th>
               <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.jadwal.colKelas') }}</th>
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">{{ t('admin.siswa.colWali') }}</th>
-              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden xl:table-cell">{{ t('admin.guru.colNoHp') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.siswa.colNisn') }}</th>
+              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">{{ t('admin.guru.colNoHp') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden xl:table-cell">{{ t('admin.guru.colEmail') }}</th>
               <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colStatus') }}</th>
               <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
             </tr>
@@ -270,13 +350,32 @@ async function copyPassword() {
           <tbody class="divide-y admin-accent-divide">
             <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
               <td class="px-4 py-3">
-                <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
-                <div class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ item.nisn }}</div>
+                <div class="flex items-center gap-3">
+                  <div v-if="item.user.foto" class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border admin-accent-border">
+                    <img :src="item.user.foto" class="w-full h-full object-cover" :alt="item.nama" />
+                  </div>
+                  <div v-else class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border admin-accent-border">
+                    <img :src="dummyAvatar(item.nama, item.user.jenisKelamin)" class="w-full h-full object-cover" :alt="item.nama" />
+                  </div>
+                  <div class="min-w-0">
+                    <span class="text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.user.isActive }">
+                      {{ item.nama }}
+                    </span>
+                    <div v-if="item.user.jenisKelamin" class="text-xs text-gray-400 dark:text-gray-500" :class="{ 'text-gray-300 dark:text-gray-600': !item.user.isActive }">
+                      {{ jenisKelaminLabel(item.user.jenisKelamin) }}
+                    </div>
+                  </div>
+                </div>
               </td>
-              <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.nisn }}</td>
               <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden md:table-cell">{{ item.kelas?.nama || '-' }}</td>
-              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.namaWali || '-' }}</td>
-              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs text-center hidden xl:table-cell">{{ item.nomorHp1 || item.nomorHp2 ? (item.nomorHp1 || '-') : '-' }}</td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.nisn }}</td>
+              <td class="px-4 py-3 text-center hidden lg:table-cell">
+                <div class="text-gray-500 dark:text-gray-400 text-xs">
+                  <div>{{ item.nomorHp1 || '-' }}</div>
+                  <div v-if="item.nomorHp2" class="mt-0.5">{{ item.nomorHp2 }}</div>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden xl:table-cell">{{ item.user.email || '-' }}</td>
               <td class="px-4 py-3 text-center">
                 <BaseBadge :variant="item.user.isActive ? 'green' : 'gray'" size="sm" :dot="item.user.isActive">
                   {{ item.user.isActive ? t('admin.tahunAjaran.aktif') : t('admin.tahunAjaran.tidakAktif') }}
@@ -287,6 +386,16 @@ async function copyPassword() {
                   <button @click="openEdit(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md" :title="t('common.edit')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+
+                  <!-- Lihat Info Wali -->
+                  <button @click="openWaliDetail(item)"
+                    class="p-2 text-gray-400 dark:text-gray-500 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/30 rounded-md transition-all duration-150"
+                    :title="t('admin.siswa.viewWaliTitle')">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </button>
 
@@ -358,19 +467,43 @@ async function copyPassword() {
             class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
 
-        <div class="grid grid-cols-2 gap-4">
-          <BaseFormField :label="t('admin.siswa.labelNisn')" required>
-            <input v-model="form.nisn" type="text" @input="onFormChange" required
-              :placeholder="t('admin.siswa.placeholderNisn')"
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
-          </BaseFormField>
+        <BaseFormField :label="t('admin.guru.labelJenisKelamin')" required>
+          <select v-model="form.jenisKelamin" @change="onFormChange" required
+            :class="form.jenisKelamin ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'"
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="" disabled>{{ t('admin.guru.pilihJenisKelamin') }}</option>
+            <option value="LAKI_LAKI">{{ t('admin.guru.jenisKelaminL') }}</option>
+            <option value="PEREMPUAN">{{ t('admin.guru.jenisKelaminP') }}</option>
+          </select>
+        </BaseFormField>
 
+        <div class="grid grid-cols-2 gap-4">
           <BaseFormField :label="t('admin.jadwal.labelKelas')" required>
             <select v-model="form.kelasId" @change="onFormChange" required
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700">
               <option :value="0" disabled>{{ t('admin.jadwal.pilihKelas') }}</option>
               <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
             </select>
+          </BaseFormField>
+
+          <BaseFormField :label="t('admin.siswa.labelNisn')" required>
+            <input v-model="form.nisn" type="text" @input="onNisnInput" required maxlength="10" inputmode="numeric"
+              :placeholder="t('admin.siswa.placeholderNisn')"
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+          </BaseFormField>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <BaseFormField :label="t('admin.siswa.labelNoHp1')">
+            <input v-model="form.nomorHp1" type="text" @input="onFormChange"
+              :placeholder="t('admin.siswa.placeholderHpMurid')"
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+          </BaseFormField>
+
+          <BaseFormField :label="t('admin.siswa.labelNoHp2')">
+            <input v-model="form.nomorHp2" type="text" @input="onFormChange"
+              :placeholder="t('admin.guru.placeholderHp2')"
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
           </BaseFormField>
         </div>
 
@@ -390,20 +523,6 @@ async function copyPassword() {
           <BaseFormField :label="t('admin.siswa.labelKontakWali')">
             <input v-model="form.kontakWali" type="text" @input="onFormChange"
               :placeholder="t('admin.siswa.placeholderKontakWali')"
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
-          </BaseFormField>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <BaseFormField :label="t('admin.siswa.labelNoHp1')">
-            <input v-model="form.nomorHp1" type="text" @input="onFormChange"
-              :placeholder="t('admin.siswa.placeholderHpMurid')"
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
-          </BaseFormField>
-
-          <BaseFormField :label="t('admin.siswa.labelNoHp2')">
-            <input v-model="form.nomorHp2" type="text" @input="onFormChange"
-              :placeholder="t('admin.guru.placeholderHp2')"
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
           </BaseFormField>
         </div>
@@ -431,6 +550,42 @@ async function copyPassword() {
           class="px-5 py-2 text-xs  text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
           <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           {{ saving ? 'Menyimpan...' : 'Simpan' }}
+        </button>
+      </template>
+    </BaseModal>
+
+    <!-- Modal Info Wali -->
+    <BaseModal :show="!!waliDetail" :title="t('admin.siswa.modalWali')" max-w="max-w-sm" @close="waliDetail = null">
+      <template v-if="waliDetail">
+        <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg mb-4">
+          <div class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border admin-accent-border">
+            <img :src="waliDetail.user.foto || dummyAvatar(waliDetail.nama, waliDetail.user.jenisKelamin)" class="w-full h-full object-cover" :alt="waliDetail.nama" />
+          </div>
+          <div class="min-w-0">
+            <div class="text-sm text-gray-900 dark:text-gray-100">{{ waliDetail.nama }}</div>
+            <div class="text-xs text-gray-400 dark:text-gray-500">{{ waliDetail.nisn }} &middot; {{ waliDetail.kelas?.nama }}</div>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.siswa.labelNamaWali') }}</label>
+            <div class="px-3.5 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-slate-700">
+              {{ waliDetail.namaWali || '-' }}
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.siswa.labelKontakWali') }}</label>
+            <div class="px-3.5 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-slate-700">
+              {{ waliDetail.kontakWali || '-' }}
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <button @click="waliDetail = null"
+          class="px-4 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
+          {{ t('admin.guru.tutup') }}
         </button>
       </template>
     </BaseModal>

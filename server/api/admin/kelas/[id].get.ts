@@ -5,12 +5,12 @@ export default defineEventHandler(async (event) => {
   const data = await prisma.kelas.findUnique({
     where: { id },
     include: {
-      waliKelas: { select: { id: true, nama: true, nip: true } },
+      waliKelas: { select: { id: true, nama: true, nip: true, jenisKelamin: true, foto: true } },
       tahunAjaran: true,
       _count: { select: { siswa: true, jadwalPelajaran: true } },
       siswa: {
         include: {
-          user: { select: { id: true, nama: true, email: true, isActive: true } }
+          user: { select: { id: true, nama: true, email: true, isActive: true, foto: true, jenisKelamin: true } }
         }
       }
     }

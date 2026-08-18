@@ -4,12 +4,18 @@ interface Kelas {
   nama: string
   waliKelasId: number | null
   tahunAjaranId: number
-  waliKelas: { id: number; nama: string } | null
+  waliKelas: { id: number; nama: string; jenisKelamin: string | null; foto: string | null } | null
   tahunAjaran: { id: number; nama: string; semester: string }
   _count: { siswa: number; jadwalPelajaran: number }
 }
 
 const { t } = useI18n()
+
+function jenisKelaminLabel(jk: string | null) {
+  if (jk === 'LAKI_LAKI') return t('admin.guru.jenisKelaminL')
+  if (jk === 'PEREMPUAN') return t('admin.guru.jenisKelaminP')
+  return ''
+}
 
 const draftSearch = ref('')
 const draftTa = ref(0)
@@ -237,7 +243,15 @@ async function handleDelete() {
                   {{ item.nama }}
                 </NuxtLink>
               </td>
-              <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.waliKelas?.nama || '-' }}</td>
+              <td class="px-4 py-3 hidden sm:table-cell">
+                <div v-if="item.waliKelas" class="min-w-0">
+                  <span class="text-gray-600 dark:text-gray-300">{{ item.waliKelas.nama }}</span>
+                  <div v-if="item.waliKelas.jenisKelamin" class="text-xs text-gray-400 dark:text-gray-500">
+                    {{ jenisKelaminLabel(item.waliKelas.jenisKelamin) }}
+                  </div>
+                </div>
+                <span v-else class="text-gray-600 dark:text-gray-300">-</span>
+              </td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden md:table-cell">{{ item.tahunAjaran.nama }}</td>
               <td class="px-4 py-3 text-center">
                 <span class="text-gray-700 dark:text-gray-200 ">{{ item._count.siswa }}</span>

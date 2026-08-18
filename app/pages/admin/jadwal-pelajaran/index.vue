@@ -7,11 +7,17 @@ interface Jadwal {
   jamSelesai: string
   kelas: { id: number; nama: string }
   ruangan: { id: number; nama: string }
-  guru: { id: number; nama: string }
-  ptkPendamping?: { id: number; nama: string } | null
+  guru: { id: number; nama: string; jenisKelamin: string | null }
+  ptkPendamping?: { id: number; nama: string; jenisKelamin: string | null } | null
 }
 
 const { t } = useI18n()
+
+function jenisKelaminLabel(jk: string | null) {
+  if (jk === 'LAKI_LAKI') return t('admin.guru.jenisKelaminL')
+  if (jk === 'PEREMPUAN') return t('admin.guru.jenisKelaminP')
+  return ''
+}
 
 const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin/kelas', { immediate: true })
 const { data: guruList } = useFetch<{ id: number; nama: string }[]>('/api/admin/guru', { immediate: true })
@@ -201,8 +207,23 @@ async function handleDelete() {
               <td class="px-4 py-3 text-gray-600 dark:text-gray-300 text-xs">{{ item.jamMulai }} - {{ item.jamSelesai }}</td>
               <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.kelas.nama }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.ruangan.nama }}</td>
-              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.guru.nama }}</td>
-              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden xl:table-cell">{{ item.ptkPendamping?.nama || '-' }}</td>
+              <td class="px-4 py-3 hidden lg:table-cell">
+                <div class="min-w-0">
+                  <span class="text-gray-500 dark:text-gray-400 text-xs">{{ item.guru.nama }}</span>
+                  <div v-if="item.guru.jenisKelamin" class="text-[10px] text-gray-400 dark:text-gray-500">
+                    {{ jenisKelaminLabel(item.guru.jenisKelamin) }}
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3 hidden xl:table-cell">
+                <div v-if="item.ptkPendamping" class="min-w-0">
+                  <span class="text-gray-500 dark:text-gray-400 text-xs">{{ item.ptkPendamping.nama }}</span>
+                  <div v-if="item.ptkPendamping.jenisKelamin" class="text-[10px] text-gray-400 dark:text-gray-500">
+                    {{ jenisKelaminLabel(item.ptkPendamping.jenisKelamin) }}
+                  </div>
+                </div>
+                <span v-else class="text-gray-500 dark:text-gray-400 text-xs">-</span>
+              </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
                   <button @click="openEdit(item)" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-gray-100 rounded-md" :title="t('common.edit')">

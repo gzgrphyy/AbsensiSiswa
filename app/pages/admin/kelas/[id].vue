@@ -7,7 +7,7 @@ interface SiswaItem {
   nomorHp2: string | null
   namaWali: string | null
   kontakWali: string | null
-  user: { id: number; nama: string; email: string; isActive: boolean } | null
+  user: { id: number; nama: string; email: string; isActive: boolean; foto: string | null; jenisKelamin: string | null } | null
 }
 
 interface KelasDetail {
@@ -15,13 +15,19 @@ interface KelasDetail {
   nama: string
   waliKelasId: number | null
   tahunAjaranId: number
-  waliKelas: { id: number; nama: string; nip: string | null } | null
+  waliKelas: { id: number; nama: string; nip: string | null; jenisKelamin: string | null; foto: string | null } | null
   tahunAjaran: { id: number; nama: string; semester: string }
   _count: { siswa: number; jadwalPelajaran: number }
   siswa: SiswaItem[]
 }
 
 const { t } = useI18n()
+
+function jenisKelaminLabel(jk: string | null) {
+  if (jk === 'LAKI_LAKI') return t('admin.guru.jenisKelaminL')
+  if (jk === 'PEREMPUAN') return t('admin.guru.jenisKelaminP')
+  return ''
+}
 
 const route = useRoute()
 const kelasId = computed(() => parseInt(route.params.id as string))
@@ -92,7 +98,12 @@ watch(searchSiswa, () => { page.value = 1 })
         <dl class="space-y-1.5 text-sm">
           <div class="flex items-center justify-between gap-3">
             <dt class="text-gray-500 dark:text-gray-400">{{ t('admin.kelas.colWali') }}</dt>
-            <dd class="font-semibold text-gray-900 dark:text-gray-100 truncate">{{ kelas.waliKelas?.nama || '-' }}</dd>
+            <dd class="font-semibold text-gray-900 dark:text-gray-100 truncate">
+              <span>{{ kelas.waliKelas?.nama || '-' }}</span>
+              <div v-if="kelas.waliKelas?.jenisKelamin" class="text-xs text-gray-400 dark:text-gray-500 font-normal">
+                {{ jenisKelaminLabel(kelas.waliKelas.jenisKelamin) }}
+              </div>
+            </dd>
           </div>
           <div class="flex items-center justify-between gap-3">
             <dt class="text-gray-500 dark:text-gray-400">{{ t('admin.kelas.colTa') }}</dt>

@@ -14,8 +14,8 @@ export default defineEventHandler(async (event) => {
     include: {
       kelas: { select: { id: true, nama: true } },
       ruangan: { select: { id: true, nama: true } },
-      guru: { select: { id: true, nama: true, nip: true } },
-      ptkPendamping: { select: { id: true, nama: true } }
+      guru: { select: { id: true, nama: true, nip: true, jenisKelamin: true, foto: true } },
+      ptkPendamping: { select: { id: true, nama: true, jenisKelamin: true } }
     }
   })
 })

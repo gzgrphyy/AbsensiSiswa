@@ -95,8 +95,11 @@
       "tambahMurid": "Tambah Murid",
       "namaAz": "Nama (A\u2013Z)",
       "namaAzOff": "Kembali ke urutan default",
+      "colNamaLengkap": "Nama Lengkap",
       "colNisn": "NISN",
       "colWali": "Wali",
+      "viewWaliTitle": "Lihat info wali",
+      "modalWali": "Info Wali",
       "empty": "Belum ada data murid",
       "unitMurid": "murid",
       "modalCreate": "Tambah Murid Baru",
@@ -110,15 +113,17 @@
       "labelKontakWali": "Kontak Wali",
       "placeholderKontakWali": "No. telepon",
       "labelNoHp1": "No. HP 1",
-      "labelNoHp2": "No. HP 2",
+      "labelNoHp2": "No. HP 2 (opsional)",
       "placeholderHpMurid": "Nomor HP murid",
       "infoPassword": "Password akan digenerate otomatis",
       "msgBerhasilEdit": "Data murid berhasil diperbarui",
       "msgBerhasilTambah": "Akun murid berhasil ditambahkan",
       "msgBerhasilHapus": "Data murid berhasil dihapus",
       "pwModalMsg": "Password untuk akun murid. Salin dan sampaikan ke murid.",
-      "confirmDeleteTitle": "Hapus Data Murid",
-      "confirmDeleteMsg": "Yakin ingin menghapus {nama}?"
+      "confirmDeleteTitle": "Hapus Data Murid",      "confirmDeleteMsg": "Yakin ingin menghapus {nama}?",
+      "semuaJenjang": "Semua Jenjang"
+
+
     },
     "guru": {
       "title": "Data PTK",
@@ -181,8 +186,10 @@
       "yaReset": "Ya, Reset",
       "labelNoHp": "No. HP (opsional)",
       "infoLogin": "Email digunakan untuk login",
-      "confirmDeleteTitle": "Hapus PTK",
-      "confirmDeleteMsg": "Yakin ingin menghapus {nama}?",
+      "confirmDeleteTitle": "Hapus PTK",      "confirmDeleteMsg": "Yakin ingin menghapus {nama}?",
+      "semuaJenjang": "Semua Jenjang"
+
+,
       "msgBerhasilHapus": "Data PTK berhasil dihapus"
     },
     "rekap": {
@@ -229,8 +236,10 @@
       "msgBerhasilTambah": "Kelas berhasil ditambahkan",
       "msgBerhasilEdit": "Data kelas berhasil diperbarui",
       "msgBerhasilHapus": "Kelas berhasil dihapus",
-      "confirmDeleteTitle": "Hapus Kelas",
-      "confirmDeleteMsg": "Yakin ingin menghapus {nama}?",
+      "confirmDeleteTitle": "Hapus Kelas",      "confirmDeleteMsg": "Yakin ingin menghapus {nama}?",
+      "semuaJenjang": "Semua Jenjang"
+
+,
       "unitKelas": "kelas",
       "lihatDetail": "Lihat detail kelas",
       "detailTitle": "Detail Kelas",
@@ -395,8 +404,10 @@
       "msgGagalSimpan": "Gagal menyimpan",
       "msgGagalHapus": "Gagal menghapus",
       "msgGagalQr": "Gagal memuat QR Code",
-      "confirmDeleteTitle": "Hapus Ruangan",
-      "confirmDeleteMsg": "Yakin ingin menghapus {nama}?",
+      "confirmDeleteTitle": "Hapus Ruangan",      "confirmDeleteMsg": "Yakin ingin menghapus {nama}?",
+      "semuaJenjang": "Semua Jenjang"
+
+,
       "confirmDeleteJadwal": "Ruangan ini masih memiliki {count} jadwal terkait.",
       "jenis": {
         "KELAS": "Kelas",

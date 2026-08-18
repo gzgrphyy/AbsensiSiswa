@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     orderBy: { nama: 'desc' },
     include: {
       waliKelas: {
-        select: { id: true, nama: true, nip: true }
+        select: { id: true, nama: true, nip: true, jenisKelamin: true, foto: true }
       },
       tahunAjaran: true,
       _count: {

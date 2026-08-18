@@ -95,8 +95,11 @@
       "tambahMurid": "Add Student",
       "namaAz": "Name (A\u2013Z)",
       "namaAzOff": "Back to default order",
+      "colNamaLengkap": "Full Name",
       "colNisn": "NISN",
       "colWali": "Guardian",
+      "viewWaliTitle": "View guardian info",
+      "modalWali": "Guardian Info",
       "empty": "No student data yet",
       "unitMurid": "students",
       "modalCreate": "Add New Student",
@@ -110,7 +113,7 @@
       "labelKontakWali": "Guardian Contact",
       "placeholderKontakWali": "Phone number",
       "labelNoHp1": "Phone 1",
-      "labelNoHp2": "Phone 2",
+      "labelNoHp2": "Phone 2 (optional)",
       "placeholderHpMurid": "Student phone number",
       "infoPassword": "A password will be generated automatically",
       "msgBerhasilEdit": "Student data updated successfully",
@@ -118,7 +121,8 @@
       "msgBerhasilHapus": "Student data deleted successfully",
       "pwModalMsg": "Password for the student account. Copy it and share it with the student.",
       "confirmDeleteTitle": "Delete Student Data",
-      "confirmDeleteMsg": "Are you sure you want to delete {nama}?"
+      "confirmDeleteMsg": "Are you sure you want to delete {nama}?",
+      "semuaJenjang": "All Grades"
     },
     "guru": {
       "title": "Teacher Data",

@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Siswa tidak ditemukan' })
 
-  const { nisn, nama, email, kelasId, namaWali, kontakWali, nomorHp1, nomorHp2 } = result.data
+  const { nisn, nama, email, kelasId, jenisKelamin, namaWali, kontakWali, nomorHp1, nomorHp2 } = result.data
 
   if (nisn && nisn !== existing.nisn) {
     const nisnExists = await prisma.siswa.findUnique({ where: { nisn } })
@@ -41,12 +41,13 @@ export default defineEventHandler(async (event) => {
   }
 
   return await prisma.$transaction(async (tx) => {
-    if (existing.user && (nama || email)) {
+    if (existing.user && (nama !== undefined || email !== undefined || jenisKelamin !== undefined)) {
       await tx.user.update({
         where: { id: existing.user.id },
         data: {
           ...(nama !== undefined && { nama }),
-          ...(email !== undefined && { email })
+          ...(email !== undefined && { email }),
+          ...(jenisKelamin !== undefined && { jenisKelamin: jenisKelamin || null })
         }
       })
     }
@@ -63,7 +64,7 @@ export default defineEventHandler(async (event) => {
         ...(nomorHp2 !== undefined && { nomorHp2: nomorHp2 || null })
       },
       include: {
-        user: { select: { id: true, nama: true, email: true, isActive: true } },
+        user: { select: { id: true, nama: true, email: true, isActive: true, foto: true, jenisKelamin: true } },
         kelas: { select: { id: true, nama: true } }
       }
     })

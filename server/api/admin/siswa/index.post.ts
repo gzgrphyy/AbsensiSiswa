@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { nisn, nama, email, kelasId, namaWali, kontakWali, nomorHp1, nomorHp2 } = result.data
+  const { nisn, nama, email, kelasId, jenisKelamin, namaWali, kontakWali, nomorHp1, nomorHp2 } = result.data
 
   const existingNisn = await prisma.siswa.findUnique({ where: { nisn } })
   if (existingNisn) {
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
 
   const siswa = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
-      data: { nama, email, passwordHash, role: 'SISWA', isActive: true }
+      data: { nama, email, passwordHash, role: 'SISWA', isActive: true, jenisKelamin }
     })
 
     return await tx.siswa.create({
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
         nomorHp2: nomorHp2 || null
       },
       include: {
-        user: { select: { id: true, nama: true, email: true, isActive: true } },
+        user: { select: { id: true, nama: true, email: true, isActive: true, foto: true, jenisKelamin: true } },
         kelas: { select: { id: true, nama: true } }
       }
     })
