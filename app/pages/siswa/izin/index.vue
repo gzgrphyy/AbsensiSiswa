@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { jenisIzinLabels, statusIzinLabels, statusIzinBadgeVariant } from '~/utils/absensi'
 
-interface IzinOption {
+type IzinState = 'available' | 'submitted' | 'no_schedule' | 'finished'
+
+interface IzinDay {
   tanggal: string
   hari: string
+  state: IzinState
 }
 
 interface IzinData {
-  dates: IzinOption[]
-  submitted: string[]
+  days: IzinDay[]
   today: string
 }
 
@@ -23,6 +25,8 @@ interface RiwayatItem {
   penanggap: string | null
   createdAt: string
 }
+
+const MAX_TANGGAL = 14
 
 const { data: options, refresh: refreshOptions } = useFetch<IzinData>('/api/siswa/izin/options', { immediate: true })
 const { data: riwayat, pending: pendingRiwayat, refresh: refreshRiwayat } = useFetch<RiwayatItem[]>('/api/siswa/izin', { immediate: true })
@@ -40,11 +44,44 @@ const errorMsg = ref('')
 const successMsg = ref('')
 const buktiInput = ref<HTMLInputElement>()
 
-const eligibleDates = computed(() => options.value?.dates || [])
-const submittedDates = computed(() => new Set(options.value?.submitted || []))
+const showCustomModal = ref(false)
+const customDate = ref('')
+const customDateMin = ref('')
+const customDateMax = ref('')
+const customMsg = ref('')
+const addingCustom = ref(false)
+
+const chipTooltip = ref<{ text: string; left: number; top: number } | null>(null)
+let chipTooltipTimer: ReturnType<typeof setTimeout> | null = null
+
+const disabledReasonMap: Record<string, string> = {
+  submitted: 'Sudah diajukan',
+  no_schedule: 'Tidak ada jadwal',
+  finished: 'Sesi hari ini sudah selesai semua'
+}
+
+const days = computed(() => options.value?.days || [])
+const stripDates = computed(() => new Set(days.value.map(d => d.tanggal)))
+const customSelected = computed(() => form.value.tanggal.filter(t => !stripDates.value.has(t)))
+
+function keyOf(d: Date) {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+function stateOf(tanggal: string): IzinState | undefined {
+  return days.value.find(d => d.tanggal === tanggal)?.state
+}
 
 function isDisabledDate(tanggal: string) {
-  return submittedDates.value.has(tanggal)
+  return stateOf(tanggal) !== 'available'
+}
+
+function disabledReason(tanggal: string) {
+  const s = stateOf(tanggal)
+  return s && s !== 'available' ? disabledReasonMap[s] || 'Tidak dapat dipilih' : ''
 }
 
 function dateLabel(tanggal: string) {
@@ -53,6 +90,11 @@ function dateLabel(tanggal: string) {
   const day = d.getDate()
   const month = d.toLocaleDateString('id-ID', { month: 'short' })
   return { weekday, day, month }
+}
+
+function shortDateLabel(tanggal: string) {
+  const d = new Date(`${tanggal}T00:00:00`)
+  return d.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' })
 }
 
 function fullDateLabel(tanggal: string) {
@@ -80,12 +122,76 @@ function pickJenis(jenis: string) {
 }
 
 function pickTanggal(tanggal: string) {
-  if (isDisabledDate(tanggal)) return
   const idx = form.value.tanggal.indexOf(tanggal)
   if (idx >= 0) {
     form.value.tanggal.splice(idx, 1)
   } else {
+    if (form.value.tanggal.length >= MAX_TANGGAL) {
+      showError(`Maksimal ${MAX_TANGGAL} tanggal dalam satu pengajuan`)
+      return
+    }
     form.value.tanggal.push(tanggal)
+  }
+}
+
+function clearAllTanggal() {
+  form.value.tanggal = []
+}
+
+function onStripTap(tanggal: string, event: Event) {
+  if (isDisabledDate(tanggal)) {
+    showChipTooltip(tanggal, event)
+    return
+  }
+  pickTanggal(tanggal)
+}
+
+function showChipTooltip(tanggal: string, event: Event) {
+  const el = event.currentTarget as HTMLElement | null
+  const rect = el?.getBoundingClientRect()
+  const text = disabledReason(tanggal)
+  if (!rect || !text) return
+  const vw = window.innerWidth
+  const left = Math.min(Math.max(rect.left + rect.width / 2, 80), vw - 80)
+  chipTooltip.value = { text, left, top: rect.top }
+  if (chipTooltipTimer) clearTimeout(chipTooltipTimer)
+  chipTooltipTimer = setTimeout(() => { chipTooltip.value = null }, 2500)
+}
+
+function openCustomModal() {
+  const now = new Date()
+  customDateMin.value = keyOf(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1))
+  customDateMax.value = keyOf(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30))
+  customDate.value = ''
+  customMsg.value = ''
+  showCustomModal.value = true
+}
+
+async function addCustomDate() {
+  const t = customDate.value
+  if (!t || addingCustom.value) return
+  if (form.value.tanggal.includes(t)) {
+    customMsg.value = 'Tanggal sudah dipilih'
+    return
+  }
+  if (form.value.tanggal.length >= MAX_TANGGAL) {
+    customMsg.value = `Maksimal ${MAX_TANGGAL} tanggal dalam satu pengajuan`
+    return
+  }
+  addingCustom.value = true
+  customMsg.value = ''
+  try {
+    const res = await $fetch<{ available: boolean; reason: string | null }>(`/api/siswa/izin/check?tanggal=${t}`)
+    if (!res.available) {
+      customMsg.value = res.reason || 'Tanggal tidak dapat dipilih'
+      return
+    }
+    form.value.tanggal.push(t)
+    customDate.value = ''
+  } catch (err: any) {
+    customMsg.value = err?.data?.statusMessage || 'Gagal memeriksa tanggal'
+  } finally {
+    addingCustom.value = false
   }
 }
 
@@ -149,7 +255,7 @@ async function submit() {
     form.value.keterangan = ''
     form.value.bukti = null
     await Promise.all([refreshOptions(), refreshRiwayat()])
-    const available = eligibleDates.value.find(d => !isDisabledDate(d.tanggal))
+    const available = days.value.find(d => d.state === 'available')
     if (available) form.value.tanggal = [available.tanggal]
   } catch (err: any) {
     showError(err?.data?.statusMessage || 'Gagal mengirim pengajuan')
@@ -187,48 +293,108 @@ const formError = computed(() => {
             Tanggal <span class="text-red-500">*</span>
           </label>
 
-          <div v-if="eligibleDates.length === 0" class="rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+          <div v-if="days.length === 0" class="rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
             Tidak ada hari yang bisa diajukan saat ini.
           </div>
 
           <div v-else class="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
             <button
-              v-for="opt in eligibleDates"
+              v-for="opt in days"
               :key="opt.tanggal"
               type="button"
-              :disabled="isDisabledDate(opt.tanggal)"
-              @click="pickTanggal(opt.tanggal)"
-              class="flex-shrink-0 flex flex-col items-center justify-center w-16 h-16 rounded-xl border transition-colors"
+              :aria-disabled="isDisabledDate(opt.tanggal)"
+              @click="onStripTap(opt.tanggal, $event)"
+              class="relative flex-shrink-0 flex flex-col items-center justify-center w-16 h-16 rounded-xl border transition-colors"
               :class="isDisabledDate(opt.tanggal)
                 ? 'border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-700/40 text-gray-300 dark:text-gray-600 cursor-not-allowed'
                 : form.tanggal.includes(opt.tanggal)
-                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                  ? 'bg-primary-500 border-primary-600 text-white shadow-md shadow-primary-500/30'
                   : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:border-primary-300 dark:hover:border-primary-700'"
             >
-              <span class="text-[10px] font-semibold uppercase tracking-wide leading-none" :class="form.tanggal.includes(opt.tanggal) && !isDisabledDate(opt.tanggal) ? 'text-primary-600 dark:text-primary-400' : ''">{{ dateLabel(opt.tanggal).weekday }}</span>
+              <span class="text-[10px] font-semibold uppercase tracking-wide leading-none">{{ dateLabel(opt.tanggal).weekday }}</span>
               <span class="text-lg font-bold leading-tight mt-0.5">{{ dateLabel(opt.tanggal).day }}</span>
-              <span class="text-[9px] leading-none mt-0.5" :class="form.tanggal.includes(opt.tanggal) && !isDisabledDate(opt.tanggal) ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400 dark:text-gray-500'">{{ dateLabel(opt.tanggal).month }}</span>
+              <span class="text-[9px] leading-none mt-0.5" :class="form.tanggal.includes(opt.tanggal) && !isDisabledDate(opt.tanggal) ? 'text-white/80' : 'text-gray-400 dark:text-gray-500'">{{ dateLabel(opt.tanggal).month }}</span>
+
+              <span
+                v-if="form.tanggal.includes(opt.tanggal) && !isDisabledDate(opt.tanggal)"
+                class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white text-primary-600 border border-primary-400 shadow-sm flex items-center justify-center"
+              >
+                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M5 13l4 4L19 7" />
+                </svg>
+              </span>
+
+              <span
+                v-if="isDisabledDate(opt.tanggal)"
+                class="absolute top-1 right-1 text-gray-300 dark:text-gray-600"
+              >
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17 8V7a5 5 0 0 0-10 0v1a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-8a3 3 0 0 0-3-3Zm-9-1a4 4 0 0 1 8 0v1H8V7Zm8 14H8a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2Z" />
+                </svg>
+              </span>
             </button>
           </div>
 
-          <div v-if="form.tanggal.length" class="mt-2 flex flex-wrap gap-1.5">
-            <span
-              v-for="t in form.tanggal"
-              :key="t"
-              class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-primary-50 dark:bg-primary-900/40 border border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-300 text-xs font-medium"
-            >
-              {{ fullDateLabel(t) }}
+          <!-- Tooltip chip disabled -->
+          <div
+            v-if="chipTooltip"
+            class="fixed z-50 pointer-events-none"
+            :style="{ left: chipTooltip.left + 'px', top: chipTooltip.top + 'px' }"
+          >
+            <div class="-translate-x-1/2 -translate-y-full pb-1.5">
+              <div class="relative bg-gray-900 dark:bg-slate-950 text-white text-xs rounded-lg px-2.5 py-1.5 shadow-lg whitespace-nowrap">
+                {{ chipTooltip.text }}
+                <span class="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-gray-900 dark:bg-slate-950 -mt-1 rotate-45" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Pilih tanggal lain -->
+          <button
+            type="button"
+            @click="openCustomModal"
+            class="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:underline transition-colors"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Pilih tanggal lain
+          </button>
+
+          <!-- Ringkasan chip -->
+          <div v-if="form.tanggal.length" class="mt-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50/70 dark:bg-slate-700/30 px-3 py-2.5">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-semibold text-gray-600 dark:text-gray-400">Terpilih ({{ form.tanggal.length }})</p>
               <button
                 type="button"
-                @click="pickTanggal(t)"
-                class="text-primary-500 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-200 transition-colors"
-                title="Hapus tanggal"
+                @click="clearAllTanggal"
+                class="text-xs font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors"
               >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                Hapus semua
               </button>
-            </span>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <span
+                v-for="t in form.tanggal"
+                :key="t"
+                class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white dark:bg-slate-800 border border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-300 text-xs font-medium shadow-sm"
+              >
+                <svg class="w-3 h-3 text-primary-500 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+                {{ shortDateLabel(t) }}
+                <button
+                  type="button"
+                  @click="pickTanggal(t)"
+                  class="text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors"
+                  title="Hapus tanggal"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -350,6 +516,54 @@ const formError = computed(() => {
         </button>
       </div>
     </div>
+
+    <!-- Modal Pilih Tanggal Lain -->
+    <BaseModal :show="showCustomModal" title="Pilih Tanggal Lain" max-w="max-w-sm" @close="showCustomModal = false">
+      <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Pilih tanggal di luar minggu berjalan, misalnya untuk izin / sakit lanjutan beberapa hari ke depan.</p>
+      <input
+        v-model="customDate"
+        type="date"
+        :min="customDateMin"
+        :max="customDateMax"
+        class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-xl text-sm bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow"
+      />
+      <p v-if="customMsg" class="mt-2 text-xs text-red-500">{{ customMsg }}</p>
+      <button
+        type="button"
+        :disabled="addingCustom || !customDate"
+        @click="addCustomDate"
+        class="mt-3 w-full px-4 py-2.5 text-sm font-semibold text-white bg-primary-500 rounded-xl hover:bg-primary-600 active:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md shadow-primary-500/30 inline-flex items-center justify-center gap-2"
+      >
+        <svg v-if="addingCustom" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+        Tambahkan Tanggal
+      </button>
+
+      <div v-if="customSelected.length" class="mt-4 pt-3 border-t border-gray-100 dark:border-slate-700">
+        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">Ditambahkan di luar minggu ({{ customSelected.length }})</p>
+        <div class="flex flex-wrap gap-1.5">
+          <span
+            v-for="t in customSelected"
+            :key="t"
+            class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300 text-xs font-medium"
+          >
+            {{ shortDateLabel(t) }}
+            <button
+              type="button"
+              @click="pickTanggal(t)"
+              class="text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors"
+              title="Hapus tanggal"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </span>
+        </div>
+      </div>
+    </BaseModal>
 
     <!-- Riwayat Pengajuan -->
     <section>
