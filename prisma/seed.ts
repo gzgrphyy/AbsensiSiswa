@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../server/utils/password'
+import { dummyAvatarPath } from '../server/utils/avatar'
 import { inferJK } from '../scripts/inferJK'
 
 const prisma = new PrismaClient()
@@ -164,26 +165,29 @@ async function main() {
   ]
 
   const gurus = await Promise.all(
-    guruData.map(g =>
-      prisma.user.create({
+    guruData.map(g => {
+      const jk = inferJK(g.nama)
+      return prisma.user.create({
         data: {
           nama: g.nama,
           nip: g.nip,
           email: g.email,
           nomorHp1: g.nomorHp1,
           nomorHp2: g.nomorHp2,
-          jenisKelamin: inferJK(g.nama),
+          jenisKelamin: jk,
+          foto: dummyAvatarPath(g.nama, jk),
           passwordHash: guruHash,
           role: 'GURU',
           isActive: true
         }
       })
-    )
+    })
   )
 
   const guruTambahanCount = 30 - gurus.length
   for (let i = 0; i < guruTambahanCount; i++) {
     const g = generatePtk(i)
+    const jk = inferJK(g.nama)
     const user = await prisma.user.create({
       data: {
         nama: g.nama,
@@ -191,7 +195,8 @@ async function main() {
         email: g.email,
         nomorHp1: g.nomorHp1,
         nomorHp2: g.nomorHp2,
-        jenisKelamin: inferJK(g.nama),
+        jenisKelamin: jk,
+        foto: dummyAvatarPath(g.nama, jk),
         passwordHash: guruHash,
         role: 'GURU',
         isActive: true
@@ -343,7 +348,8 @@ async function main() {
           email: `siswa${idx + 1}@absensi.test`,
           passwordHash: siswaHash,
           role: 'SISWA',
-          isActive: true
+          isActive: true,
+          foto: dummyAvatarPath(murid.nama, inferJK(murid.nama))
         }
       })
       await prisma.siswa.create({

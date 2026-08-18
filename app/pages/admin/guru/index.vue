@@ -54,11 +54,24 @@ function toggleSort() {
   page.value = 1
 }
 
-function initials(nama: string) {
-  const parts = nama.trim().split(/\s+/).filter(Boolean)
-  if (parts.length === 0) return '?'
-  if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
-  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
+// Foto profil dummy untuk PTK yang belum punya foto asli (dibedakan laki-laki/perempuan)
+const dummyAvatarsLaki = [
+  '/images/avatars/laki-1.svg',
+  '/images/avatars/laki-2.svg',
+  '/images/avatars/laki-3.svg',
+]
+
+const dummyAvatarsPerempuan = [
+  '/images/avatars/perempuan-1.svg',
+  '/images/avatars/perempuan-2.svg',
+  '/images/avatars/perempuan-3.svg',
+]
+
+function dummyAvatar(seed: string, jenisKelamin: string | null): string {
+  const list = jenisKelamin === 'PEREMPUAN' ? dummyAvatarsPerempuan : dummyAvatarsLaki
+  let hash = 0
+  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
+  return list[hash % list.length]
 }
 
 function jenisKelaminLabel(jk: string | null) {
@@ -500,8 +513,8 @@ async function copyPassword() {
                     <div v-if="item.foto" class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border admin-accent-border">
                       <img :src="item.foto" class="w-full h-full object-cover" :alt="item.nama" />
                     </div>
-                    <div v-else class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold flex-shrink-0">
-                      {{ initials(item.nama) }}
+                    <div v-else class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border admin-accent-border">
+                      <img :src="dummyAvatar(item.nama, item.jenisKelamin)" class="w-full h-full object-cover" :alt="item.nama" />
                     </div>
                     <div class="min-w-0">
                       <span class="text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.isActive }">

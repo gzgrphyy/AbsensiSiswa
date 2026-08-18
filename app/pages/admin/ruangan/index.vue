@@ -12,6 +12,7 @@ interface Ruangan {
 }
 
 const { t } = useI18n()
+const { pengaturan } = usePengaturan()
 
 const { data, pending, refresh } = useFetch<Ruangan[]>('/api/admin/ruangan', { immediate: true })
 const { data: kelasList } = useFetch<{ id: number; nama: string; tahunAjaran: { isActive: boolean } }[]>('/api/admin/kelas', { immediate: true })
@@ -74,6 +75,7 @@ const successMsg = ref('')
 const confirmClose = ref(false)
 const dirtyForm = ref(false)
 const copiedType = ref<'code' | 'url' | null>(null)
+const printSize = ref<'landscape' | 'portrait'>('landscape')
 
 const scanUrl = computed(() => {
   if (!showQR.value) return ''
@@ -183,22 +185,203 @@ async function openQR(item: Ruangan) {
   } finally { loadingQR.value = false }
 }
 
+function escapeHtml(value: string) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 function printQR() {
   if (!showQR.value) return
   const printWin = window.open('', '_blank')
   if (!printWin) return
-  printWin.document.write(`
-    <!DOCTYPE html><html><head><title>QR - ${showQR.value.nama}</title>
-    <style>body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;font-family:sans-serif}
-    .container{text-align:center}
-    h2{margin-bottom:8px;color:#1e293b}
-    p{color:#64748b;margin-top:4px}
-    svg{max-width:400px;width:100%;height:auto}</style></head>
-    <body><div class="container"><h2>${showQR.value.nama}</h2>
-    <p>${t('admin.ruangan.qr.scan')}</p>${qrSvg.value}</div></body></html>
-  `)
+
+  const isLandscape = printSize.value === 'landscape'
+  const pageW = isLandscape ? 210 : 148
+  const pageH = isLandscape ? 148 : 210
+
+  const room = escapeHtml(showQR.value.nama)
+  const fullSchoolName = (pengaturan.value?.namaSekolah || 'SMK Negeri 4 Bandung').trim().toUpperCase()
+  const m = fullSchoolName.match(/^(SMK NEGERI\s*\d+)\s+(.+)$/)
+  let schoolLine1 = fullSchoolName
+  let schoolLine2 = ''
+  if (m) {
+    schoolLine1 = m[1]
+    schoolLine2 = `KOTA ${m[2]}`
+  } else {
+    const words = fullSchoolName.split(/\s+/)
+    let lastNum = -1
+    for (let i = 0; i < words.length; i++) {
+      if (/\d/.test(words[i])) lastNum = i
+    }
+    if (lastNum > 0 && lastNum < words.length - 1) {
+      schoolLine1 = words.slice(0, lastNum + 1).join(' ')
+      schoolLine2 = words.slice(lastNum + 1).join(' ')
+    } else {
+      const mid = Math.ceil(words.length / 2)
+      schoolLine1 = words.slice(0, mid).join(' ')
+      schoolLine2 = words.slice(mid).join(' ')
+    }
+  }
+  const schoolLogo = escapeHtml(pengaturan.value?.logoSekolahPath || '/photo/smkn4.png')
+  const appLogo = escapeHtml(pengaturan.value?.iconPath || '/photo/logo_aplikasiv2.png')
+  const appLabel = escapeHtml(t('app.aplikasiLabel'))
+  const appName = escapeHtml(t('app.aplikasiSkoria'))
+  const welcome = escapeHtml(t('admin.ruangan.qr.posterSelamatDatang'))
+  const scanHere = escapeHtml(t('admin.ruangan.qr.posterScan'))
+  const scanText = escapeHtml(t('admin.ruangan.qr.scan'))
+  const mudah = escapeHtml(t('admin.ruangan.qr.posterMudah'))
+  const akurat = escapeHtml(t('admin.ruangan.qr.posterAkurat'))
+  const realtime = escapeHtml(t('admin.ruangan.qr.posterRealTime'))
+
+  const featureRow = `
+    <div class="feature-row">
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg></div>
+        <span class="label">${mudah}</span>
+      </div>
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></div>
+        <span class="label">${akurat}</span>
+      </div>
+      <div class="feature">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <span class="label">${realtime}</span>
+      </div>
+    </div>`
+
+  const waves = `
+    <div class="waves">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,70 C240,100 480,46 720,60 C960,74 1200,104 1440,64 L1440,120 L0,120 Z" fill="#123B6D"/>
+        <path d="M0,88 C240,116 480,66 720,80 C960,94 1200,120 1440,84 L1440,120 L0,120 Z" fill="#2563A8"/>
+        <path d="M0,70 C240,100 480,46 720,60 C960,74 1200,104 1440,64" fill="none" stroke="#F5C400" stroke-width="8" stroke-linecap="round"/>
+      </svg>
+    </div>`
+
+  const schoolGroup = `
+    <div class="school-group">
+      <img class="school-logo" src="${schoolLogo}" alt="Logo Sekolah">
+      <div class="school-name"><span class="line1">${escapeHtml(schoolLine1)}</span><span class="line2">${escapeHtml(schoolLine2)}</span></div>
+    </div>`
+
+  const appBrand = `
+    <div class="app-brand">
+      <img class="app-logo" src="${appLogo}" alt="EduPresensi">
+      <div class="app-text"><span class="app-label">${appLabel}</span><span class="app-name">${appName}</span></div>
+    </div>`
+
+  const footer = `
+    <div class="footer-wrap">
+      ${waves}
+    </div>`
+
+  const body = isLandscape
+    ? `<div class="body landscape-body">
+        <div class="col-left">
+          <div class="welcome">${welcome}</div>
+          <div class="badge">${room}</div>
+          <div class="instruction">${scanText}</div>
+          <div class="scan-btn"><span class="scan-dot"></span>${scanHere}</div>
+          ${featureRow}
+          ${appBrand}
+        </div>
+        <div class="col-right">
+          <div class="qr-box">${qrSvg.value}</div>
+        </div>
+      </div>`
+    : `<div class="body portrait-body">
+        <div class="welcome">${welcome}</div>
+        <div class="badge">${room}</div>
+        <div class="qr-frame">
+          <div class="scan-btn"><span class="scan-dot"></span>${scanHere}</div>
+          <div class="qr-box">${qrSvg.value}</div>
+        </div>
+        ${appBrand}
+        ${featureRow}
+        <div class="instruction">${scanText}</div>
+      </div>`
+
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>QR - ${room}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@page { size: A5 ${isLandscape ? 'landscape' : 'portrait'}; margin: 0; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Poppins','Montserrat','Inter','Segoe UI',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{background:#ffffff;color:#123B6D}
+.page{width:${pageW}mm;height:${pageH}mm;padding:7mm}
+.card{position:relative;width:100%;height:100%;background:#ffffff;border:1.5px solid #123B6D;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.stripe-band{position:relative;flex-shrink:0;height:40px;background:#123B6D;background-image:repeating-linear-gradient(-45deg,rgba(37,99,168,0.18) 0 6px,rgba(37,99,168,0) 6px 12px);border-radius:12px 12px 0 0}
+.stripe-band::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:#F5C400}
+.is-landscape .stripe-band{height:38px}
+.school-group{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:0 16px}
+.school-logo{width:28px;height:28px;object-fit:contain;flex-shrink:0}
+.school-name{font-weight:600;letter-spacing:0.05em;color:#123B6D;font-size:9.5pt;line-height:1.25;text-align:left}
+.school-name span{display:block}
+.is-landscape .school-group{margin-top:13mm;gap:4mm}
+.is-landscape .school-logo{width:13mm;height:13mm}
+.is-landscape .school-name{font-size:12px;line-height:1.2}
+.body{flex:1;padding:0 30px;display:flex;align-items:center}
+.welcome{font-weight:700;color:#123B6D;text-align:center;font-size:30pt;line-height:1.1}
+.is-landscape .welcome{font-size:26px}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:84px;height:38px;padding:0 16px;border:1.5px solid #123B6D;border-radius:999px;background:#ffffff;font-weight:600;color:#123B6D;font-size:16pt;line-height:1;text-align:center}
+.is-landscape .badge{font-size:18px;height:36px;min-width:0}
+.qr-frame{position:relative;width:310px;height:310px;border:1.5px solid #123B6D;border-radius:16px;background:#ffffff;padding:0;display:flex;align-items:center;justify-content:center}
+.qr-frame .qr-box{width:100%;height:100%;padding:26px;border:none;border-radius:16px;display:flex;align-items:center;justify-content:center}
+.qr-box{background:#ffffff;border:1px solid #D9E0E8;border-radius:16px;padding:24px;display:flex;align-items:center;justify-content:center}
+.qr-box svg{width:100%;height:100%;display:block}
+.scan-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:162px;height:40px;background:#123B6D;color:#ffffff;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border-radius:999px;font-size:10.5pt;line-height:1}
+.scan-dot{width:5px;height:5px;border-radius:999px;background:#F5C400;flex-shrink:0}
+.qr-frame .scan-btn{position:absolute;top:-20px;left:50%;transform:translateX(-50%);z-index:2}
+.is-landscape .scan-btn{font-size:12px;min-width:0;height:38px;padding:0 16px;width:auto}
+.feature-row{display:flex;justify-content:center;gap:48px}
+.feature{display:flex;flex-direction:column;align-items:center;gap:5px;color:#123B6D}
+.feature .icon{width:22px;height:22px}
+.feature .icon svg{width:100%;height:100%}
+.feature .label{font-weight:500;font-size:9pt;color:#123B6D;text-align:center}
+.is-landscape .feature-row{gap:8mm}
+.is-landscape .feature .label{font-size:10px}
+.instruction{color:#6B7280;text-align:center;font-size:9.5pt;line-height:1.5;max-width:100%}
+.is-landscape .instruction{font-size:11px;max-width:82mm}
+.app-brand{display:flex;align-items:center;justify-content:center;gap:8px}
+.app-logo{width:30px;height:30px;object-fit:contain;flex-shrink:0}
+.app-text{display:flex;flex-direction:column;align-items:flex-start;line-height:1.25}
+.app-label{font-weight:400;font-size:8.5pt;color:#6B7280}
+.app-name{font-weight:700;font-size:14pt;color:#123B6D;letter-spacing:0.01em}
+.footer-wrap{flex-shrink:0}
+.waves{height:52px}
+.waves svg{width:100%;height:100%;display:block}
+.is-landscape .waves{height:24mm}
+.landscape-body{gap:8mm}
+.landscape-body .col-left{flex:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.5mm}
+.landscape-body .col-right{flex:1;display:flex;justify-content:center}
+.is-landscape .qr-box{width:68mm;height:68mm;padding:5mm}
+.portrait-body{flex-direction:column;justify-content:center}
+.portrait-body > *{margin-top:12px}
+.portrait-body .welcome{margin-top:16px}
+.portrait-body .badge{margin-top:12px}
+.portrait-body .qr-frame{margin-top:38px}
+.portrait-body .app-brand{margin-top:14px}
+.portrait-body .feature-row{margin-top:18px}
+.portrait-body .instruction{margin-top:14px}
+</style></head>
+<body><div class="page ${isLandscape ? 'is-landscape' : 'is-portrait'}"><div class="card">
+<div class="stripe-band"></div>
+${schoolGroup}
+${body}
+${footer}
+</div></div></body></html>`
+
+  printWin.document.write(html)
   printWin.document.close()
-  printWin.print()
+  printWin.focus()
+  setTimeout(() => printWin.print(), 300)
 }
 
 function ruanganUrl(item: Ruangan) {
@@ -454,6 +637,18 @@ function ruanganUrl(item: Ruangan) {
                   </div>
                   <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">{{ t('admin.ruangan.qr.infoScan') }}</p>
                 </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="block text-left text-xs text-gray-500 dark:text-gray-400 tracking-wider mb-1.5">{{ t('admin.ruangan.qr.pilihUkuran') }}</label>
+              <div class="flex rounded-lg border border-gray-200 dark:border-slate-600 overflow-hidden">
+                <button @click="printSize = 'landscape'"
+                  :class="printSize === 'landscape' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'"
+                  class="flex-1 py-2 text-xs font-semibold transition-colors">{{ t('admin.ruangan.qr.cetakLandscape') }}</button>
+                <button @click="printSize = 'portrait'"
+                  :class="printSize === 'portrait' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'"
+                  class="flex-1 py-2 text-xs font-semibold transition-colors">{{ t('admin.ruangan.qr.cetakPortrait') }}</button>
               </div>
             </div>
 

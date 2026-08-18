@@ -562,15 +562,15 @@ async function copyPassword() {
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
           </BaseFormField>
 
-          <BaseFormField :label="t('admin.siswa.labelEmailWali')">
-            <input v-model="form.emailWali" type="email" @input="onFormChange"
-              :placeholder="t('admin.siswa.placeholderEmailWali')"
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
-          </BaseFormField>
-
           <BaseFormField :label="t('admin.siswa.labelKontakWali')">
             <input v-model="form.kontakWali" type="text" @input="onFormChange"
               :placeholder="t('admin.siswa.placeholderKontakWali')"
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+          </BaseFormField>
+
+          <BaseFormField :label="t('admin.siswa.labelEmailWali')">
+            <input v-model="form.emailWali" type="email" @input="onFormChange"
+              :placeholder="t('admin.siswa.placeholderEmailWali')"
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
           </BaseFormField>
         </div>

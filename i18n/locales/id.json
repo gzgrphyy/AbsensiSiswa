@@ -426,7 +426,15 @@
         "salinUrl": "Salin URL",
         "tersalin": "Tersalin!",
         "infoScan": "Ketik kode QR atau URL ini di halaman scan murid",
-        "cetak": "Cetak QR"
+        "cetak": "Cetak QR",
+        "pilihUkuran": "Pilih Ukuran Kertas",
+        "cetakLandscape": "A5 Landscape",
+        "cetakPortrait": "A5 Portrait",
+        "posterSelamatDatang": "Selamat Datang",
+        "posterScan": "Scan di Sini",
+        "posterMudah": "Mudah",
+        "posterAkurat": "Akurat",
+        "posterRealTime": "Real-Time"
       }
     },
     "monitoring": {

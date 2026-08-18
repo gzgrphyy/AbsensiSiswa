@@ -1,4 +1,5 @@
 import { createSiswaSchema } from './schema'
+import { dummyAvatarPath } from '../../../utils/avatar'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -38,7 +39,7 @@ export default defineEventHandler(async (event) => {
 
   const siswa = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
-      data: { nama, email, passwordHash, role: 'SISWA', isActive: true, jenisKelamin }
+      data: { nama, email, passwordHash, role: 'SISWA', isActive: true, jenisKelamin, foto: dummyAvatarPath(nama, jenisKelamin ?? null) }
     })
 
     return await tx.siswa.create({

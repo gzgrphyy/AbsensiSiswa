@@ -1,4 +1,5 @@
 import { createGuruSchema } from './schema'
+import { dummyAvatarPath } from '../../../utils/avatar'
 
 export default defineEventHandler(async (event) => {
   const result = createGuruSchema.safeParse(await readBody(event))
@@ -44,6 +45,7 @@ export default defineEventHandler(async (event) => {
       nomorHp1: nomorHp1 || null,
       nomorHp2: nomorHp2 || null,
       jenisKelamin: jenisKelamin ?? null,
+      foto: dummyAvatarPath(nama, jenisKelamin ?? null),
       passwordHash,
       role: 'GURU',
       isActive: true

@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const svg = renderSVG(scanUrl, {
     pixelSize: 8,
     border: 2,
-    blackColor: '#1e293b',
+    blackColor: '#111827',
     whiteColor: '#ffffff'
   })
 

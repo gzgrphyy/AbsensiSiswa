@@ -419,7 +419,15 @@
         "salinUrl": "Copy URL",
         "tersalin": "Copied!",
         "infoScan": "Enter this QR code or URL on the student scan page",
-        "cetak": "Print QR"
+        "cetak": "Print QR",
+        "pilihUkuran": "Select Paper Size",
+        "cetakLandscape": "A5 Landscape",
+        "cetakPortrait": "A5 Portrait",
+        "posterSelamatDatang": "Welcome",
+        "posterScan": "Scan Here",
+        "posterMudah": "Easy",
+        "posterAkurat": "Accurate",
+        "posterRealTime": "Real-Time"
       }
     },
     "monitoring": {

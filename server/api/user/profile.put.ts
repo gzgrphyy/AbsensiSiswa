@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { dummyAvatarPath } from '../../utils/avatar'
 
 const guruSchema = z.object({
   nama: z.preprocess(v => v === '' ? undefined : v, z.string().min(1, 'Nama tidak boleh kosong').max(100).optional()),
@@ -29,6 +30,9 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody(event)
 
+    const resolveFoto = (foto: string | null) =>
+      foto === null ? dummyAvatarPath(user.nama, user.jenisKelamin) : foto
+
     if (user.role === 'GURU' || user.role === 'ADMIN') {
       const parsed = guruSchema.parse(body)
 
@@ -41,7 +45,7 @@ export default defineEventHandler(async (event) => {
         }
         updateData.email = parsed.email
       }
-      if (parsed.foto !== undefined) updateData.foto = parsed.foto
+      if (parsed.foto !== undefined) updateData.foto = resolveFoto(parsed.foto)
 
       if (Object.keys(updateData).length > 0) {
         await prisma.user.update({ where: { id: user.id }, data: updateData })
@@ -71,7 +75,7 @@ export default defineEventHandler(async (event) => {
       }
 
       const updateUser: Record<string, unknown> = {}
-      if (parsed.foto !== undefined) updateUser.foto = parsed.foto
+      if (parsed.foto !== undefined) updateUser.foto = resolveFoto(parsed.foto)
       if (parsed.email) {
         const existing = await prisma.user.findUnique({ where: { email: parsed.email } })
         if (existing && existing.id !== user.id) {
