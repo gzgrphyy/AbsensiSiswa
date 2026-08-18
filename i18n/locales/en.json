@@ -174,7 +174,14 @@
       "yaNonaktifkan": "Yes, Deactivate",
       "resetTitle": "Reset Password",
       "resetMsg": "A new password will be generated automatically. The old password can no longer be used. Continue?",
-      "yaReset": "Yes, Reset"
+      "yaReset": "Yes, Reset",
+      "labelNoHp": "Phone (optional)",
+      "labelKeterangan": "Notes",
+      "placeholderKeterangan": "e.g. Lab coordinator",
+      "infoLogin": "Fill in the email if this person needs a login account. Leave it empty if not.",
+      "confirmDeleteTitle": "Delete Teacher",
+      "confirmDeleteMsg": "Are you sure you want to delete {nama}?",
+      "msgBerhasilHapus": "Teacher data deleted successfully"
     },
     "rekap": {
       "title": "Attendance Recap",

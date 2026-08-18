@@ -4,9 +4,16 @@ interface AlphaItem {
   nama: string
   kelas: string
   totalAlpha: number
+  pelajaran?: { mapel: string; total: number; tanggal: string[] }[]
 }
 
 const { t } = useI18n()
+
+// Murid yang sedang dilihat detail alphanya (modal)
+const detailItem = ref<AlphaItem | null>(null)
+
+// Jumlah chip pelajaran yang ditampilkan di tabel; sisanya lewat modal detail
+const maxChips = 3
 
 const selectedBulan = ref('')
 const selectedKelas = ref<number | ''>('')
@@ -74,7 +81,7 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
       <div class="flex flex-col gap-1 min-w-[180px]">
         <label class="text-xs text-gray-500">Periode</label>
         <select v-model="selectedBulan"
-          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="">Bulan Berjalan</option>
           <option v-for="o in bulanOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
@@ -84,7 +91,7 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
       <div class="flex flex-col gap-1 min-w-[160px]">
         <label class="text-xs text-gray-500">Kelas</label>
         <select v-model="selectedKelas"
-          class="px-3 py-2 border admin-accent-border rounded-lg text-sm bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="''">Semua Kelas</option>
           <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
@@ -92,18 +99,18 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
 
       <!-- Tombol Terapkan -->
       <button @click="applyFilter()"
-        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md border border-blue-600 transition-colors">
+        class="px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md border border-blue-600 transition-colors">
         {{ t('common.terapkan') }}
       </button>
 
       <!-- Tombol Reset -->
       <button @click="resetFilter()"
-        class="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border admin-accent-border transition-colors">
+        class="px-3 py-2 text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border admin-accent-border transition-colors">
         {{ t('common.aturUlang') }}
       </button>
     </div>
 
-    <LoadingSkeleton v-if="pending" type="table" :rows="6" :columns="3" />
+    <LoadingSkeleton v-if="pending" type="table" :rows="6" :columns="5" />
 
     <template v-else>
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
@@ -118,19 +125,49 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">Nama</th>
                 <th class="text-left px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">Kelas</th>
+                <th class="text-left px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">Pelajaran Alpha</th>
                 <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">Total Alpha</th>
+                <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">Aksi</th>
               </tr>
             </thead>
             <tbody class="divide-y admin-accent-divide">
               <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 py-3 text-gray-900 dark:text-gray-100">{{ item.nama }}</td>
                 <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.kelas }}</td>
+                <td class="px-4 py-3 hidden md:table-cell">
+                  <div class="flex flex-wrap gap-1">
+                    <span v-for="p in (item.pelajaran || []).slice(0, maxChips)" :key="p.mapel"
+                      class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-slate-700 ring-1 ring-gray-200 dark:ring-slate-600">
+                      {{ p.mapel }} <span class="ml-1 font-semibold text-red-600 dark:text-red-400">×{{ p.total }}</span>
+                    </span>
+                    <button
+                      v-if="(item.pelajaran || []).length > maxChips"
+                      @click="detailItem = item"
+                      :title="'Lihat ' + ((item.pelajaran || []).length - maxChips) + ' pelajaran lainnya'"
+                      class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 ring-1 ring-blue-200 dark:ring-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
+                      +{{ (item.pelajaran || []).length - maxChips }} lainnya
+                    </button>
+                    <span v-if="!item.pelajaran?.length" class="text-gray-400 dark:text-gray-500">-</span>
+                  </div>
+                </td>
                 <td class="px-4 py-3 text-center">
                   <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-800">{{ item.totalAlpha }}x</span>
                 </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center justify-center">
+                    <button @click="detailItem = item"
+                      class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      Lihat
+                    </button>
+                  </div>
+                </td>
               </tr>
               <tr v-if="!data || data.length === 0">
-                <td colspan="3" class="px-4 py-16 text-center">
+                <td colspan="5" class="px-4 py-16 text-center">
                   <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -170,5 +207,64 @@ const totalAlpha = computed(() => (data.value || []).reduce((a, b) => a + b.tota
         </div>
       </BaseCard>
     </template>
+
+    <!-- Modal Detail Alpha per Murid -->
+    <BaseModal
+      :show="!!detailItem"
+      :title="detailItem ? 'Detail Alpha — ' + detailItem.nama : ''"
+      max-width="max-w-lg"
+      @close="detailItem = null"
+    >
+      <div v-if="detailItem" class="space-y-4">
+        <!-- Ringkasan murid -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ detailItem.nama }}</p>
+            <p class="text-xs text-gray-400 dark:text-gray-500">
+              {{ detailItem.kelas }} • {{ detailItem.totalAlpha }}x alpha
+            </p>
+          </div>
+        </div>
+
+        <!-- Rincian per pelajaran -->
+        <div class="overflow-hidden rounded-lg border admin-accent-border">
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
+                <th class="text-left px-4 py-2.5 text-gray-600 dark:text-gray-300 text-xs tracking-wider">Pelajaran</th>
+                <th class="text-center px-4 py-2.5 text-gray-600 dark:text-gray-300 text-xs tracking-wider">Jumlah</th>
+                <th class="text-left px-4 py-2.5 text-gray-600 dark:text-gray-300 text-xs tracking-wider">Tanggal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y admin-accent-divide">
+              <tr v-for="p in detailItem.pelajaran || []" :key="p.mapel">
+                <td class="px-4 py-2.5 text-gray-900 dark:text-gray-100">{{ p.mapel }}</td>
+                <td class="px-4 py-2.5 text-center">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-lg text-xs text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 ring-1 ring-red-200 dark:ring-red-800">{{ p.total }}x</span>
+                </td>
+                <td class="px-4 py-2.5 text-gray-500 dark:text-gray-400">{{ p.tanggal.join(', ') }}</td>
+              </tr>
+              <tr v-if="!detailItem.pelajaran?.length">
+                <td colspan="3" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">Tidak ada rincian pelajaran</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <template #footer>
+        <button
+          @click="detailItem = null"
+          class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors"
+        >
+          Tutup
+        </button>
+      </template>
+    </BaseModal>
   </AppLayout>
 </template>

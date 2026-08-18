@@ -22,8 +22,7 @@ export default defineEventHandler(async (event) => {
     sesiFilter.jadwal = { kelasId: query.kelasId }
   }
 
-  const grouped = await prisma.absensiRequest.groupBy({
-    by: ['siswaId'],
+  const requests = await prisma.absensiRequest.findMany({
     where: {
       status: 'ALPHA',
       sesi: {
@@ -31,25 +30,47 @@ export default defineEventHandler(async (event) => {
         ...sesiFilter
       }
     },
-    _count: { status: true },
-    orderBy: { _count: { status: 'desc' } }
+    select: {
+      siswaId: true,
+      sesi: {
+        select: {
+          tanggal: true,
+          jadwal: { select: { mapel: true } }
+        }
+      }
+    }
   })
 
-  if (grouped.length === 0) return []
+  if (requests.length === 0) return []
+
+  // Agregasi per murid: mapel apa saja yang alpha + jumlah + tanggal
+  const agg = new Map<number, Map<string, { total: number; tanggal: string[] }>>()
+  for (const r of requests) {
+    const mapel = r.sesi.jadwal.mapel
+    const perSiswa = agg.get(r.siswaId) ?? new Map<string, { total: number; tanggal: string[] }>()
+    const entry = perSiswa.get(mapel) ?? { total: 0, tanggal: [] as string[] }
+    entry.total += 1
+    entry.tanggal.push(r.sesi.tanggal.toISOString().slice(0, 10))
+    perSiswa.set(mapel, entry)
+    agg.set(r.siswaId, perSiswa)
+  }
 
   const siswa = await prisma.siswa.findMany({
-    where: { id: { in: grouped.map(g => g.siswaId) } },
+    where: { id: { in: [...agg.keys()] } },
     select: { id: true, nama: true, kelas: { select: { nama: true } } }
   })
 
   const siswaMap = new Map(siswa.map(s => [s.id, s]))
 
-  const result = grouped.map(g => ({
-    id: g.siswaId,
-    nama: siswaMap.get(g.siswaId)?.nama || '-',
-    kelas: siswaMap.get(g.siswaId)?.kelas?.nama || '-',
-    totalAlpha: g._count.status
+  const result = [...agg.entries()].map(([siswaId, mapelMap]) => ({
+    id: siswaId,
+    nama: siswaMap.get(siswaId)?.nama || '-',
+    kelas: siswaMap.get(siswaId)?.kelas?.nama || '-',
+    totalAlpha: [...mapelMap.values()].reduce((sum, v) => sum + v.total, 0),
+    pelajaran: [...mapelMap.entries()]
+      .map(([mapel, v]) => ({ mapel, total: v.total, tanggal: v.tanggal.sort() }))
+      .sort((a, b) => b.total - a.total || a.mapel.localeCompare(b.mapel))
   }))
 
-  return result.sort((a, b) => a.nama.length - b.nama.length || a.nama.localeCompare(b.nama))
+  return result.sort((a, b) => b.totalAlpha - a.totalAlpha || a.nama.localeCompare(b.nama))
 })

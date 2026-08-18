@@ -174,7 +174,14 @@
       "yaNonaktifkan": "Ya, Nonaktifkan",
       "resetTitle": "Reset Password",
       "resetMsg": "Password baru akan digenerate otomatis. Password lama tidak bisa digunakan lagi. Lanjutkan?",
-      "yaReset": "Ya, Reset"
+      "yaReset": "Ya, Reset",
+      "labelNoHp": "No. HP (opsional)",
+      "labelKeterangan": "Keterangan",
+      "placeholderKeterangan": "contoh: Koordinator Lab Komputer",
+      "infoLogin": "Isi email jika orang ini perlu akun login. Kosongkan jika tidak.",
+      "confirmDeleteTitle": "Hapus PTK",
+      "confirmDeleteMsg": "Yakin ingin menghapus {nama}?",
+      "msgBerhasilHapus": "Data PTK berhasil dihapus"
     },
     "rekap": {
       "title": "Rekap Absensi",

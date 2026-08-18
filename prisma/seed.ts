@@ -249,6 +249,10 @@ async function main() {
   // ============================================
   // RUANGAN
   // ============================================
+  // Ruangan jenis KELAS harus ter-link ke kelas yang sama namanya agar
+  // muncul dengan benar di halaman Data Ruangan (kolom Kelas)
+  const kelasByName = new Map(kelasList.map(k => [k.nama, k.id]))
+
   const ruanganData = [
     { nama: 'XII-A', jenis: 'KELAS', qrCode: 'R-001' },
     { nama: 'XII-B', jenis: 'KELAS', qrCode: 'R-002' },
@@ -265,7 +269,12 @@ async function main() {
   await Promise.all(
     ruanganData.map(r =>
       prisma.ruangan.create({
-        data: { nama: r.nama, jenis: r.jenis as any, qrCode: r.qrCode }
+        data: {
+          nama: r.nama,
+          jenis: r.jenis as any,
+          qrCode: r.qrCode,
+          kelasId: r.jenis === 'KELAS' ? (kelasByName.get(r.nama) ?? null) : null
+        }
       })
     )
   )
@@ -365,7 +374,7 @@ async function main() {
   console.log('✓ Pengaturan default dibuat')
 
   // ============================================
-  // JADWAL PELAJARAN (lengkap Senin–Sabtu per kelas)
+  // JADWAL PELAJARAN (lengkap Senin–Jumat per kelas)
   // ============================================
   const [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10] = await prisma.ruangan.findMany({ orderBy: { id: 'asc' } })
 
@@ -393,8 +402,7 @@ async function main() {
     SELASA: ['PPKn', 'Fisika', 'Kimia', 'Sejarah', 'PJOK'],
     RABU: ['Matematika', 'Bahasa Indonesia', 'Biologi', 'Ekonomi', 'Seni Budaya'],
     KAMIS: ['Bahasa Inggris', 'Geografi', 'Prakarya & Kewirausahaan', 'Dasar Program Keahlian', 'Bahasa Sunda'],
-    JUMAT: ['Fisika', 'Kimia', 'Matematika', 'Bahasa Indonesia', 'Dasar Program Keahlian'],
-    SABTU: ['Pembinaan Karakter', 'Ekstrakurikuler', 'Literasi Perpustakaan']
+    JUMAT: ['Fisika', 'Kimia', 'Matematika', 'Bahasa Indonesia', 'Dasar Program Keahlian']
   }
 
   const SLOT_PER_HARI: Record<string, { jamMulai: string; jamSelesai: string }[]> = {
@@ -432,15 +440,10 @@ async function main() {
       { jamMulai: '10:00', jamSelesai: '11:30' },
       { jamMulai: '12:00', jamSelesai: '13:30' },
       { jamMulai: '13:30', jamSelesai: '15:00' }
-    ],
-    SABTU: [
-      { jamMulai: '07:00', jamSelesai: '08:30' },
-      { jamMulai: '08:30', jamSelesai: '10:00' },
-      { jamMulai: '10:00', jamSelesai: '11:30' }
     ]
   }
 
-  const HARI_URUTAN = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU']
+  const HARI_URUTAN = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT']
 
   const jadwalData: {
     kelasIdx: number
