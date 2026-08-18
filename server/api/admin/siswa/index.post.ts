@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { nisn, nama, email, kelasId, jenisKelamin, namaWali, kontakWali, nomorHp1, nomorHp2 } = result.data
+  const { nisn, nama, email, kelasId, jenisKelamin, namaWali, emailWali, kontakWali, nomorHp1, nomorHp2 } = result.data
 
   const existingNisn = await prisma.siswa.findUnique({ where: { nisn } })
   if (existingNisn) {
@@ -48,6 +48,7 @@ export default defineEventHandler(async (event) => {
         nama,
         kelasId,
         namaWali: namaWali || null,
+        emailWali: emailWali || null,
         kontakWali: kontakWali || null,
         nomorHp1: nomorHp1 || null,
         nomorHp2: nomorHp2 || null

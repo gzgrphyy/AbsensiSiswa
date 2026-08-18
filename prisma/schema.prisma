@@ -134,6 +134,7 @@ model Siswa {
   nomorHp2   String?  @map("nomor_hp2") @db.VarChar(20)
   kelasId    Int      @map("kelas_id")
   namaWali   String?  @map("nama_wali") @db.VarChar(100)
+  emailWali  String?  @map("email_wali") @db.VarChar(150)
   kontakWali String?  @map("kontak_wali") @db.VarChar(20)
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")

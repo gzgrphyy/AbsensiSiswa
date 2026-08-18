@@ -9,6 +9,7 @@ export const createSiswaSchema = z.object({
   kelasId: z.number().int().positive('Kelas wajib dipilih'),
   jenisKelamin: z.enum(['LAKI_LAKI', 'PEREMPUAN'], { errorMap: () => ({ message: 'Jenis kelamin wajib diisi' }) }),
   namaWali: z.string().optional(),
+  emailWali: z.string().email('Format email tidak valid').optional(),
   kontakWali: z.string().max(20).optional(),
   nomorHp1: z.string().max(20).optional(),
   nomorHp2: z.string().max(20).optional()
@@ -21,6 +22,7 @@ export const updateSiswaSchema = z.object({
   kelasId: z.number().int().positive('Kelas wajib dipilih').optional(),
   jenisKelamin: z.enum(['LAKI_LAKI', 'PEREMPUAN']).optional().nullable(),
   namaWali: z.string().optional().nullable(),
+  emailWali: z.string().email('Format email tidak valid').optional().nullable(),
   kontakWali: z.string().max(20).optional().nullable(),
   nomorHp1: z.string().max(20).optional().nullable(),
   nomorHp2: z.string().max(20).optional().nullable()

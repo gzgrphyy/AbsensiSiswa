@@ -7,6 +7,7 @@ interface Siswa {
   nomorHp1: string | null
   nomorHp2: string | null
   namaWali: string | null
+  emailWali: string | null
   kontakWali: string | null
   kelas: { id: number; nama: string }
   user: { email: string; isActive: boolean; foto: string | null; jenisKelamin: string | null }
@@ -79,6 +80,12 @@ const jenjangList = computed(() => {
   return [...set].sort()
 })
 
+// Filter kelas list berdasarkan jenjang yang dipilih
+const filteredKelasList = computed(() => {
+  if (!filterJenjang.value) return kelasList.value || []
+  return (kelasList.value || []).filter(k => jenjangOf(k.nama) === filterJenjang.value)
+})
+
 // Urutan data: abjad = A-Z, default (off) = urutan dari server
 const displayData = computed(() => {
   let rows = siswaList.value || []
@@ -114,7 +121,8 @@ const visibleData = computed(() => {
   return displayData.value.slice(start, start + pageSize)
 })
 
-watch([searchQuery, filterKelas, filterJenjang], () => { page.value = 1 })
+watch([searchQuery, filterJenjang], () => { filterKelas.value = 0; page.value = 1 })
+watch(filterKelas, () => { page.value = 1 })
 
 const { data: siswaList, pending, refresh } = useFetch<Siswa[]>(() => {
   const params = new URLSearchParams()
@@ -126,7 +134,7 @@ const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin
 
 const showModal = ref(false)
 const editing = ref<Siswa | null>(null)
-const form = ref({ nama: '', nisn: '', email: '', kelasId: 0, jenisKelamin: '', namaWali: '', kontakWali: '', nomorHp1: '', nomorHp2: '' })
+const form = ref({ nama: '', nisn: '', email: '', kelasId: 0, jenisKelamin: '', namaWali: '', emailWali: '', kontakWali: '', nomorHp1: '', nomorHp2: '' })
 const saving = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
@@ -151,7 +159,7 @@ function showSuccess(msg: string) {
 
 function openCreate() {
   editing.value = null
-  form.value = { nama: '', nisn: '', email: '', kelasId: 0, jenisKelamin: '', namaWali: '', kontakWali: '', nomorHp1: '', nomorHp2: '' }
+  form.value = { nama: '', nisn: '', email: '', kelasId: 0, jenisKelamin: '', namaWali: '', emailWali: '', kontakWali: '', nomorHp1: '', nomorHp2: '' }
   errorMsg.value = ''
   dirtyForm.value = false
   showModal.value = true
@@ -166,6 +174,7 @@ function openEdit(item: Siswa) {
     kelasId: item.kelasId,
     jenisKelamin: item.user.jenisKelamin || '',
     namaWali: item.namaWali || '',
+    emailWali: item.emailWali || '',
     kontakWali: item.kontakWali || '',
     nomorHp1: item.nomorHp1 || '',
     nomorHp2: item.nomorHp2 || ''
@@ -205,6 +214,7 @@ async function handleSave() {
       if (form.value.kelasId !== editing.value.kelasId) body.kelasId = form.value.kelasId
       if ((form.value.jenisKelamin || null) !== (editing.value.user.jenisKelamin || null)) body.jenisKelamin = form.value.jenisKelamin || null
       if (form.value.namaWali !== (editing.value.namaWali || '')) body.namaWali = form.value.namaWali || null
+      if (form.value.emailWali !== (editing.value.emailWali || '')) body.emailWali = form.value.emailWali || null
       if (form.value.kontakWali !== (editing.value.kontakWali || '')) body.kontakWali = form.value.kontakWali || null
       if (form.value.nomorHp1 !== (editing.value.nomorHp1 || '')) body.nomorHp1 = form.value.nomorHp1 || null
       if (form.value.nomorHp2 !== (editing.value.nomorHp2 || '')) body.nomorHp2 = form.value.nomorHp2 || null
@@ -224,6 +234,7 @@ async function handleSave() {
           kelasId: form.value.kelasId,
           jenisKelamin: form.value.jenisKelamin || undefined,
           namaWali: form.value.namaWali || undefined,
+          emailWali: form.value.emailWali || undefined,
           kontakWali: form.value.kontakWali || undefined,
           nomorHp1: form.value.nomorHp1 || undefined,
           nomorHp2: form.value.nomorHp2 || undefined
@@ -315,7 +326,7 @@ async function copyPassword() {
         <select v-model="filterKelas"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="0">{{ t('admin.jadwal.semuaKelas') }}</option>
-          <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
+          <option v-for="k in filteredKelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
         <button
           role="switch"
@@ -551,6 +562,12 @@ async function copyPassword() {
               class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
           </BaseFormField>
 
+          <BaseFormField :label="t('admin.siswa.labelEmailWali')">
+            <input v-model="form.emailWali" type="email" @input="onFormChange"
+              :placeholder="t('admin.siswa.placeholderEmailWali')"
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+          </BaseFormField>
+
           <BaseFormField :label="t('admin.siswa.labelKontakWali')">
             <input v-model="form.kontakWali" type="text" @input="onFormChange"
               :placeholder="t('admin.siswa.placeholderKontakWali')"
@@ -603,6 +620,12 @@ async function copyPassword() {
             <label class="block text-xs text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.siswa.labelNamaWali') }}</label>
             <div class="px-3.5 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-slate-700">
               {{ waliDetail.namaWali || '-' }}
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.siswa.labelEmailWali') }}</label>
+            <div class="px-3.5 py-2.5 border border-gray-200 dark:border-slate-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-slate-700">
+              {{ waliDetail.emailWali || '-' }}
             </div>
           </div>
           <div>

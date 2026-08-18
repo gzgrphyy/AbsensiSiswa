@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Siswa tidak ditemukan' })
 
-  const { nisn, nama, email, kelasId, jenisKelamin, namaWali, kontakWali, nomorHp1, nomorHp2 } = result.data
+  const { nisn, nama, email, kelasId, jenisKelamin, namaWali, emailWali, kontakWali, nomorHp1, nomorHp2 } = result.data
 
   if (nisn && nisn !== existing.nisn) {
     const nisnExists = await prisma.siswa.findUnique({ where: { nisn } })
@@ -59,6 +59,7 @@ export default defineEventHandler(async (event) => {
         ...(nama !== undefined && { nama }),
         ...(kelasId !== undefined && { kelasId }),
         ...(namaWali !== undefined && { namaWali: namaWali || null }),
+        ...(emailWali !== undefined && { emailWali: emailWali || null }),
         ...(kontakWali !== undefined && { kontakWali: kontakWali || null }),
         ...(nomorHp1 !== undefined && { nomorHp1: nomorHp1 || null }),
         ...(nomorHp2 !== undefined && { nomorHp2: nomorHp2 || null })
