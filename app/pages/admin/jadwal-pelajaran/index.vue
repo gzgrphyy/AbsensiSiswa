@@ -5,9 +5,10 @@ interface Jadwal {
   hari: string
   jamMulai: string
   jamSelesai: string
-  kelas: { id: number; nama: string; ptkPendamping?: { nama: string } | null }
+  kelas: { id: number; nama: string }
   ruangan: { id: number; nama: string }
   guru: { id: number; nama: string }
+  ptkPendamping?: { id: number; nama: string } | null
 }
 
 const { t } = useI18n()
@@ -15,6 +16,7 @@ const { t } = useI18n()
 const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin/kelas', { immediate: true })
 const { data: guruList } = useFetch<{ id: number; nama: string }[]>('/api/admin/guru', { immediate: true })
 const { data: ruanganList } = useFetch<{ id: number; nama: string }[]>('/api/admin/ruangan', { immediate: true })
+const { data: pendampingList } = useFetch<{ id: number; nama: string }[]>('/api/admin/ptk-pendamping', { immediate: true })
 
 const hariList = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU']
 const hariLabel = (h: string) => t('hari.' + h)
@@ -47,7 +49,7 @@ watch([searchQuery, filterKelasId], () => { page.value = 1 })
 
 const showModal = ref(false)
 const editing = ref<Jadwal | null>(null)
-const form = ref({ mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0 })
+const form = ref({ mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0, ptkPendampingId: 0 })
 const saving = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
@@ -67,7 +69,7 @@ function showSuccess(msg: string) {
 
 function openCreate() {
   editing.value = null
-  form.value = { mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0 }
+  form.value = { mapel: '', hari: 'SENIN', jamMulai: '', jamSelesai: '', kelasId: 0, ruanganId: 0, guruId: 0, ptkPendampingId: 0 }
   errorMsg.value = ''
   dirtyForm.value = false
   showModal.value = true
@@ -82,7 +84,8 @@ function openEdit(item: Jadwal) {
     jamSelesai: item.jamSelesai,
     kelasId: item.kelas.id,
     ruanganId: item.ruangan.id,
-    guruId: item.guru.id
+    guruId: item.guru.id,
+    ptkPendampingId: item.ptkPendamping?.id || 0
   }
   errorMsg.value = ''
   dirtyForm.value = false
@@ -107,7 +110,8 @@ async function handleSave() {
       jamSelesai: form.value.jamSelesai,
       kelasId: form.value.kelasId,
       ruanganId: form.value.ruanganId,
-      guruId: form.value.guruId
+      guruId: form.value.guruId,
+      ptkPendampingId: form.value.ptkPendampingId || null
     }
 
     if (editing.value) {
@@ -198,7 +202,7 @@ async function handleDelete() {
               <td class="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ item.kelas.nama }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell">{{ item.ruangan.nama }}</td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden lg:table-cell">{{ item.guru.nama }}</td>
-              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden xl:table-cell">{{ item.kelas.ptkPendamping?.nama || '-' }}</td>
+              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden xl:table-cell">{{ item.ptkPendamping?.nama || '-' }}</td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
                   <button @click="openEdit(item)" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-gray-100 rounded-md" :title="t('common.edit')">
@@ -310,6 +314,14 @@ async function handleDelete() {
             </select>
           </BaseFormField>
         </div>
+
+        <BaseFormField :label="t('admin.jadwal.labelPtkPendamping')">
+          <select v-model="form.ptkPendampingId" @change="onFormChange"
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+            <option :value="0">{{ t('admin.jadwal.tanpaPtkPendamping') }}</option>
+            <option v-for="p in pendampingList" :key="p.id" :value="p.id">{{ p.nama }}</option>
+          </select>
+        </BaseFormField>
 
       </form>
       <template #footer>

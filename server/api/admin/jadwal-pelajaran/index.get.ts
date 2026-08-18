@@ -12,9 +12,10 @@ export default defineEventHandler(async (event) => {
     },
     orderBy: [{ hari: 'asc' }, { jamMulai: 'asc' }],
     include: {
-      kelas: { select: { id: true, nama: true, ptkPendamping: { select: { nama: true } } } },
+      kelas: { select: { id: true, nama: true } },
       ruangan: { select: { id: true, nama: true } },
-      guru: { select: { id: true, nama: true, nip: true } }
+      guru: { select: { id: true, nama: true, nip: true } },
+      ptkPendamping: { select: { id: true, nama: true } }
     }
   })
 })

@@ -12,7 +12,6 @@ interface ProfileData {
   waliKelas?: { id: number; nama: string; nomorHp1?: string | null }
   namaWali?: string | null
   kontakWali?: string | null
-  ptkPendamping?: { id: number; nama: string; nomorHp?: string | null }[]
 }
 
 const { data: profile, refresh } = useFetch<ProfileData>('/api/user/profile', { immediate: true })
@@ -39,8 +38,8 @@ const fotoPreview = ref<string | null>(null)
 const fotoUploading = ref(false)
 const showEditModal = ref(false)
 
-const hasWaliPendamping = computed(() =>
-  !!(profile.value?.namaWali || profile.value?.kontakWali || profile.value?.waliKelas || profile.value?.ptkPendamping?.length)
+const hasWali = computed(() =>
+  !!(profile.value?.namaWali || profile.value?.kontakWali || profile.value?.waliKelas)
 )
 
 const pwErrorMsg = ref('')
@@ -227,7 +226,7 @@ async function handleChangePassword() {
       </div>
     </BaseCard>
 
-    <!-- Wali & Pendamping -->
+    <!-- Wali -->
     <BaseCard class="mt-6">
       <div class="flex items-center gap-2 mb-4">
         <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -236,10 +235,10 @@ async function handleChangePassword() {
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
           <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
         </svg>
-        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Wali & Pendamping</h3>
+        <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Wali</h3>
       </div>
 
-      <div v-if="hasWaliPendamping" class="divide-y-[0.5px] divide-gray-100 dark:divide-slate-700/60">
+      <div v-if="hasWali" class="divide-y-[0.5px] divide-gray-100 dark:divide-slate-700/60">
         <!-- Wali murid -->
         <div v-if="profile?.namaWali || profile?.kontakWali" class="flex items-center gap-3 py-3">
           <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-400 dark:text-gray-500 flex-shrink-0">
@@ -280,29 +279,8 @@ async function handleChangePassword() {
           </a>
         </div>
 
-        <!-- Guru pendamping -->
-        <div v-for="p in profile?.ptkPendamping || []" :key="p.id" class="flex items-center gap-3 py-3">
-          <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-400 dark:text-gray-500 flex-shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-              <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-            </svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ p.nama }}</p>
-            <p class="text-xs text-gray-400 dark:text-gray-500">Guru pendamping</p>
-          </div>
-          <a v-if="p.nomorHp" :href="'tel:' + p.nomorHp" :title="p.nomorHp"
-            class="flex-shrink-0 w-9 h-9 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-          </a>
-        </div>
       </div>
-      <p v-else class="text-sm text-gray-500 dark:text-gray-400">Belum ada data wali & pendamping.</p>
+      <p v-else class="text-sm text-gray-500 dark:text-gray-400">Belum ada data wali.</p>
     </BaseCard>
 
     <!-- Ubah Password -->

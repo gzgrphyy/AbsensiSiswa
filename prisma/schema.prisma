@@ -113,7 +113,6 @@ model Kelas {
   tahunAjaran     TahunAjaran        @relation(fields: [tahunAjaranId], references: [id])
   siswa           Siswa[]
   jadwalPelajaran JadwalPelajaran[]
-  ptkPendamping   PtkPendamping?     @relation("KelasPendamping")
   ruangan         Ruangan[]
 
   @@unique([nama, tahunAjaranId])
@@ -158,28 +157,29 @@ model Ruangan {
 }
 
 model JadwalPelajaran {
-  id         Int      @id @default(autoincrement())
-  kelasId    Int      @map("kelas_id")
-  ruanganId  Int      @map("ruangan_id")
-  mapel      String   @db.VarChar(100)
-  guruId     Int      @map("guru_id")
-  hari       Hari
-  jamMulai   String   @map("jam_mulai") @db.VarChar(5)
-  jamSelesai String   @map("jam_selesai") @db.VarChar(5)
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id               Int      @id @default(autoincrement())
+  kelasId          Int      @map("kelas_id")
+  ruanganId        Int      @map("ruangan_id")
+  mapel            String   @db.VarChar(100)
+  guruId           Int      @map("guru_id")
+  ptkPendampingId  Int?     @map("ptk_pendamping_id")
+  hari             Hari
+  jamMulai         String   @map("jam_mulai") @db.VarChar(5)
+  jamSelesai       String   @map("jam_selesai") @db.VarChar(5)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
-  kelas   Kelas          @relation(fields: [kelasId], references: [id])
-  ruangan Ruangan        @relation(fields: [ruanganId], references: [id])
-  guru    User           @relation("GuruPengampu", fields: [guruId], references: [id])
-  sesi    SesiAbsensi[]
+  kelas         Kelas          @relation(fields: [kelasId], references: [id])
+  ruangan       Ruangan        @relation(fields: [ruanganId], references: [id])
+  guru          User           @relation("GuruPengampu", fields: [guruId], references: [id])
+  ptkPendamping PtkPendamping? @relation("JadwalPendamping", fields: [ptkPendampingId], references: [id])
+  sesi          SesiAbsensi[]
 
   @@map("jadwal_pelajaran")
 }
 
 model PtkPendamping {
   id         Int      @id @default(autoincrement())
-  kelasId    Int?     @unique @map("kelas_id")
   nama       String   @db.VarChar(100)
   nip        String?  @db.VarChar(30)
   nomorHp    String?  @map("nomor_hp") @db.VarChar(20)
@@ -188,7 +188,7 @@ model PtkPendamping {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  kelas Kelas? @relation("KelasPendamping", fields: [kelasId], references: [id])
+  jadwalPelajaran JadwalPelajaran[] @relation("JadwalPendamping")
 
   @@map("ptk_pendamping")
 }

@@ -246,15 +246,6 @@ async function main() {
 
   console.log(`✓ ${kelasList.length} kelas dibuat`)
 
-  // Assign 1 PTK pendamping per kelas (1-1)
-  for (let i = 0; i < kelasList.length; i++) {
-    await prisma.ptkPendamping.update({
-      where: { id: ptkPendampingList[i].id },
-      data: { kelasId: kelasList[i].id }
-    })
-  }
-  console.log(`✓ ${kelasList.length} PTK pendamping di-assign ke kelas`)
-
   // ============================================
   // RUANGAN
   // ============================================
@@ -456,6 +447,7 @@ async function main() {
     mapel: string
     guruIdx: number
     ruanganId: number
+    ptkPendampingId: number | null
     hari: string
     jamMulai: string
     jamSelesai: string
@@ -470,11 +462,17 @@ async function main() {
         const mapel = mapels[(s + offset) % mapels.length]
         const guruIdx = (k * 5 + s + HARI_URUTAN.indexOf(hari)) % gurus.length
         const ruanganId = RUANG_KHUSUS[mapel] ?? ruangKelasUtama[k].id
+        // 1 pelajaran = 1 PTK pendamping (rotasi; sebagian tanpa pendamping agar variatif)
+        const pendampingIdx = (k * 3 + s + HARI_URUTAN.indexOf(hari)) % ptkPendampingCount
+        const ptkPendampingId = (k + s + HARI_URUTAN.indexOf(hari)) % 3 === 0
+          ? null
+          : ptkPendampingList[pendampingIdx].id
         jadwalData.push({
           kelasIdx: k,
           mapel,
           guruIdx,
           ruanganId,
+          ptkPendampingId,
           hari,
           jamMulai: slots[s].jamMulai,
           jamSelesai: slots[s].jamSelesai
@@ -491,6 +489,7 @@ async function main() {
           mapel: j.mapel,
           guruId: gurus[j.guruIdx].id,
           ruanganId: j.ruanganId,
+          ptkPendampingId: j.ptkPendampingId,
           hari: j.hari as any,
           jamMulai: j.jamMulai,
           jamSelesai: j.jamSelesai

@@ -36,14 +36,6 @@ export default defineEventHandler(async (event) => {
       }
     })
     if (siswa) {
-      const ptkPendamping = await prisma.ptkPendamping.findMany({
-        where: {
-          isActive: true,
-          kelasId: siswa.kelasId
-        },
-        select: { id: true, nama: true, nomorHp: true },
-        orderBy: { nama: 'asc' }
-      })
       return {
         ...user,
         nisn: siswa.nisn,
@@ -51,8 +43,7 @@ export default defineEventHandler(async (event) => {
         kelas: siswa.kelas,
         waliKelas: siswa.kelas.waliKelas,
         namaWali: siswa.namaWali,
-        kontakWali: siswa.kontakWali,
-        ptkPendamping
+        kontakWali: siswa.kontakWali
       }
     }
   }

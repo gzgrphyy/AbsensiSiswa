@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const existing = await prisma.jadwalPelajaran.findUnique({ where: { id } })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Jadwal pelajaran tidak ditemukan' })
 
-  const { kelasId, ruanganId, mapel, guruId, hari, jamMulai, jamSelesai } = result.data
+  const { kelasId, ruanganId, mapel, guruId, ptkPendampingId, hari, jamMulai, jamSelesai } = result.data
 
   if (kelasId) {
     const k = await prisma.kelas.findUnique({ where: { id: kelasId } })
@@ -29,6 +29,10 @@ export default defineEventHandler(async (event) => {
   if (guruId) {
     const g = await prisma.user.findFirst({ where: { id: guruId, role: 'GURU' } })
     if (!g) throw createError({ statusCode: 404, statusMessage: 'Guru tidak ditemukan' })
+  }
+  if (ptkPendampingId) {
+    const p = await prisma.ptkPendamping.findUnique({ where: { id: ptkPendampingId } })
+    if (!p) throw createError({ statusCode: 404, statusMessage: 'PTK pendamping tidak ditemukan' })
   }
 
   const finalHari = hari ?? existing.hari
@@ -66,6 +70,7 @@ export default defineEventHandler(async (event) => {
       ...(ruanganId !== undefined && { ruanganId }),
       ...(mapel !== undefined && { mapel }),
       ...(guruId !== undefined && { guruId }),
+      ...(ptkPendampingId !== undefined && { ptkPendampingId: ptkPendampingId ?? null }),
       ...(hari !== undefined && { hari: hari as any }),
       ...(jamMulai !== undefined && { jamMulai }),
       ...(jamSelesai !== undefined && { jamSelesai })
@@ -73,7 +78,8 @@ export default defineEventHandler(async (event) => {
     include: {
       kelas: { select: { id: true, nama: true } },
       ruangan: { select: { id: true, nama: true } },
-      guru: { select: { id: true, nama: true, nip: true } }
+      guru: { select: { id: true, nama: true, nip: true } },
+      ptkPendamping: { select: { id: true, nama: true } }
     }
   })
 })

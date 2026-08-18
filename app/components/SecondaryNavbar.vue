@@ -8,7 +8,6 @@ const activeMenu = computed(() => {
   if (path === '/admin') return 'dasbor'
   if (
     path.startsWith('/admin/guru') ||
-    path.startsWith('/admin/ptk-pendamping') ||
     path.startsWith('/admin/siswa') ||
     path.startsWith('/admin/kelas') ||
     path.startsWith('/admin/tahun-ajaran') ||
@@ -29,7 +28,6 @@ interface SubMenuItem {
 const subMenus: Record<string, SubMenuItem[]> = {
   dataMaster: [
     { labelKey: 'nav.dataPtk',          to: '/admin/guru' },
-    { labelKey: 'nav.dataPtkPendamping', to: '/admin/ptk-pendamping' },
     { labelKey: 'nav.dataMurid',         to: '/admin/siswa' },
     { labelKey: 'nav.dataKelas',         to: '/admin/kelas' },
     { labelKey: 'nav.tahunAjaran',       to: '/admin/tahun-ajaran' },

@@ -10,8 +10,6 @@ export default defineEventHandler(async (event) => {
     },
     select: {
       id: true,
-      kelasId: true,
-      kelas: { select: { id: true, nama: true } },
       nama: true,
       nip: true,
       nomorHp: true,
