@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { nama, email, nip, nomorHp1, nomorHp2 } = result.data
+  const { nama, email, nip, nomorHp1, nomorHp2, jenisKelamin } = result.data
 
   const existingEmail = await prisma.user.findUnique({
     where: { email }
@@ -43,6 +43,7 @@ export default defineEventHandler(async (event) => {
       nip: nip || null,
       nomorHp1: nomorHp1 || null,
       nomorHp2: nomorHp2 || null,
+      jenisKelamin: jenisKelamin ?? null,
       passwordHash,
       role: 'GURU',
       isActive: true

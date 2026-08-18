@@ -13,7 +13,7 @@ withDefaults(defineProps<{
 
 <template>
   <div>
-    <label v-if="label" class="block text-sm  text-gray-600 dark:text-gray-400 mb-1.5">
+    <label v-if="label" class="block text-xs  text-gray-600 dark:text-gray-400 mb-1.5">
       {{ label }}
       <span v-if="required" class="text-red-500">*</span>
     </label>

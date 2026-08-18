@@ -10,13 +10,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { nama, nip, nomorHp, keterangan } = result.data
+  const { nama, nip, nomorHp, jenisKelamin, keterangan } = result.data
 
   return await prisma.ptkPendamping.create({
     data: {
       nama,
       nip: nip ?? null,
       nomorHp: nomorHp ?? null,
+      jenisKelamin: jenisKelamin ?? null,
       keterangan: keterangan ?? null
     }
   })

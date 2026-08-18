@@ -322,11 +322,11 @@ function promptDelete(item: TahunAjaran) {
             <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <!-- Nama -->
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.tahunAjaran.labelNama') }}</label>
+                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.tahunAjaran.labelNama') }}</label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
                   :placeholder="t('admin.tahunAjaran.placeholderNama')"
                   :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 <Transition name="fade">
                   <p v-if="editing && editing._count.kelas > 0" class="flex items-center gap-1 text-xs text-amber-600 mt-1.5">
                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -339,10 +339,10 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Semester -->
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.tahunAjaran.labelSemester') }}</label>
+                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.tahunAjaran.labelSemester') }}</label>
                 <select v-model="form.semester" @change="onFormChange"
                   :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
                   <option value="GANJIL">{{ t('semester.ganjil') }}</option>
                   <option value="GENAP">{{ t('semester.genap') }}</option>
                 </select>
@@ -353,7 +353,7 @@ function promptDelete(item: TahunAjaran) {
                 <input id="setActive" v-model="form.setActive" type="checkbox" @change="onFormChange"
                   class="mt-0.5 w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-primary-600 focus:ring-primary-500 transition-shadow" />
                 <div class="flex flex-col">
-                  <label for="setActive" class="text-sm  text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <label for="setActive" class="text-xs  text-gray-700 dark:text-gray-300 cursor-pointer">
                     {{ editing ? t('admin.tahunAjaran.setAktifEdit') : t('admin.tahunAjaran.setAktifCreate') }}
                   </label>
                   <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -364,7 +364,7 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Edit mode info -->
               <Transition name="fade">
-                <div v-if="editing && editing.isActive" class="flex items-center gap-2 p-3 bg-primary-50 border border-primary-200 rounded-lg text-sm text-primary-700">
+                <div v-if="editing && editing.isActive" class="flex items-center gap-2 p-3 bg-primary-50 border border-primary-200 rounded-lg text-xs text-primary-700">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -374,7 +374,7 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Error -->
               <Transition name="fade">
-                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -385,11 +385,11 @@ function promptDelete(item: TahunAjaran) {
               <!-- Actions -->
               <div class="flex justify-end gap-3 pt-2 border-t border-gray-100 dark:border-slate-700">
                 <button type="button" @click="handleCloseClick"
-                  class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
+                  class="px-4 py-2 text-xs  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                   {{ t('common.batal') }}
                 </button>
                 <button type="submit" :disabled="saving"
-                  class="px-5 py-2 text-sm  text-white bg-primary-600 rounded-md hover:bg-primary-700 active:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
+                  class="px-5 py-2 text-xs  text-white bg-primary-600 rounded-md hover:bg-primary-700 active:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
                   <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -407,15 +407,15 @@ function promptDelete(item: TahunAjaran) {
         <div v-if="confirmClose" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmClose = false"></div>
           <div class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
-            <h2 class="text-lg  text-gray-900 dark:text-gray-100 mb-2">{{ t('admin.tahunAjaran.confirmCloseTitle') }}</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">{{ t('admin.tahunAjaran.confirmCloseMsg') }}</p>
+            <h2 class="text-xs  text-gray-900 dark:text-gray-100 mb-2">{{ t('admin.tahunAjaran.confirmCloseTitle') }}</h2>
+            <p class="text-xs text-gray-600 dark:text-gray-400 mb-5">{{ t('admin.tahunAjaran.confirmCloseMsg') }}</p>
             <div class="flex justify-end gap-3">
               <button @click="confirmClose = false"
-                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
+                class="px-4 py-2 text-xs  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 {{ t('admin.tahunAjaran.lanjutkanEdit') }}
               </button>
               <button @click="showModal = false; confirmClose = false"
-                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
+                class="px-4 py-2 text-xs  text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
                 {{ t('admin.tahunAjaran.yaBatalkan') }}
               </button>
             </div>

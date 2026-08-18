@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
   })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Guru tidak ditemukan' })
 
-  const { nama, email, nip, nomorHp1, nomorHp2, isActive } = result.data
+  const { nama, email, nip, nomorHp1, nomorHp2, jenisKelamin, isActive } = result.data
 
   if (email && email !== existing.email) {
     const emailExists = await prisma.user.findUnique({
@@ -54,6 +54,7 @@ export default defineEventHandler(async (event) => {
       ...(nip !== undefined && { nip: nip || null }),
       ...(nomorHp1 !== undefined && { nomorHp1: nomorHp1 || null }),
       ...(nomorHp2 !== undefined && { nomorHp2: nomorHp2 || null }),
+      ...(jenisKelamin !== undefined && { jenisKelamin: jenisKelamin ?? null }),
       ...(isActive !== undefined && { isActive })
     },
     select: {

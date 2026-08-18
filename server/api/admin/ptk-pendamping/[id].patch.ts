@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   const existing = await prisma.ptkPendamping.findUnique({ where: { id } })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'PTK pendamping tidak ditemukan' })
 
-  const { nama, nip, nomorHp, keterangan } = result.data
+  const { nama, nip, nomorHp, jenisKelamin, keterangan } = result.data
 
   return await prisma.ptkPendamping.update({
     where: { id },
@@ -24,6 +24,7 @@ export default defineEventHandler(async (event) => {
       ...(nama !== undefined && { nama }),
       ...(nip !== undefined && { nip: nip ?? null }),
       ...(nomorHp !== undefined && { nomorHp: nomorHp ?? null }),
+      ...(jenisKelamin !== undefined && { jenisKelamin: jenisKelamin ?? null }),
       ...(keterangan !== undefined && { keterangan: keterangan ?? null })
     }
   })

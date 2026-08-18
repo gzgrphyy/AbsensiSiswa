@@ -265,20 +265,20 @@ async function handleDelete() {
         <BaseFormField :label="t('admin.jadwal.labelMapel')" required>
           <input v-model="form.mapel" type="text" @input="onFormChange" required
             :placeholder="t('admin.jadwal.placeholderMapel')"
-            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-500" />
         </BaseFormField>
 
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField :label="t('admin.jadwal.labelHari')" required>
             <select v-model="form.hari" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
               <option v-for="h in hariList" :key="h" :value="h">{{ hariLabel(h) }}</option>
             </select>
           </BaseFormField>
 
           <BaseFormField :label="t('admin.jadwal.labelKelas')" required>
             <select v-model="form.kelasId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
               <option :value="0" disabled>{{ t('admin.jadwal.pilihKelas') }}</option>
               <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
             </select>
@@ -288,19 +288,19 @@ async function handleDelete() {
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField :label="t('admin.jadwal.labelJamMulai')" required>
             <input v-model="form.jamMulai" type="time" @input="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
           </BaseFormField>
 
           <BaseFormField :label="t('admin.jadwal.labelJamSelesai')" required>
             <input v-model="form.jamSelesai" type="time" @input="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500" />
           </BaseFormField>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <BaseFormField :label="t('admin.jadwal.labelRuangan')" required>
             <select v-model="form.ruanganId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
               <option :value="0" disabled>{{ t('admin.jadwal.pilihRuangan') }}</option>
               <option v-for="r in ruanganList" :key="r.id" :value="r.id">{{ r.nama }}</option>
             </select>
@@ -308,7 +308,7 @@ async function handleDelete() {
 
           <BaseFormField :label="t('admin.jadwal.labelPtk')" required>
             <select v-model="form.guruId" @change="onFormChange" required
-              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+              class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
               <option :value="0" disabled>{{ t('admin.jadwal.pilihPtk') }}</option>
               <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
             </select>
@@ -317,7 +317,7 @@ async function handleDelete() {
 
         <BaseFormField :label="t('admin.jadwal.labelPtkPendamping')">
           <select v-model="form.ptkPendampingId" @change="onFormChange"
-            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+            class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
             <option :value="0">{{ t('admin.jadwal.tanpaPtkPendamping') }}</option>
             <option v-for="p in pendampingList" :key="p.id" :value="p.id">{{ p.nama }}</option>
           </select>
@@ -325,9 +325,9 @@ async function handleDelete() {
 
       </form>
       <template #footer>
-        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md">{{ t('common.batal') }}</button>
+        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-xs  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md">{{ t('common.batal') }}</button>
         <button type="submit" @click="handleSave" :disabled="saving"
-          class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
+          class="px-5 py-2 text-xs  text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
           <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           {{ saving ? t('common.menyimpan') : t('common.simpan') }}
         </button>

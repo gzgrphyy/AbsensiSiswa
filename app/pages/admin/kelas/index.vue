@@ -309,12 +309,12 @@ async function handleDelete() {
         <BaseFormField :label="t('admin.kelas.labelNama')" required>
           <input v-model="form.nama" type="text" @input="onFormChange" required
             :placeholder="t('admin.kelas.placeholderNama')"
-            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </BaseFormField>
 
         <BaseFormField :label="t('admin.kelas.labelWali')">
           <select v-model="form.waliKelasId" @change="onFormChange"
-            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
+            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary-500 bg-white">
             <option :value="0">{{ t('common.tidakAda') }}</option>
             <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
           </select>
@@ -322,15 +322,15 @@ async function handleDelete() {
 
         <BaseFormField :label="t('admin.kelas.labelTa')" required>
           <select v-model="form.tahunAjaranId" @change="onFormChange" required
-            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 bg-white">
+            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary-500 bg-white">
             <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})</option>
           </select>
         </BaseFormField>
       </form>
       <template #footer>
-        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md">{{ t('common.batal') }}</button>
+        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-xs  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md">{{ t('common.batal') }}</button>
         <button type="submit" @click="handleSave" :disabled="saving"
-          class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
+          class="px-5 py-2 text-xs  text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
           <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           {{ saving ? t('common.menyimpan') : t('common.simpan') }}
         </button>

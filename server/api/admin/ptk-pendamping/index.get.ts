@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
       nama: true,
       nip: true,
       nomorHp: true,
+      jenisKelamin: true,
       keterangan: true,
       isActive: true,
       createdAt: true,

@@ -16,6 +16,8 @@ export default defineEventHandler(async (event) => {
       nip: true,
       nomorHp1: true,
       nomorHp2: true,
+      jenisKelamin: true,
+      foto: true,
       isActive: true,
       createdAt: true,
       updatedAt: true,

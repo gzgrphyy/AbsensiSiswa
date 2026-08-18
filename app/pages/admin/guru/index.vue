@@ -6,6 +6,8 @@ interface Guru {
   nip: string | null
   nomorHp1: string | null
   nomorHp2: string | null
+  jenisKelamin: string | null
+  foto: string | null
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -17,6 +19,7 @@ interface PtkPendamping {
   nama: string
   nip: string | null
   nomorHp: string | null
+  jenisKelamin: string | null
   keterangan: string | null
   isActive: boolean
   createdAt: string
@@ -30,9 +33,12 @@ interface Row {
   jenis: Jenis
   id: number
   nama: string
+  foto: string | null
   email: string | null
   nip: string | null
   nomorHp: string | null
+  nomorHp2: string | null
+  jenisKelamin: string | null
   keterangan: string | null
   isActive: boolean
 }
@@ -48,6 +54,19 @@ const pageSize = 10
 function toggleSort() {
   sortOrder.value = sortOrder.value === 'abjad' ? '' : 'abjad'
   page.value = 1
+}
+
+function initials(nama: string) {
+  const parts = nama.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return '?'
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase()
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
+}
+
+function jenisKelaminLabel(jk: string | null) {
+  if (jk === 'LAKI_LAKI') return t('admin.guru.jenisKelaminL')
+  if (jk === 'PEREMPUAN') return t('admin.guru.jenisKelaminP')
+  return ''
 }
 
 const guruParams = computed(() => {
@@ -71,9 +90,12 @@ const rows = computed<Row[]>(() => {
       jenis: 'PTK',
       id: g.id,
       nama: g.nama,
+      foto: g.foto,
       email: g.email,
       nip: g.nip,
-      nomorHp: g.nomorHp1 || g.nomorHp2,
+      nomorHp: g.nomorHp1,
+      nomorHp2: g.nomorHp2,
+      jenisKelamin: g.jenisKelamin,
       keterangan: null,
       isActive: g.isActive
     })
@@ -84,9 +106,12 @@ const rows = computed<Row[]>(() => {
       jenis: 'PENDAMPING',
       id: p.id,
       nama: p.nama,
+      foto: null,
       email: null,
       nip: p.nip,
       nomorHp: p.nomorHp,
+      nomorHp2: null,
+      jenisKelamin: p.jenisKelamin,
       keterangan: p.keterangan,
       isActive: p.isActive
     })
@@ -113,7 +138,7 @@ const showPasswordModal = ref(false)
 const editingRow = ref<Row | null>(null)
 const editingGuru = ref<Guru | null>(null)
 const editingPendamping = ref<PtkPendamping | null>(null)
-const form = ref({ nama: '', email: '', nip: '', nomorHp: '', keterangan: '' })
+const form = ref({ nama: '', email: '', nip: '', nomorHp1: '', nomorHp2: '', jenisKelamin: '', keterangan: '' })
 const saving = ref(false)
 const generatedPassword = ref('')
 const resetPasswordFor = ref<Guru | null>(null)
@@ -138,7 +163,7 @@ function openCreate() {
   editingRow.value = null
   editingGuru.value = null
   editingPendamping.value = null
-  form.value = { nama: '', email: '', nip: '', nomorHp: '', keterangan: '' }
+  form.value = { nama: '', email: '', nip: '', nomorHp1: '', nomorHp2: '', jenisKelamin: '', keterangan: '' }
   errorMsg.value = ''
   successMsg.value = ''
   dirtyForm.value = false
@@ -158,7 +183,9 @@ function openEdit(item: Row) {
     nama: item.nama,
     email: editingGuru.value?.email || '',
     nip: item.nip || '',
-    nomorHp: item.jenis === 'PTK' ? (editingGuru.value?.nomorHp1 || '') : (item.nomorHp || ''),
+    nomorHp1: item.jenis === 'PTK' ? (editingGuru.value?.nomorHp1 || '') : (item.nomorHp || ''),
+    nomorHp2: item.jenis === 'PTK' ? (editingGuru.value?.nomorHp2 || '') : '',
+    jenisKelamin: item.jenisKelamin || '',
     keterangan: item.keterangan || ''
   }
   errorMsg.value = ''
@@ -184,6 +211,11 @@ async function handleSave() {
   errorMsg.value = ''
   successMsg.value = ''
 
+  if (!form.value.nama.trim()) { showError('Nama lengkap wajib diisi'); saving.value = false; return }
+  if (!form.value.jenisKelamin) { showError('Jenis kelamin wajib diisi'); saving.value = false; return }
+  if (!form.value.nip.trim()) { showError('NIP wajib diisi'); saving.value = false; return }
+  if (!form.value.nomorHp1.trim()) { showError('No. HP 1 wajib diisi'); saving.value = false; return }
+
   try {
     if (editingRow.value) {
       if (editingRow.value.jenis === 'PTK') {
@@ -193,7 +225,9 @@ async function handleSave() {
         if (form.value.nama !== guru.nama) body.nama = form.value.nama
         if (form.value.email !== guru.email) body.email = form.value.email
         if ((form.value.nip || null) !== guru.nip) body.nip = form.value.nip || null
-        if ((form.value.nomorHp || null) !== guru.nomorHp1) body.nomorHp1 = form.value.nomorHp || null
+        if ((form.value.nomorHp1 || null) !== guru.nomorHp1) body.nomorHp1 = form.value.nomorHp1 || null
+        if ((form.value.nomorHp2 || null) !== guru.nomorHp2) body.nomorHp2 = form.value.nomorHp2 || null
+        if ((form.value.jenisKelamin || null) !== guru.jenisKelamin) body.jenisKelamin = form.value.jenisKelamin || null
 
         if (Object.keys(body).length === 0) {
           showModal.value = false
@@ -215,7 +249,8 @@ async function handleSave() {
         const body = {
           nama: form.value.nama,
           nip: form.value.nip || null,
-          nomorHp: form.value.nomorHp || null,
+          nomorHp: form.value.nomorHp1 || null,
+          jenisKelamin: form.value.jenisKelamin || null,
           keterangan: form.value.keterangan || null
         }
         const { error } = await useFetch(`/api/admin/ptk-pendamping/${pendamping.id}`, {
@@ -237,7 +272,9 @@ async function handleSave() {
             nama: form.value.nama,
             email: form.value.email,
             nip: form.value.nip || undefined,
-            nomorHp1: form.value.nomorHp || undefined
+            nomorHp1: form.value.nomorHp1 || undefined,
+            nomorHp2: form.value.nomorHp2 || undefined,
+            jenisKelamin: form.value.jenisKelamin || undefined
           }
         })
         if (error.value) {
@@ -254,7 +291,8 @@ async function handleSave() {
           body: {
             nama: form.value.nama,
             nip: form.value.nip || null,
-            nomorHp: form.value.nomorHp || null,
+            nomorHp: form.value.nomorHp1 || null,
+            jenisKelamin: form.value.jenisKelamin || null,
             keterangan: form.value.keterangan || null
           }
         })
@@ -434,9 +472,9 @@ async function copyPassword() {
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.guru.colNama') }}</th>
-                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.guru.colEmail') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.guru.colNip') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">{{ t('admin.guru.colNoHp') }}</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.guru.colEmail') }}</th>
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden xl:table-cell">{{ t('admin.ptkPendamping.colKeterangan') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colStatus') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
@@ -449,15 +487,23 @@ async function copyPassword() {
                   ? 'hover:bg-gray-50 dark:hover:bg-gray-700/30'
                   : 'bg-gray-50/50 dark:bg-gray-800/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 border-l-2 border-l-gray-300 dark:border-l-gray-600'">
                 <td class="px-4 sm:px-6 py-4">
-                  <span class=" text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.isActive }">
-                    {{ item.nama }}
-                  </span>
-                  <div v-if="item.jenis === 'PTK'" class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ item.email }}</div>
-                </td>
-                <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
-                  <span class="text-gray-600 dark:text-gray-300" :class="{ 'text-gray-400 dark:text-gray-500': !item.isActive }">
-                    {{ item.email || '-' }}
-                  </span>
+                  <div class="flex items-center gap-3">
+                    <div v-if="item.foto" class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border admin-accent-border">
+                      <img :src="item.foto" class="w-full h-full object-cover" :alt="item.nama" />
+                    </div>
+                    <div v-else class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold flex-shrink-0">
+                      {{ initials(item.nama) }}
+                    </div>
+                    <div class="min-w-0">
+                      <span class="text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.isActive }">
+                        {{ item.nama }}
+                      </span>
+                      <div v-if="item.jenisKelamin" class="text-xs text-gray-400 dark:text-gray-500" :class="{ 'text-gray-300 dark:text-gray-600': !item.isActive }">
+                        {{ jenisKelaminLabel(item.jenisKelamin) }}
+                      </div>
+                      <div v-if="item.jenis === 'PTK'" class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ item.email }}</div>
+                    </div>
+                  </div>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center hidden md:table-cell">
                   <span class="text-gray-500 dark:text-gray-400" :class="{ 'text-gray-300 dark:text-gray-600': !item.isActive }">
@@ -465,8 +511,14 @@ async function copyPassword() {
                   </span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center hidden lg:table-cell">
-                  <span class="text-gray-500 dark:text-gray-400 text-xs" :class="{ 'text-gray-300 dark:text-gray-600': !item.isActive }">
-                    {{ item.nomorHp || '-' }}
+                  <div class="text-gray-500 dark:text-gray-400 text-xs" :class="{ 'text-gray-300 dark:text-gray-600': !item.isActive }">
+                    <div>{{ item.nomorHp || '-' }}</div>
+                    <div v-if="item.nomorHp2" class="mt-0.5">{{ item.nomorHp2 }}</div>
+                  </div>
+                </td>
+                <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
+                  <span class="text-gray-600 dark:text-gray-300" :class="{ 'text-gray-400 dark:text-gray-500': !item.isActive }">
+                    {{ item.email || '-' }}
                   </span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 hidden xl:table-cell">
@@ -601,52 +653,77 @@ async function copyPassword() {
             <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <!-- Nama Lengkap -->
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">
+                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">
                   {{ t('admin.guru.labelNama') }} <span class="text-red-500">*</span>
                 </label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
                   :placeholder="t('admin.guru.placeholderNama')"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
-              <!-- Email -->
+              <!-- Jenis Kelamin -->
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">
-                  {{ t('admin.guru.labelEmail') }}
+                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">
+                  {{ t('admin.guru.labelJenisKelamin') }} <span class="text-red-500">*</span>
                 </label>
-                <input v-model="form.email" type="email" @input="onFormChange"
-                  :placeholder="t('admin.guru.placeholderEmail')"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
-                <p class="mt-1.5 text-xs text-gray-400 dark:text-gray-500">{{ t('admin.guru.infoLogin') }}</p>
+                <select v-model="form.jenisKelamin" @change="onFormChange" required
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+                  <option value="" disabled>{{ t('admin.guru.pilihJenisKelamin') }}</option>
+                  <option value="LAKI_LAKI">{{ t('admin.guru.jenisKelaminL') }}</option>
+                  <option value="PEREMPUAN">{{ t('admin.guru.jenisKelaminP') }}</option>
+                </select>
               </div>
 
               <!-- NIP -->
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.guru.labelNip') }}</label>
-                <input v-model="form.nip" type="text" @input="onFormChange"
+                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">
+                  {{ t('admin.guru.labelNip') }} <span class="text-red-500">*</span>
+                </label>
+                <input v-model="form.nip" type="text" @input="onFormChange" required
                   :placeholder="t('admin.guru.placeholderNip')"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
               <!-- Nomor HP -->
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">
+                    {{ t('admin.guru.labelNoHp1') }} <span class="text-red-500">*</span>
+                  </label>
+                  <input v-model="form.nomorHp1" type="text" @input="onFormChange" required
+                    :placeholder="t('admin.guru.placeholderHp')"
+                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                </div>
+                <div>
+                  <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.guru.labelNoHp2') }}</label>
+                  <input v-model="form.nomorHp2" type="text" @input="onFormChange"
+                    :placeholder="t('admin.guru.placeholderHp2')"
+                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                </div>
+              </div>
+
+              <!-- Email -->
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.guru.labelNoHp') }}</label>
-                <input v-model="form.nomorHp" type="text" @input="onFormChange"
-                  :placeholder="t('admin.guru.placeholderHp')"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">
+                  {{ t('admin.guru.labelEmail') }}
+                </label>
+                <input v-model="form.email" type="email" @input="onFormChange"
+                  :placeholder="t('admin.guru.placeholderEmail')"
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                <p class="mt-1.5 text-xs text-gray-400 dark:text-gray-500">{{ t('admin.guru.infoLogin') }}</p>
               </div>
 
               <!-- Keterangan -->
               <div>
-                <label class="block text-sm  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.guru.labelKeterangan') }}</label>
+                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.guru.labelKeterangan') }}</label>
                 <textarea v-model="form.keterangan" rows="2" @input="onFormChange"
                   :placeholder="t('admin.guru.placeholderKeterangan')"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-sm dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500"></textarea>
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500"></textarea>
               </div>
 
               <!-- Info create -->
               <Transition name="fade">
-                <div v-if="!editingRow && form.email.trim() !== ''" class="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-700 dark:text-blue-300">
+                <div v-if="!editingRow && form.email.trim() !== ''" class="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg text-xs text-blue-700 dark:text-blue-300">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -656,7 +733,7 @@ async function copyPassword() {
 
               <!-- Error -->
               <Transition name="fade">
-                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300">
+                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-xs text-red-700 dark:text-red-300">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -667,11 +744,11 @@ async function copyPassword() {
               <!-- Actions -->
               <div class="flex justify-end gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                 <button type="button" @click="handleCloseClick"
-                  class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
+                  class="px-4 py-2 text-xs  text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                   {{ t('common.batal') }}
                 </button>
                 <button type="submit" :disabled="saving"
-                  class="px-5 py-2 text-sm  text-white bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
+                  class="px-5 py-2 text-xs  text-white bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2">
                   <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -689,15 +766,15 @@ async function copyPassword() {
         <div v-if="confirmClose" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmClose = false"></div>
           <div class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
-            <h2 class="text-lg  text-gray-900 dark:text-gray-100 mb-2">{{ t('admin.tahunAjaran.confirmCloseTitle') }}</h2>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-5">{{ t('admin.tahunAjaran.confirmCloseMsg') }}</p>
+            <h2 class="text-xs  text-gray-900 dark:text-gray-100 mb-2">{{ t('admin.tahunAjaran.confirmCloseTitle') }}</h2>
+            <p class="text-xs text-gray-600 dark:text-gray-400 mb-5">{{ t('admin.tahunAjaran.confirmCloseMsg') }}</p>
             <div class="flex justify-end gap-3">
               <button @click="confirmClose = false"
-                class="px-4 py-2 text-sm  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
+                class="px-4 py-2 text-xs  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md transition-colors">
                 {{ t('admin.tahunAjaran.lanjutkanEdit') }}
               </button>
               <button @click="showModal = false; confirmClose = false"
-                class="px-4 py-2 text-sm  text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
+                class="px-4 py-2 text-xs  text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
                 {{ t('admin.tahunAjaran.yaBatalkan') }}
               </button>
             </div>
