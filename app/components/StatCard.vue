@@ -43,7 +43,7 @@ const cardStyle = {
       </div>
       <div class="min-w-0">
         <p class="text-[10px] text-gray-500 dark:text-gray-400 tracking-wider  truncate">{{ label }}</p>
-        <p class="text-base  text-gray-900 dark:text-gray-100 mt-0.5">{{ value }}</p>
+        <p class="text-xs  text-gray-900 dark:text-gray-100 mt-0.5">{{ value }}</p>
         <p v-if="trendLabel" class="text-[10px] mt-0.5  text-gray-400 dark:text-gray-500">{{ trendLabel }}</p>
       </div>
     </div>
