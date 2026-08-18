@@ -73,8 +73,8 @@ function jenjangOf(nama: string) {
 
 const jenjangList = computed(() => {
   const set = new Set<string>()
-  for (const s of siswaList.value || []) {
-    const j = jenjangOf(s.kelas?.nama || '')
+  for (const k of kelasList.value || []) {
+    const j = jenjangOf(k.nama)
     if (j) set.add(j)
   }
   return [...set].sort()
