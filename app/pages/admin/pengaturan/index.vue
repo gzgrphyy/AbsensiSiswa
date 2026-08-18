@@ -272,20 +272,20 @@ async function handleSave() {
     <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
     <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
 
-    <div class="flex gap-1 mb-5 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+    <div class="flex border-b admin-accent-border mb-5" :style="{ '--tab-accent': formBranding.warnaUtama }">
       <button @click="activeTab = 'umum'"
-        class="flex-1 py-2 px-4 text-sm  rounded-md transition-all"
-        :class="activeTab === 'umum' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border admin-accent-border' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
+        class="relative flex-1 py-2.5 px-4 text-sm font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--tab-accent)] after:transition-all"
+        :class="activeTab === 'umum' ? 'text-[var(--tab-accent)] after:w-full' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 after:w-0 hover:after:w-full'">
         {{ t('admin.pengaturan.tabUmum') }}
       </button>
       <button @click="activeTab = 'absensi'"
-        class="flex-1 py-2 px-4 text-sm  rounded-md transition-all"
-        :class="activeTab === 'absensi' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border admin-accent-border' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
+        class="relative flex-1 py-2.5 px-4 text-sm font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--tab-accent)] after:transition-all"
+        :class="activeTab === 'absensi' ? 'text-[var(--tab-accent)] after:w-full' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 after:w-0 hover:after:w-full'">
         {{ t('admin.pengaturan.tabAbsensi') }}
       </button>
       <button @click="activeTab = 'keamanan'"
-        class="flex-1 py-2 px-4 text-sm  rounded-md transition-all"
-        :class="activeTab === 'keamanan' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border admin-accent-border' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
+        class="relative flex-1 py-2.5 px-4 text-sm font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--tab-accent)] after:transition-all"
+        :class="activeTab === 'keamanan' ? 'text-[var(--tab-accent)] after:w-full' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 after:w-0 hover:after:w-full'">
         {{ t('admin.pengaturan.tabKeamanan') }}
       </button>
     </div>
