@@ -20,7 +20,6 @@ interface PtkPendamping {
   nip: string | null
   nomorHp: string | null
   jenisKelamin: string | null
-  keterangan: string | null
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -39,7 +38,6 @@ interface Row {
   nomorHp: string | null
   nomorHp2: string | null
   jenisKelamin: string | null
-  keterangan: string | null
   isActive: boolean
 }
 
@@ -69,6 +67,32 @@ function jenisKelaminLabel(jk: string | null) {
   return ''
 }
 
+function jenisKelaminBadgeClass(jk: string | null, isActive: boolean): string {
+  if (!isActive) return 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+  if (jk === 'PEREMPUAN') return 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300'
+  return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+}
+
+// Foto profil dummy untuk data PTK yang belum punya foto asli (dibedakan laki-laki/perempuan)
+const dummyAvatarsLaki = [
+  '/images/avatars/laki-1.svg',
+  '/images/avatars/laki-2.svg',
+  '/images/avatars/laki-3.svg',
+]
+
+const dummyAvatarsPerempuan = [
+  '/images/avatars/perempuan-1.svg',
+  '/images/avatars/perempuan-2.svg',
+  '/images/avatars/perempuan-3.svg',
+]
+
+function dummyAvatar(seed: string, jenisKelamin: string | null): string {
+  const list = jenisKelamin === 'PEREMPUAN' ? dummyAvatarsPerempuan : dummyAvatarsLaki
+  let hash = 0
+  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0
+  return list[hash % list.length]
+}
+
 const guruParams = computed(() => {
   const params = new URLSearchParams()
   if (showInactive.value) params.set('showInactive', 'true')
@@ -90,13 +114,12 @@ const rows = computed<Row[]>(() => {
       jenis: 'PTK',
       id: g.id,
       nama: g.nama,
-      foto: g.foto,
+      foto: g.foto || dummyAvatar(g.nama, g.jenisKelamin),
       email: g.email,
       nip: g.nip,
       nomorHp: g.nomorHp1,
       nomorHp2: g.nomorHp2,
       jenisKelamin: g.jenisKelamin,
-      keterangan: null,
       isActive: g.isActive
     })
   }
@@ -106,13 +129,12 @@ const rows = computed<Row[]>(() => {
       jenis: 'PENDAMPING',
       id: p.id,
       nama: p.nama,
-      foto: null,
+      foto: dummyAvatar(p.nama, p.jenisKelamin),
       email: null,
       nip: p.nip,
       nomorHp: p.nomorHp,
       nomorHp2: null,
       jenisKelamin: p.jenisKelamin,
-      keterangan: p.keterangan,
       isActive: p.isActive
     })
   }
@@ -122,6 +144,23 @@ const rows = computed<Row[]>(() => {
 })
 
 const totalPages = computed(() => Math.max(1, Math.ceil(rows.value.length / pageSize)))
+
+// Nomor halaman untuk lompat langsung (pakai elipsis jika halaman banyak)
+const pageNumbers = computed<(number | '...')[]>(() => {
+  const total = totalPages.value
+  const current = page.value
+  const set = new Set<number>([1, total, current - 1, current, current + 1])
+  const sorted = [...set].filter(n => n >= 1 && n <= total).sort((a, b) => a - b)
+  const result: (number | '...')[] = []
+  let prev = 0
+  for (const n of sorted) {
+    if (n - prev > 1) result.push('...')
+    result.push(n)
+    prev = n
+  }
+  return result
+})
+
 const visibleData = computed(() => {
   const start = (page.value - 1) * pageSize
   return rows.value.slice(start, start + pageSize)
@@ -138,7 +177,7 @@ const showPasswordModal = ref(false)
 const editingRow = ref<Row | null>(null)
 const editingGuru = ref<Guru | null>(null)
 const editingPendamping = ref<PtkPendamping | null>(null)
-const form = ref({ nama: '', email: '', nip: '', nomorHp1: '', nomorHp2: '', jenisKelamin: '', keterangan: '' })
+const form = ref({ nama: '', email: '', nip: '', nomorHp1: '', nomorHp2: '', jenisKelamin: '' })
 const saving = ref(false)
 const generatedPassword = ref('')
 const resetPasswordFor = ref<Guru | null>(null)
@@ -163,7 +202,7 @@ function openCreate() {
   editingRow.value = null
   editingGuru.value = null
   editingPendamping.value = null
-  form.value = { nama: '', email: '', nip: '', nomorHp1: '', nomorHp2: '', jenisKelamin: '', keterangan: '' }
+  form.value = { nama: '', email: '', nip: '', nomorHp1: '', nomorHp2: '', jenisKelamin: '' }
   errorMsg.value = ''
   successMsg.value = ''
   dirtyForm.value = false
@@ -185,8 +224,7 @@ function openEdit(item: Row) {
     nip: item.nip || '',
     nomorHp1: item.jenis === 'PTK' ? (editingGuru.value?.nomorHp1 || '') : (item.nomorHp || ''),
     nomorHp2: item.jenis === 'PTK' ? (editingGuru.value?.nomorHp2 || '') : '',
-    jenisKelamin: item.jenisKelamin || '',
-    keterangan: item.keterangan || ''
+    jenisKelamin: item.jenisKelamin || ''
   }
   errorMsg.value = ''
   successMsg.value = ''
@@ -196,6 +234,13 @@ function openEdit(item: Row) {
 
 function onFormChange() {
   dirtyForm.value = true
+}
+
+// NIP maksimal 18 digit, hanya angka
+function onNipInput(event: Event) {
+  const target = event.target as HTMLInputElement
+  form.value.nip = target.value.replace(/\D/g, '').slice(0, 18)
+  onFormChange()
 }
 
 function handleCloseClick() {
@@ -250,8 +295,7 @@ async function handleSave() {
           nama: form.value.nama,
           nip: form.value.nip || null,
           nomorHp: form.value.nomorHp1 || null,
-          jenisKelamin: form.value.jenisKelamin || null,
-          keterangan: form.value.keterangan || null
+          jenisKelamin: form.value.jenisKelamin || null
         }
         const { error } = await useFetch(`/api/admin/ptk-pendamping/${pendamping.id}`, {
           method: 'PATCH',
@@ -292,8 +336,7 @@ async function handleSave() {
             nama: form.value.nama,
             nip: form.value.nip || null,
             nomorHp: form.value.nomorHp1 || null,
-            jenisKelamin: form.value.jenisKelamin || null,
-            keterangan: form.value.keterangan || null
+            jenisKelamin: form.value.jenisKelamin || null
           }
         })
         if (error.value) {
@@ -471,11 +514,10 @@ async function copyPassword() {
           <table class="w-full text-xs">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
-                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.guru.colNama') }}</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.guru.labelNama') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.guru.colNip') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden lg:table-cell">{{ t('admin.guru.colNoHp') }}</th>
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.guru.colEmail') }}</th>
-                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden xl:table-cell">{{ t('admin.ptkPendamping.colKeterangan') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colStatus') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
               </tr>
@@ -498,8 +540,18 @@ async function copyPassword() {
                       <span class="text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.isActive }">
                         {{ item.nama }}
                       </span>
-                      <div v-if="item.jenisKelamin" class="text-xs text-gray-400 dark:text-gray-500" :class="{ 'text-gray-300 dark:text-gray-600': !item.isActive }">
-                        {{ jenisKelaminLabel(item.jenisKelamin) }}
+                      <div v-if="item.jenisKelamin" class="mt-0.5">
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium" :class="jenisKelaminBadgeClass(item.jenisKelamin, item.isActive)">
+                          <svg v-if="item.jenisKelamin === 'PEREMPUAN'" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="5" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 17v6M9 20h6" />
+                          </svg>
+                          <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="5" r="3" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 8v5a7 7 0 11-14 0V8" />
+                          </svg>
+                          {{ jenisKelaminLabel(item.jenisKelamin) }}
+                        </span>
                       </div>
                       <div v-if="item.jenis === 'PTK'" class="text-xs text-gray-400 dark:text-gray-500 sm:hidden">{{ item.email }}</div>
                     </div>
@@ -519,11 +571,6 @@ async function copyPassword() {
                 <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
                   <span class="text-gray-600 dark:text-gray-300" :class="{ 'text-gray-400 dark:text-gray-500': !item.isActive }">
                     {{ item.email || '-' }}
-                  </span>
-                </td>
-                <td class="px-4 sm:px-6 py-4 hidden xl:table-cell">
-                  <span class="text-gray-500 dark:text-gray-400 text-xs" :class="{ 'text-gray-300 dark:text-gray-600': !item.isActive }">
-                    {{ item.keterangan || '-' }}
                   </span>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
@@ -579,7 +626,7 @@ async function copyPassword() {
 
               <!-- Empty state -->
               <tr v-if="rows.length === 0">
-                <td colspan="7" class="px-4 sm:px-6 py-16 text-center">
+                <td colspan="6" class="px-4 sm:px-6 py-16 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <svg class="w-12 h-12 text-gray-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -616,7 +663,21 @@ async function copyPassword() {
               </svg>
               {{ t('common.sebelumnya') }}
             </button>
-            <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages }) }}</span>
+            <div class="flex items-center gap-1">
+              <template v-for="(n, i) in pageNumbers" :key="i">
+                <button
+                  v-if="n !== '...'"
+                  @click="page = n"
+                  :disabled="n === page"
+                  :class="n === page
+                    ? 'w-7 h-7 rounded-md text-xs  text-white bg-primary-600 ring-1 ring-primary-600 cursor-default'
+                    : 'w-7 h-7 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors'"
+                >
+                  {{ n }}
+                </button>
+                <span v-else class="px-0.5 text-xs text-gray-400 dark:text-gray-500 select-none">&hellip;</span>
+              </template>
+            </div>
             <button
               @click="page++"
               :disabled="page >= totalPages"
@@ -667,7 +728,8 @@ async function copyPassword() {
                   {{ t('admin.guru.labelJenisKelamin') }} <span class="text-red-500">*</span>
                 </label>
                 <select v-model="form.jenisKelamin" @change="onFormChange" required
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700">
+                  :class="form.jenisKelamin ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'"
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow">
                   <option value="" disabled>{{ t('admin.guru.pilihJenisKelamin') }}</option>
                   <option value="LAKI_LAKI">{{ t('admin.guru.jenisKelaminL') }}</option>
                   <option value="PEREMPUAN">{{ t('admin.guru.jenisKelaminP') }}</option>
@@ -679,7 +741,7 @@ async function copyPassword() {
                 <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">
                   {{ t('admin.guru.labelNip') }} <span class="text-red-500">*</span>
                 </label>
-                <input v-model="form.nip" type="text" @input="onFormChange" required
+                <input v-model="form.nip" type="text" @input="onNipInput" required maxlength="18" inputmode="numeric"
                   :placeholder="t('admin.guru.placeholderNip')"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
@@ -711,14 +773,6 @@ async function copyPassword() {
                   :placeholder="t('admin.guru.placeholderEmail')"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 <p class="mt-1.5 text-xs text-gray-400 dark:text-gray-500">{{ t('admin.guru.infoLogin') }}</p>
-              </div>
-
-              <!-- Keterangan -->
-              <div>
-                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.guru.labelKeterangan') }}</label>
-                <textarea v-model="form.keterangan" rows="2" @input="onFormChange"
-                  :placeholder="t('admin.guru.placeholderKeterangan')"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500"></textarea>
               </div>
 
               <!-- Info create -->

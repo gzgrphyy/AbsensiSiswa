@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../server/utils/password'
+import { inferJK } from '../scripts/inferJK'
 
 const prisma = new PrismaClient()
 
@@ -171,6 +172,7 @@ async function main() {
           email: g.email,
           nomorHp1: g.nomorHp1,
           nomorHp2: g.nomorHp2,
+          jenisKelamin: inferJK(g.nama),
           passwordHash: guruHash,
           role: 'GURU',
           isActive: true
@@ -189,6 +191,7 @@ async function main() {
         email: g.email,
         nomorHp1: g.nomorHp1,
         nomorHp2: g.nomorHp2,
+        jenisKelamin: inferJK(g.nama),
         passwordHash: guruHash,
         role: 'GURU',
         isActive: true
@@ -211,6 +214,7 @@ async function main() {
         nama: p.nama,
         nip: p.nip,
         nomorHp: p.nomorHp,
+        jenisKelamin: inferJK(p.nama),
         keterangan: p.keterangan,
         isActive: p.isActive
       }
