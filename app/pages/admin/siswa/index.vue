@@ -378,8 +378,8 @@ async function copyPassword() {
                     <span class="text-gray-900 dark:text-gray-100" :class="{ 'text-gray-500 dark:text-gray-400': !item.user.isActive }">
                       {{ item.nama }}
                     </span>
-                    <div v-if="item.user.jenisKelamin" class="text-xs text-gray-400 dark:text-gray-500" :class="{ 'text-gray-300 dark:text-gray-600': !item.user.isActive }">
-                      {{ jenisKelaminLabel(item.user.jenisKelamin) }}
+                    <div class="text-xs text-gray-400 dark:text-gray-500" :class="{ 'text-gray-300 dark:text-gray-600': !item.user.isActive }">
+                      {{ item.user.jenisKelamin ? jenisKelaminLabel(item.user.jenisKelamin) : '-' }}
                     </div>
                   </div>
                 </div>
