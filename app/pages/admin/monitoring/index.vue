@@ -17,6 +17,34 @@ const { data, pending, refresh } = useFetch<MonitoringItem[]>('/api/admin/monito
 
 const displayData = computed(() => data.value || [])
 
+const page = ref(1)
+const pageSize = 10
+
+const totalPages = computed(() => Math.max(1, Math.ceil(displayData.value.length / pageSize)))
+const visibleData = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return displayData.value.slice(start, start + pageSize)
+})
+
+const pageNumbers = computed < (number | '...')[] > (() => {
+  const total = totalPages.value
+  const current = page.value
+  const set = new Set < number > ([1, total, current - 1, current, current + 1])
+  const sorted = [...set].filter(n => n >= 1 && n <= total).sort((a, b) => a - b)
+  const result: (number | '...')[] = []
+  let prev = 0
+  for (const n of sorted) {
+    if (n - prev > 1) result.push('...')
+    result.push(n)
+    prev = n
+  }
+  return result
+})
+
+watch(() => displayData.value.length, () => {
+  if (page.value > totalPages.value) page.value = totalPages.value
+})
+
 function statusLabel(status: string) {
   if (status === 'AKTIF') return t('admin.monitoring.status.AKTIF')
   if (status === 'TIDAK AKTIF') return t('admin.monitoring.status.TIDAK AKTIF')
@@ -71,7 +99,7 @@ onMounted(() => {
               </tr>
             </thead>
             <tbody class="divide-y admin-accent-divide">
-              <tr v-for="item in displayData" :key="item.ruangan" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+              <tr v-for="item in visibleData" :key="item.ruangan" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.ruangan }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.sesiAktif }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.totalSiswa }}</td>
@@ -90,6 +118,40 @@ onMounted(() => {
               </tr>
             </tbody>
           </table>
+        </div>
+        <div v-if="displayData.length > pageSize"
+          class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize,
+            displayData.length), total: displayData.length, unit: t('admin.monitoring.unitRuangan') }) }}
+          </p>
+          <div class="ml-auto flex items-center gap-2">
+            <button @click="page--" :disabled="page <= 1"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              {{ t('common.sebelumnya') }}
+            </button>
+            <div class="flex items-center gap-1">
+              <template v-for="(n, i) in pageNumbers" :key="i">
+                <button v-if="n !== '...'" @click="page = n" :disabled="n === page"
+                  :class="n === page
+                    ? 'w-7 h-7 rounded-md text-xs text-white bg-primary-600 ring-1 ring-primary-600 cursor-default'
+                    : 'w-7 h-7 rounded-md text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors'">
+                  {{ n }}
+                </button>
+                <span v-else class="px-0.5 text-xs text-gray-400 dark:text-gray-500 select-none">&hellip;</span>
+              </template>
+            </div>
+            <button @click="page++" :disabled="page >= totalPages"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+              {{ t('common.selanjutnya') }}
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </BaseCard>
     </template>

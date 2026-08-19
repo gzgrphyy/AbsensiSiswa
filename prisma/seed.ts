@@ -66,34 +66,55 @@ function generatePtkPendamping(i: number) {
   }
 }
 
-function buildMuridNama() {
-  const r = Math.random()
-  const depan = () => (Math.random() < 0.5 ? rand(NAMA_DEPAN_PRI) : rand(NAMA_DEPAN_WANITA))
+function buildMuridNama(pria: boolean) {
+  const depanPool = pria ? NAMA_DEPAN_PRI : NAMA_DEPAN_WANITA
 
-  if (r < 0.15) {
-    // Pendek — 1 kata
-    return depan()
+  // Coba acak dulu (minimal 2 kata, cek keunikan)
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const r = Math.random()
+    let nama = ''
+    if (r < 0.4) {
+      // 2 kata
+      nama = `${rand(depanPool)} ${rand(NAMA_BELAKANG)}`
+    } else if (r < 0.85) {
+      // 3 kata
+      const blk = Math.random() < 0.5 ? rand(NAMA_BELAKANG) : rand(NAMA_BELAKANG_PANJANG)
+      nama = `${rand(depanPool)} ${rand(NAMA_BELAKANG)} ${blk}`
+    } else {
+      // 4 kata
+      nama = `${rand(NAMA_DEPAN_PANJANG)} ${rand(depanPool)} ${rand(NAMA_BELAKANG)} ${rand(NAMA_BELAKANG_PANJANG)}`
+    }
+    if (!usedNamaMurid.has(nama)) {
+      usedNamaMurid.add(nama)
+      return nama
+    }
   }
-  if (r < 0.65) {
-    // Standar — 2 kata
-    return `${depan()} ${rand(NAMA_BELAKANG)}`
+
+  // Fallback deterministik (counter) agar pasti unik
+  let n = namaCounter++
+  for (let guard = 0; guard < 100000; guard++) {
+    const depan = depanPool[n % depanPool.length]
+    const blk1 = NAMA_BELAKANG[Math.floor(n / depanPool.length) % NAMA_BELAKANG.length]
+    const blk2 = NAMA_BELAKANG_PANJANG[Math.floor(n / (depanPool.length * NAMA_BELAKANG.length)) % NAMA_BELAKANG_PANJANG.length]
+    const nama = `${depan} ${blk1} ${blk2}`
+    if (!usedNamaMurid.has(nama)) {
+      usedNamaMurid.add(nama)
+      return nama
+    }
+    n++
   }
-  if (r < 0.9) {
-    // Panjang — 3 kata
-    const blk = Math.random() < 0.5 ? rand(NAMA_BELAKANG) : rand(NAMA_BELAKANG_PANJANG)
-    return `${depan()} ${rand(NAMA_BELAKANG)} ${blk}`
-  }
-  // Sangat panjang — 4 kata
-  const blk1 = rand(NAMA_BELAKANG)
-  const blk2 = rand(NAMA_BELAKANG_PANJANG)
-  return `${rand(NAMA_DEPAN_PANJANG)} ${depan()} ${blk1} ${blk2}`
+  throw new Error('Tidak bisa membuat nama murid unik')
 }
+
+const usedNamaMurid = new Set<string>()
+let namaCounter = 0
 
 function generateMurid(i: number) {
   const pria = Math.random() < 0.5
-  const nama = buildMuridNama()
+  const nama = buildMuridNama(pria)
   return {
     nama,
+    jenisKelamin: (pria ? 'LAKI_LAKI' : 'PEREMPUAN') as 'LAKI_LAKI' | 'PEREMPUAN',
     nisn: String(9000000000 + i),
     nomorHp1: Math.random() < 0.7 ? `0813${String(20000000 + i).padStart(8, '0')}` : null,
     namaWali: `${pria ? 'Bpk' : 'Ibu'} ${nama}`,
@@ -354,6 +375,9 @@ async function main() {
   ]
   const NAMED_PER_KELAS = 5
 
+  // Seeded dengan nama murid bernama agar generasi tidak bentrok
+  for (const m of muridPerKelas) usedNamaMurid.add(m.nama)
+
   let idx = 0
   for (let k = 0; k < kelasList.length; k++) {
     const kelas = kelasList[k]
@@ -361,6 +385,9 @@ async function main() {
     for (let m = 0; m < target; m++) {
       const named = m < NAMED_PER_KELAS ? muridPerKelas[k * NAMED_PER_KELAS + m] : undefined
       const murid = named ?? generateMurid(idx)
+      const jk: 'LAKI_LAKI' | 'PEREMPUAN' = (murid as { jenisKelamin?: 'LAKI_LAKI' | 'PEREMPUAN' }).jenisKelamin
+        ?? inferJK(murid.nama)
+        ?? (Math.random() < 0.5 ? 'LAKI_LAKI' : 'PEREMPUAN')
       const user = await prisma.user.create({
         data: {
           nama: murid.nama,
@@ -368,7 +395,8 @@ async function main() {
           passwordHash: siswaHash,
           role: 'SISWA',
           isActive: true,
-          foto: dummyAvatarPath(murid.nama, inferJK(murid.nama))
+          jenisKelamin: jk,
+          foto: dummyAvatarPath(murid.nama, jk)
         }
       })
       await prisma.siswa.create({

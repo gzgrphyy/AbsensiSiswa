@@ -527,6 +527,7 @@
       "colSudahAbsen": "Sudah Absen",
       "colBelumAbsen": "Belum Absen",
       "colStatus": "Status",
+      "unitRuangan": "ruangan",
       "empty": "Belum ada data pemantauan",
       "status": {
         "AKTIF": "Aktif",

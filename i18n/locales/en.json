@@ -519,6 +519,7 @@
       "colSudahAbsen": "Checked In",
       "colBelumAbsen": "Not Checked In",
       "colStatus": "Status",
+      "unitRuangan": "rooms",
       "empty": "No monitoring data yet",
       "status": {
         "AKTIF": "Active",
