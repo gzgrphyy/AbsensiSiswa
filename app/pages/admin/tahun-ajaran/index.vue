@@ -383,6 +383,147 @@
       </div>
     </div>
 
+    <!-- Tab: Absensi -->
+    <div v-show="activeTab === 'absensi'">
+      <div class="flex flex-wrap items-center justify-end gap-3 mb-4">
+        <button @click="openCreate"
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs ">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="hidden sm:inline">{{ t('admin.tahunAjaran.tambahAjaran') }}</span>
+        </button>
+      </div>
+
+      <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
+      <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
+
+      <!-- Loading skeleton -->
+      <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
+        <div class="p-6 space-y-4">
+          <div v-for="i in 3" :key="i" class="flex items-center gap-4 animate-pulse">
+            <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-32"></div>
+            <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-20"></div>
+            <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-12 ml-auto"></div>
+            <div class="h-6 bg-gray-200 dark:bg-slate-700 rounded-lg w-20"></div>
+            <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-24 ml-auto"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div v-else class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                  t('admin.tahunAjaran.colTahunAjaran') }}</th>
+                <th
+                  class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
+                  {{ t('admin.tahunAjaran.colSemester') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                  t('admin.tahunAjaran.colKelas') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                  t('admin.tahunAjaran.colStatus') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                  t('admin.tahunAjaran.colAksi') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y admin-accent-divide">
+              <tr v-for="item in data" :key="item.id" class="transition-all duration-150" :class="item.isActive
+                  ? 'border-l-2 border-l-green-500 hover:bg-gray-50 dark:hover:bg-gray-700/30'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-700/30'">
+                <td class="px-4 sm:px-6 py-4">
+                  <div class="flex items-center gap-2">
+                    <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
+                    <span class="sm:hidden text-xs text-gray-500 dark:text-gray-400">
+                      {{ semesterLabel(item.semester) }}
+                    </span>
+                  </div>
+                </td>
+                <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-slate-600">
+                    {{ semesterLabel(item.semester) }}
+                  </span>
+                </td>
+                <td class="px-4 sm:px-6 py-4 text-center">
+                  <span class="text-gray-600 ">{{ item._count.kelas }}</span>
+                </td>
+                <td class="px-4 sm:px-6 py-4 text-center">
+                  <BaseBadge :variant="item.isActive ? 'green' : 'gray'" size="sm" :dot="item.isActive">
+                    {{ item.isActive ? t('admin.tahunAjaran.aktif') : t('admin.tahunAjaran.tidakAktif') }}
+                  </BaseBadge>
+                </td>
+                <td class="px-4 sm:px-6 py-4">
+                  <div class="flex items-center justify-center gap-1">
+                    <!-- Edit -->
+                    <button @click="openEdit(item)"
+                      class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-md transition-all duration-150"
+                      :title="t('admin.tahunAjaran.editTitle', { name: fullLabel(item) })">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+
+                    <!-- Activate (only if not active) -->
+                    <button v-if="!item.isActive" @click="promptToggle(item)"
+                      class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-md transition-all duration-150"
+                      :title="t('admin.tahunAjaran.aktifkanTitle', { name: fullLabel(item) })">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+
+                    <!-- Active indicator icon -->
+                    <span v-else class="p-2 text-green-500 cursor-default" :title="t('admin.tahunAjaran.sedangAktif')">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </span>
+
+                    <!-- Delete (only if not active) -->
+                    <button v-if="!item.isActive" @click="promptDelete(item)"
+                      class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all duration-150"
+                      :title="t('admin.tahunAjaran.hapusTitle', { name: fullLabel(item) })">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Empty state -->
+              <tr v-if="!data || data.length === 0">
+                <td colspan="5" class="px-4 sm:px-6 py-16 text-center">
+                  <div class="flex flex-col items-center gap-3">
+                    <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p class="text-gray-500 ">{{ t('admin.tahunAjaran.empty') }}</p>
+                    <button @click="openCreate"
+                      class="inline-flex items-center gap-1 px-4 py-2 text-xs text-primary-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                      {{ t('admin.tahunAjaran.emptyAction') }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal Create/Edit -->
     <Teleport to="body">
       <Transition name="modal">
