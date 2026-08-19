@@ -369,7 +369,7 @@
       "modalCreate": "Add Semester",
       "modalEdit": "Edit Semester",
       "labelNama": "Semester",
-      "placeholderNama": "e.g. 2026/2027",
+      "placeholderNama": "letters only, e.g. Ganjil",
       "labelNomorSemester": "Semester Number",
       "labelTanggalMulai": "Start Date",
       "labelTanggalAkhir": "End Date",

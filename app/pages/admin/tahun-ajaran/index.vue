@@ -74,7 +74,7 @@
 
   const showModal = ref(false)
   const editing = ref < TahunAjaran | null > (null)
-  const form = ref({ nama: '', semester: 'GANJIL' as 'GANJIL' | 'GENAP', setActive: false, tanggalMulai: '', tanggalAkhir: '' })
+  const form = ref({ nama: '', semester: '', setActive: false, tanggalMulai: '', tanggalAkhir: '' })
   const saving = ref(false)
   const confirmToggle = ref < { id: number; nama: string; active: boolean } | null > (null)
   const confirmDelete = ref < { id: number; nama: string; kelasCount: number } | null > (null)
@@ -89,7 +89,7 @@
 
   function openCreate() {
     editing.value = null
-    form.value = { nama: '', semester: 'GANJIL', setActive: false, tanggalMulai: '', tanggalAkhir: '' }
+    form.value = { nama: '', semester: '', setActive: false, tanggalMulai: '', tanggalAkhir: '' }
     errorMsg.value = ''
     successMsg.value = ''
     dirtyForm.value = false
@@ -115,6 +115,18 @@
     dirtyForm.value = true
   }
 
+  function onSemesterInput(e: Event) {
+    const target = e.target as HTMLInputElement
+    target.value = target.value.replace(/[^a-zA-Z\s]/g, '')
+    form.value.nama = target.value
+  }
+
+  function onNomorSemesterInput(e: Event) {
+    const target = e.target as HTMLInputElement
+    target.value = target.value.replace(/[^0-9]/g, '')
+    form.value.semester = target.value
+  }
+
   function handleCloseClick() {
     if (dirtyForm.value) {
       confirmClose.value = true
@@ -137,6 +149,15 @@
     saving.value = true
     errorMsg.value = ''
     successMsg.value = ''
+
+    // Validate & map nomor semester
+    const nomorSemester = form.value.semester.trim()
+    if (!['1', '2'].includes(nomorSemester)) {
+      showError(t('admin.tahunAjaran.labelNomorSemester') + ' harus 1 (Ganjil) atau 2 (Genap)')
+      saving.value = false
+      return
+    }
+    form.value.semester = nomorSemester === '1' ? 'GANJIL' : 'GENAP'
 
     try {
       if (editing.value) {
@@ -585,7 +606,7 @@
               <div>
                 <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{
                   t('admin.tahunAjaran.labelNama') }}</label>
-                <input v-model="form.nama" type="text" @input="onFormChange"
+                <input v-model="form.nama" type="text" @input="onSemesterInput"
                   :placeholder="t('admin.tahunAjaran.placeholderNama')"
                   :disabled="!!editing && editing._count.kelas > 0"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
@@ -605,11 +626,10 @@
               <div>
                 <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{
                   t('admin.tahunAjaran.labelNomorSemester') }}</label>
-                <select v-model="form.semester" @change="onFormChange" :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
-                  <option value="GANJIL">1</option>
-                  <option value="GENAP">2</option>
-                </select>
+                <input v-model="form.semester" type="text" @input="onNomorSemesterInput" @change="onFormChange"
+                  placeholder="Pilih angka 1 atau 2"
+                  :disabled="!!editing && editing._count.kelas > 0"
+                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
               </div>
 
               <!-- Tanggal Aktif -->

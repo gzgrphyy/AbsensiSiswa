@@ -375,7 +375,7 @@
       "modalCreate": "Tambah Semester",
       "modalEdit": "Edit Semester",
       "labelNama": "Semester",
-      "placeholderNama": "contoh: 2026/2027",
+      "placeholderNama": "Ganjil atau Genap",
       "labelNomorSemester": "Nomor Semester",
       "labelTanggalMulai": "Tanggal Mulai",
       "labelTanggalAkhir": "Tanggal Akhir",
