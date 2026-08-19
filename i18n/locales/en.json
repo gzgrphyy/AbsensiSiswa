@@ -250,6 +250,7 @@
       "title": "Class Schedule",
       "desc": "Manage class schedules",
       "semuaHari": "All Days",
+      "semuaJenjang": "All Grades",
       "semuaKelas": "All Classes",
       "semuaPtk": "All Teachers",
       "filter": "Filter",

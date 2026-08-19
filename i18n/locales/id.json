@@ -255,6 +255,7 @@
       "title": "Jadwal Pelajaran",
       "desc": "Kelola jadwal pelajaran",
       "semuaHari": "Semua Hari",
+      "semuaJenjang": "Semua Jenjang",
       "semuaKelas": "Semua Kelas",
       "semuaPtk": "Semua PTK",
       "filter": "Penyaring",

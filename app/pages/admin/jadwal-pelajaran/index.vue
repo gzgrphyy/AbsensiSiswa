@@ -29,6 +29,7 @@ const hariLabel = (h: string) => t('hari.' + h)
 
 const searchQuery = ref('')
 const filterKelasId = ref<number | undefined>(undefined)
+const filterJenjang = ref('')
 const page = ref(1)
 const pageSize = 10
 
@@ -36,22 +37,58 @@ const { data: jadwalList, pending, refresh } = useFetch<Jadwal[]>('/api/admin/ja
   immediate: true
 })
 
+function jenjangOf(nama: string) {
+  return (nama.match(/^[IVXLCDM]+/)?.[0] || '').toUpperCase()
+}
+
+const jenjangList = computed(() => {
+  const set = new Set<string>()
+  for (const k of kelasList.value || []) {
+    const j = jenjangOf(k.nama)
+    if (j) set.add(j)
+  }
+  return [...set].sort()
+})
+
+const filteredKelasList = computed(() => {
+  if (!filterJenjang.value) return kelasList.value || []
+  return (kelasList.value || []).filter(k => jenjangOf(k.nama) === filterJenjang.value)
+})
+
 const filteredJadwal = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
   return (jadwalList.value || []).filter((j) => {
     const matchKelas = !filterKelasId.value || j.kelas.id === filterKelasId.value
+    const matchJenjang = !filterJenjang.value || jenjangOf(j.kelas?.nama || '') === filterJenjang.value
     const matchMapel = !q || j.mapel.toLowerCase().includes(q)
-    return matchKelas && matchMapel
+    return matchKelas && matchJenjang && matchMapel
   })
 })
 
 const totalPages = computed(() => Math.max(1, Math.ceil(filteredJadwal.value.length / pageSize)))
+
+const pageNumbers = computed<(number | '...')[]>(() => {
+  const total = totalPages.value
+  const current = page.value
+  const set = new Set<number>([1, total, current - 1, current, current + 1])
+  const sorted = [...set].filter(n => n >= 1 && n <= total).sort((a, b) => a - b)
+  const result: (number | '...')[] = []
+  let prev = 0
+  for (const n of sorted) {
+    if (n - prev > 1) result.push('...')
+    result.push(n)
+    prev = n
+  }
+  return result
+})
+
 const visibleData = computed(() => {
   const start = (page.value - 1) * pageSize
   return filteredJadwal.value.slice(start, start + pageSize)
 })
 
-watch([searchQuery, filterKelasId], () => { page.value = 1 })
+watch([searchQuery, filterJenjang], () => { filterKelasId.value = undefined; page.value = 1 })
+watch(filterKelasId, () => { page.value = 1 })
 
 const showModal = ref(false)
 const editing = ref<Jadwal | null>(null)
@@ -163,10 +200,15 @@ async function handleDelete() {
           <input v-model="searchQuery" type="text" :placeholder="t('admin.jadwal.searchPlaceholder')"
             class="w-40 sm:w-56 pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
+        <select v-model="filterJenjang"
+          class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">{{ t('admin.jadwal.semuaJenjang') }}</option>
+          <option v-for="j in jenjangList" :key="j" :value="j">{{ j }}</option>
+        </select>
         <select v-model="filterKelasId"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="undefined">{{ t('admin.jadwal.semuaKelas') }}</option>
-          <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
+          <option v-for="k in filteredKelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
       </div>
       <button @click="openCreate"
@@ -265,7 +307,21 @@ async function handleDelete() {
             </svg>
             {{ t('common.sebelumnya') }}
           </button>
-          <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages }) }}</span>
+          <div class="flex items-center gap-1">
+            <template v-for="(n, i) in pageNumbers" :key="i">
+              <button
+                v-if="n !== '...'"
+                @click="page = n"
+                :disabled="n === page"
+                :class="n === page
+                  ? 'w-7 h-7 rounded-md text-xs  text-white bg-primary-600 ring-1 ring-primary-600 cursor-default'
+                  : 'w-7 h-7 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors'"
+              >
+                {{ n }}
+              </button>
+              <span v-else class="px-0.5 text-xs text-gray-400 dark:text-gray-500 select-none">&hellip;</span>
+            </template>
+          </div>
           <button
             @click="page++"
             :disabled="page >= totalPages"
