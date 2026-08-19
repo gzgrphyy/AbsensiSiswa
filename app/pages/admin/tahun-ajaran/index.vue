@@ -124,8 +124,37 @@
   function onNomorSemesterInput(e: Event) {
     const target = e.target as HTMLInputElement
     target.value = target.value.replace(/[^0-9]/g, '')
+    const num = parseInt(target.value)
+    const namaLower = form.value.nama.toLowerCase()
+    if (target.value && !isNaN(num)) {
+      const isGanjil = namaLower.includes('ganjil')
+      const isGenap = namaLower.includes('genap')
+      if (isGanjil && num % 2 === 0) {
+        target.value = target.value.slice(0, -1)
+      } else if (isGenap && num % 2 !== 0) {
+        target.value = target.value.slice(0, -1)
+      }
+    }
     form.value.semester = target.value
   }
+
+  const angkaHint = computed(() => {
+    const namaLower = form.value.nama.toLowerCase()
+    if (namaLower.includes('ganjil')) return 'Masukkan angka ganjil (1, 3, 5, 7, 9, ...)' 
+    if (namaLower.includes('genap')) return 'Masukkan angka genap (2, 4, 6, 8, 10, ...)' 
+    return ''
+  })
+
+  const isAngkaValid = computed(() => {
+    const angka = form.value.semester.trim()
+    const namaLower = form.value.nama.toLowerCase()
+    if (!angka) return true
+    const num = parseInt(angka)
+    if (isNaN(num)) return false
+    if (namaLower.includes('ganjil')) return num % 2 !== 0
+    if (namaLower.includes('genap')) return num % 2 === 0
+    return true
+  })
 
   function handleCloseClick() {
     if (dirtyForm.value) {
@@ -152,12 +181,24 @@
 
     // Validate & map nomor semester
     const nomorSemester = form.value.semester.trim()
-    if (!['1', '2'].includes(nomorSemester)) {
-      showError(t('admin.tahunAjaran.labelNomorSemester') + ' harus 1 (Ganjil) atau 2 (Genap)')
+    const num = parseInt(nomorSemester)
+    const namaLower = form.value.nama.toLowerCase()
+    if (!nomorSemester || isNaN(num) || num < 1) {
+      showError(t('admin.tahunAjaran.labelNomorSemester') + ' harus angka minimal 1')
       saving.value = false
       return
     }
-    form.value.semester = nomorSemester === '1' ? 'GANJIL' : 'GENAP'
+    if (namaLower.includes('ganjil') && num % 2 === 0) {
+      showError('Untuk semester Ganjil, angka harus ganjil (1, 3, 5, ...)')
+      saving.value = false
+      return
+    }
+    if (namaLower.includes('genap') && num % 2 !== 0) {
+      showError('Untuk semester Genap, angka harus genap (2, 4, 6, ...)')
+      saving.value = false
+      return
+    }
+    form.value.semester = namaLower.includes('ganjil') ? 'GANJIL' : 'GENAP'
 
     try {
       if (editing.value) {
@@ -310,51 +351,47 @@
           <table class="w-full text-xs">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
-                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                <th rowspan="2" class="text-left px-4 sm:px-6 py-3.5 text-gray-600 dark:text-gray-300 text-xs tracking-wider align-middle border-r border-gray-200 dark:border-slate-600">{{
                   t('admin.tahunAjaran.colSemester') }}</th>
-                <th
-                  class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
+                <th rowspan="2" class="text-center px-4 sm:px-6 py-3.5 text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell align-middle border-r border-gray-200 dark:border-slate-600">
                   {{ t('admin.tahunAjaran.colAngka') }}</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
-                  <div>{{ t('admin.tahunAjaran.colTanggalAktif') }}</div>
-                  <div class="flex items-center justify-center gap-1.5 mt-0.5">
-                    <span class="text-[10px] text-gray-400">{{ t('admin.tahunAjaran.colMulai') }}</span>
-                    <span class="text-[10px] text-gray-400">|</span>
-                    <span class="text-[10px] text-gray-400">{{ t('admin.tahunAjaran.colAkhir') }}</span>
-                  </div>
+                <th colspan="2" class="text-center px-4 sm:px-6 py-3.5 text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell border-r border-gray-200 dark:border-slate-600">
+                  {{ t('admin.tahunAjaran.colTanggalAktif') }}
                 </th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
-                  t('admin.tahunAjaran.colKelas') }}</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                <th rowspan="2" class="text-center px-4 sm:px-6 py-3.5 text-gray-600 dark:text-gray-300 text-xs tracking-wider align-middle border-r border-gray-200 dark:border-slate-600">{{
                   t('admin.tahunAjaran.colStatus') }}</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                <th rowspan="2" class="text-center px-4 sm:px-6 py-3.5 text-gray-600 dark:text-gray-300 text-xs tracking-wider align-middle">{{
                   t('admin.tahunAjaran.colAksi') }}</th>
+              </tr>
+              <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
+                <th class="text-center px-4 sm:px-6 py-3.5 text-gray-600 dark:text-gray-300 text-[10px] tracking-wider hidden sm:table-cell border-r border-gray-200 dark:border-slate-600">
+                  {{ t('admin.tahunAjaran.colMulai') }}
+                </th>
+                <th class="text-center px-4 sm:px-6 py-3.5 text-gray-600 dark:text-gray-300 text-[10px] tracking-wider hidden sm:table-cell">
+                  {{ t('admin.tahunAjaran.colAkhir') }}
+                </th>
               </tr>
             </thead>
             <tbody class="divide-y admin-accent-divide">
               <tr v-for="item in data" :key="item.id" class="transition-all duration-150" :class="item.isActive
                   ? 'border-l-2 border-l-green-500 hover:bg-gray-50 dark:hover:bg-gray-700/30'
                   : 'hover:bg-gray-50 dark:hover:bg-gray-700/30'">
-                <td class="px-4 sm:px-6 py-4">
+                <td class="px-4 sm:px-6 py-4 border-r border-gray-200 dark:border-slate-600">
                   <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
                 </td>
-                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
+                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell border-r border-gray-200 dark:border-slate-600">
                   <span
                     class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-slate-600">
                     {{ item.semester === 'GANJIL' ? '1' : '2' }}
                   </span>
                 </td>
-                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
-                  <div class="flex items-center justify-center gap-1 text-xs text-gray-600 dark:text-gray-300">
-                    <span>{{ item.tanggalMulai ? new Date(item.tanggalMulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' }}</span>
-                    <span class="text-gray-400">|</span>
-                    <span>{{ item.tanggalAkhir ? new Date(item.tanggalAkhir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' }}</span>
-                  </div>
+                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell border-r border-gray-200 dark:border-slate-600">
+                  <span class="text-xs text-gray-600 dark:text-gray-300">{{ item.tanggalMulai ? new Date(item.tanggalMulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' }}</span>
                 </td>
-                <td class="px-4 sm:px-6 py-4 text-center">
-                  <span class="text-gray-600 ">{{ item._count.kelas }}</span>
+                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell border-r border-gray-200 dark:border-slate-600">
+                  <span class="text-xs text-gray-600 dark:text-gray-300">{{ item.tanggalAkhir ? new Date(item.tanggalAkhir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' }}</span>
                 </td>
-                <td class="px-4 sm:px-6 py-4 text-center">
+                <td class="px-4 sm:px-6 py-4 text-center border-r border-gray-200 dark:border-slate-600">
                   <BaseBadge :variant="item.isActive ? 'green' : 'gray'" size="sm" :dot="item.isActive">
                     {{ item.isActive ? t('admin.tahunAjaran.aktif') : t('admin.tahunAjaran.tidakAktif') }}
                   </BaseBadge>
@@ -555,7 +592,7 @@
 
               <!-- Empty state -->
               <tr v-if="!data || data.length === 0">
-                <td colspan="6" class="px-4 sm:px-6 py-16 text-center">
+                <td colspan="5" class="px-4 sm:px-6 py-16 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -622,14 +659,30 @@
                 </Transition>
               </div>
 
-              <!-- Nomor Semester -->
+              <!-- Kode/Angka -->
               <div>
                 <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{
                   t('admin.tahunAjaran.labelNomorSemester') }}</label>
                 <input v-model="form.semester" type="text" @input="onNomorSemesterInput" @change="onFormChange"
-                  placeholder="Pilih angka 1 atau 2"
+                  :placeholder="angkaHint || 'Masukkan angka sesuai semester'"
                   :disabled="!!editing && editing._count.kelas > 0"
-                  class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                  :class="[form.semester && !isAngkaValid ? 'border-red-400 dark:border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 dark:border-slate-600 focus:ring-primary-500 focus:border-primary-500']"
+                  class="w-full px-3.5 py-2.5 border rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
+                <Transition name="fade">
+                  <p v-if="angkaHint" class="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                    {{ angkaHint }}
+                  </p>
+                </Transition>
+                <Transition name="fade">
+                  <p v-if="form.semester && !isAngkaValid"
+                    class="flex items-center gap-1 text-xs text-red-500 mt-1">
+                    <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                    Angka tidak sesuai dengan jenis semester
+                  </p>
+                </Transition>
               </div>
 
               <!-- Tanggal Aktif -->
