@@ -55,6 +55,8 @@
     "jadwalPelajaran": "Jadwal Pelajaran",
     "pemantauanRuangan": "Pemantauan Ruangan",
     "rekapAbsensi": "Rekap Absensi",
+    "rekapPerKelas": "Per Kelas",
+    "rekapPerSesi": "Per Sesi",
     "eksporLaporan": "Ekspor Laporan",
     "pengaturan": "Pengaturan",
     "profil": "Profil",
@@ -111,9 +113,11 @@
       "labelNamaWali": "Nama Orangtua/Wali",
       "placeholderNamaWali": "Nama orang tua/wali",
       "labelEmailWali": "Email Orangtua/Wali",
-      "placeholderEmailWali": "email contoh: orangtua{'@'}gmail.com",
-      "labelKontakWali": "Kontak Orangtua/Wali",
-      "placeholderKontakWali": "No. telepon",
+      "placeholderEmailWali": "orangtua{'@'}gmail.com",
+      "labelKontakWali": "No. HP 1 Orangtua/Wali",
+      "placeholderKontakWali": "No. HP ke-1",
+      "labelKontakWali2": "No. HP 2 Orangtua/Wali ",
+      "placeholderKontakWali2": "No. HP ke-2",
       "labelNoHp1": "No. HP 1",
       "labelNoHp2": "No. HP 2 (opsional)",
       "placeholderHpMurid": "Nomor HP murid",
@@ -123,7 +127,8 @@
       "msgBerhasilHapus": "Data murid berhasil dihapus",
       "pwModalMsg": "Password untuk akun murid. Salin dan sampaikan ke murid.",
       "confirmDeleteTitle": "Hapus Data Murid",      "confirmDeleteMsg": "Yakin ingin menghapus {nama}?",
-      "semuaJenjang": "Semua Jenjang"
+      "semuaJenjang": "Semua Jenjang",
+      "labelTitleKontakWali": "KONTAK ORANGTUA/WALI"
 
 
     },
@@ -216,6 +221,29 @@
       "colIzin": "Izin",
       "colAlpha": "Alpha",
       "colPersentase": "% Kehadiran"
+    },
+    "rekapSesi": {
+      "title": "Rekap per Sesi",
+      "desc": "Rekapitulasi kehadiran per sesi pelajaran",
+      "labelJenjang": "Jenjang",
+      "labelDari": "Dari Tanggal",
+      "labelSampai": "Sampai Tanggal",
+      "labelStatusSesi": "Status Sesi",
+      "semuaStatus": "Semua Status",
+      "searchPlaceholder": "Cari mapel/kelas...",
+      "colTanggal": "Tanggal",
+      "colHari": "Hari",
+      "colMapel": "Mata Pelajaran",
+      "colJam": "Jam",
+      "colRuangan": "Ruangan",
+      "colStatusSesi": "Status",
+      "colTotalMurid": "Total Murid",
+      "colDetail": "Detail",
+      "sesiAktif": "Aktif",
+      "sesiSelesai": "Selesai",
+      "lihatDetail": "Lihat",
+      "empty": "Belum ada sesi absensi",
+      "unitSesi": "sesi"
     },
     "kelas": {
       "title": "Data Kelas",
@@ -330,6 +358,8 @@
     "tahunAjaran": {
       "title": "Tahun Ajaran",
       "desc": "Kelola tahun ajaran dan semester aktif",
+      "tabData": "Semester",
+      "tabTahunAjaran": "Tahun Ajaran",
       "colTahunAjaran": "Tahun Ajaran",
       "colSemester": "Semester",
       "colKelas": "Kelas",

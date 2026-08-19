@@ -1,187 +1,261 @@
 <script setup lang="ts">
 
-interface TahunAjaran {
-  id: number
-  nama: string
-  semester: 'GANJIL' | 'GENAP'
-  isActive: boolean
-  deletedAt: string | null
-  createdAt: string
-  updatedAt: string
-  _count: { kelas: number }
-}
-
-const { t } = useI18n()
-
-const { data, pending, refresh } = useFetch<TahunAjaran[]>('/api/admin/tahun-ajaran', {
-  immediate: true
-})
-
-const showModal = ref(false)
-const editing = ref<TahunAjaran | null>(null)
-const form = ref({ nama: '', semester: 'GANJIL' as 'GANJIL' | 'GENAP', setActive: false })
-const saving = ref(false)
-const confirmToggle = ref<{ id: number; nama: string; active: boolean } | null>(null)
-const confirmDelete = ref<{ id: number; nama: string; kelasCount: number } | null>(null)
-const confirmClose = ref<boolean>(false)
-const errorMsg = ref('')
-const successMsg = ref('')
-const dirtyForm = ref(false)
-
-const semesterLabel = (s: 'GANJIL' | 'GENAP') => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
-const fullLabel = (item: { nama: string; semester: 'GANJIL' | 'GENAP' }) =>
-  `${item.nama} ${semesterLabel(item.semester)}`
-
-function openCreate() {
-  editing.value = null
-  form.value = { nama: '', semester: 'GANJIL', setActive: false }
-  errorMsg.value = ''
-  successMsg.value = ''
-  dirtyForm.value = false
-  showModal.value = true
-}
-
-function openEdit(item: TahunAjaran) {
-  editing.value = item
-  form.value = {
-    nama: item.nama,
-    semester: item.semester,
-    setActive: false
+  interface TahunAjaran {
+    id: number
+    nama: string
+    semester: 'GANJIL' | 'GENAP'
+    isActive: boolean
+    deletedAt: string | null
+    createdAt: string
+    updatedAt: string
+    _count: { kelas: number }
   }
-  errorMsg.value = ''
-  successMsg.value = ''
-  dirtyForm.value = false
-  showModal.value = true
-}
 
-function onFormChange() {
-  dirtyForm.value = true
-}
+  const { t } = useI18n()
 
-function handleCloseClick() {
-  if (dirtyForm.value) {
-    confirmClose.value = true
-  } else {
-    showModal.value = false
-  }
-}
+  const activeTab = ref < 'data' | 'absensi' > ('data')
+  const { pengaturan, fetch: fetchPengaturan } = usePengaturan()
 
-function showError(msg: string) {
-  errorMsg.value = msg
-  setTimeout(() => { errorMsg.value = '' }, 5000)
-}
+  const formAbsensi = reactive({
+    batasScan: 10,
+    autoTutupSesi: true,
+    batasTelat: 15,
+    notifikasi: true,
+    toleransiAlpha: 3,
+    izinTeksBebas: false,
+  })
 
-function showSuccess(msg: string) {
-  successMsg.value = msg
-  setTimeout(() => { successMsg.value = '' }, 3000)
-}
+  const savingPengaturan = ref(false)
+  const successMsgPengaturan = ref('')
+  const errorMsgPengaturan = ref('')
 
-async function handleSave() {
-  saving.value = true
-  errorMsg.value = ''
-  successMsg.value = ''
+  onMounted(() => {
+    fetchPengaturan()
+  })
 
-  try {
-    if (editing.value) {
-      const body: Record<string, unknown> = {}
-      const hasKelas = editing.value._count.kelas > 0
-      if (!hasKelas) {
-        body.nama = form.value.nama
-        body.semester = form.value.semester
-      }
-      if (form.value.setActive) {
-        body.isActive = true
-      }
-      if (Object.keys(body).length === 0) {
-        showModal.value = false
-        return
-      }
-      const { error } = await useFetch(`/api/admin/tahun-ajaran/${editing.value.id}`, {
-        method: 'PATCH',
-        body
+  async function handleSaveAbsensi() {
+    savingPengaturan.value = true
+    errorMsgPengaturan.value = ''
+    successMsgPengaturan.value = ''
+    try {
+      await $fetch('/api/admin/pengaturan', {
+        method: 'PUT',
+        body: {
+          umum: {
+            namaSekolah: pengaturan.value?.namaSekolah || 'SMK Negeri 1 Bandung',
+            logoSekolahPath: pengaturan.value?.logoSekolahPath || null,
+            alamat: pengaturan.value?.alamat || '',
+            telp: pengaturan.value?.telp || '',
+            email: pengaturan.value?.email || '',
+            tahunAjaran: pengaturan.value?.tahunAjaran || '',
+            semester: pengaturan.value?.semester || '',
+            kepalaSekolah: pengaturan.value?.kepalaSekolah || '',
+            nipKepsek: pengaturan.value?.nipKepsek || '',
+          },
+          absensi: formAbsensi,
+        },
       })
-      if (error.value) {
-        showError(error.value.statusMessage || 'Gagal menyimpan')
-        return
-      }
-      showSuccess(t('admin.tahunAjaran.msgBerhasilEdit'))
-      confirmClose.value = false
-    } else {
-      const { error } = await useFetch('/api/admin/tahun-ajaran', {
-        method: 'POST',
-        body: form.value
-      })
-      if (error.value) {
-        showError(error.value.statusMessage || 'Gagal menyimpan')
-        return
-      }
-      showSuccess(t('admin.tahunAjaran.msgBerhasilTambah'))
+      await fetchPengaturan()
+      successMsgPengaturan.value = t('admin.pengaturan.msgBerhasilSave')
+      setTimeout(() => { successMsgPengaturan.value = '' }, 3000)
+    } catch (err: any) {
+      errorMsgPengaturan.value = err?.data?.statusMessage || err?.message || t('admin.pengaturan.msgGagalSave')
+      setTimeout(() => { errorMsgPengaturan.value = '' }, 5000)
+    } finally {
+      savingPengaturan.value = false
     }
-    showModal.value = false
+  }
+
+  const { data, pending, refresh } = useFetch < TahunAjaran[] > ('/api/admin/tahun-ajaran', {
+    immediate: true
+  })
+
+  const showModal = ref(false)
+  const editing = ref < TahunAjaran | null > (null)
+  const form = ref({ nama: '', semester: 'GANJIL' as 'GANJIL' | 'GENAP', setActive: false })
+  const saving = ref(false)
+  const confirmToggle = ref < { id: number; nama: string; active: boolean } | null > (null)
+  const confirmDelete = ref < { id: number; nama: string; kelasCount: number } | null > (null)
+  const confirmClose = ref < boolean > (false)
+  const errorMsg = ref('')
+  const successMsg = ref('')
+  const dirtyForm = ref(false)
+
+  const semesterLabel = (s: 'GANJIL' | 'GENAP') => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
+  const fullLabel = (item: { nama: string; semester: 'GANJIL' | 'GENAP' }) =>
+    `${item.nama} ${semesterLabel(item.semester)}`
+
+  function openCreate() {
+    editing.value = null
+    form.value = { nama: '', semester: 'GANJIL', setActive: false }
+    errorMsg.value = ''
+    successMsg.value = ''
+    dirtyForm.value = false
+    showModal.value = true
+  }
+
+  function openEdit(item: TahunAjaran) {
+    editing.value = item
+    form.value = {
+      nama: item.nama,
+      semester: item.semester,
+      setActive: false
+    }
+    errorMsg.value = ''
+    successMsg.value = ''
+    dirtyForm.value = false
+    showModal.value = true
+  }
+
+  function onFormChange() {
+    dirtyForm.value = true
+  }
+
+  function handleCloseClick() {
+    if (dirtyForm.value) {
+      confirmClose.value = true
+    } else {
+      showModal.value = false
+    }
+  }
+
+  function showError(msg: string) {
+    errorMsg.value = msg
+    setTimeout(() => { errorMsg.value = '' }, 5000)
+  }
+
+  function showSuccess(msg: string) {
+    successMsg.value = msg
+    setTimeout(() => { successMsg.value = '' }, 3000)
+  }
+
+  async function handleSave() {
+    saving.value = true
+    errorMsg.value = ''
+    successMsg.value = ''
+
+    try {
+      if (editing.value) {
+        const body: Record<string, unknown> = {}
+        const hasKelas = editing.value._count.kelas > 0
+        if (!hasKelas) {
+          body.nama = form.value.nama
+          body.semester = form.value.semester
+        }
+        if (form.value.setActive) {
+          body.isActive = true
+        }
+        if (Object.keys(body).length === 0) {
+          showModal.value = false
+          return
+        }
+        const { error } = await useFetch(`/api/admin/tahun-ajaran/${editing.value.id}`, {
+          method: 'PATCH',
+          body
+        })
+        if (error.value) {
+          showError(error.value.statusMessage || 'Gagal menyimpan')
+          return
+        }
+        showSuccess(t('admin.tahunAjaran.msgBerhasilEdit'))
+        confirmClose.value = false
+      } else {
+        const { error } = await useFetch('/api/admin/tahun-ajaran', {
+          method: 'POST',
+          body: form.value
+        })
+        if (error.value) {
+          showError(error.value.statusMessage || 'Gagal menyimpan')
+          return
+        }
+        showSuccess(t('admin.tahunAjaran.msgBerhasilTambah'))
+      }
+      showModal.value = false
+      await refresh()
+    } finally {
+      saving.value = false
+    }
+  }
+
+  async function handleToggle() {
+    if (!confirmToggle.value) return
+    const { id } = confirmToggle.value
+    confirmToggle.value = null
+
+    const { error } = await useFetch(`/api/admin/tahun-ajaran/${id}`, {
+      method: 'PATCH',
+      body: { isActive: true }
+    })
+    if (error.value) {
+      showError(error.value.statusMessage || 'Gagal mengubah status')
+      return
+    }
+    showSuccess(t('admin.tahunAjaran.msgBerhasilPindahAktif'))
     await refresh()
-  } finally {
-    saving.value = false
   }
-}
 
-async function handleToggle() {
-  if (!confirmToggle.value) return
-  const { id } = confirmToggle.value
-  confirmToggle.value = null
+  async function handleDelete() {
+    if (!confirmDelete.value) return
+    const { id } = confirmDelete.value
+    confirmDelete.value = null
 
-  const { error } = await useFetch(`/api/admin/tahun-ajaran/${id}`, {
-    method: 'PATCH',
-    body: { isActive: true }
-  })
-  if (error.value) {
-    showError(error.value.statusMessage || 'Gagal mengubah status')
-    return
+    const { error } = await useFetch(`/api/admin/tahun-ajaran/${id}`, {
+      method: 'DELETE'
+    })
+    if (error.value) {
+      showError(error.value.statusMessage || 'Gagal menghapus')
+      return
+    }
+    showSuccess(t('admin.tahunAjaran.msgBerhasilHapus'))
+    await refresh()
   }
-  showSuccess(t('admin.tahunAjaran.msgBerhasilPindahAktif'))
-  await refresh()
-}
 
-async function handleDelete() {
-  if (!confirmDelete.value) return
-  const { id } = confirmDelete.value
-  confirmDelete.value = null
-
-  const { error } = await useFetch(`/api/admin/tahun-ajaran/${id}`, {
-    method: 'DELETE'
-  })
-  if (error.value) {
-    showError(error.value.statusMessage || 'Gagal menghapus')
-    return
+  function promptToggle(item: TahunAjaran) {
+    confirmToggle.value = { id: item.id, nama: fullLabel(item), active: item.isActive }
   }
-  showSuccess(t('admin.tahunAjaran.msgBerhasilHapus'))
-  await refresh()
-}
 
-function promptToggle(item: TahunAjaran) {
-  confirmToggle.value = { id: item.id, nama: fullLabel(item), active: item.isActive }
-}
-
-function promptDelete(item: TahunAjaran) {
-  confirmDelete.value = { id: item.id, nama: fullLabel(item), kelasCount: item._count.kelas }
-}
+  function promptDelete(item: TahunAjaran) {
+    confirmDelete.value = { id: item.id, nama: fullLabel(item), kelasCount: item._count.kelas }
+  }
 </script>
 
 <template>
   <AppLayout>
     <PageHeader :title="t('admin.tahunAjaran.title')" :description="t('admin.tahunAjaran.desc')" />
 
-    <div class="flex flex-wrap items-center justify-end gap-3 mb-4">
-      <button @click="openCreate"
-        class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs ">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        <span class="hidden sm:inline">{{ t('admin.tahunAjaran.tambahAjaran') }}</span>
+    <Notification type="error" :message="errorMsgPengaturan" :show="!!errorMsgPengaturan"
+      @dismiss="errorMsgPengaturan = ''" />
+    <Notification type="success" :message="successMsgPengaturan" :show="!!successMsgPengaturan"
+      @dismiss="successMsgPengaturan = ''" />
+
+    <div class="flex border-b admin-accent-border mb-5"
+      :style="{ '--tab-accent': pengaturan?.warnaUtama || '#0A66A0' }">
+      <button @click="activeTab = 'data'"
+        class="relative flex-1 py-2.5 px-4 text-sm font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--tab-accent)] after:transition-all"
+        :class="activeTab === 'data' ? 'text-[var(--tab-accent)] after:w-full' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 after:w-0 hover:after:w-full'">
+        {{ t('admin.tahunAjaran.tabData') }}
+      </button>
+      <button @click="activeTab = 'absensi'"
+        class="relative flex-1 py-2.5 px-4 text-sm font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--tab-accent)] after:transition-all"
+        :class="activeTab === 'absensi' ? 'text-[var(--tab-accent)] after:w-full' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 after:w-0 hover:after:w-full'">
+        {{ t('admin.tahunAjaran.tabTahunAjaran') }}
       </button>
     </div>
 
-    <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
-    <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
+    <!-- Tab: Semester -->
+    <div v-show="activeTab === 'data'">
+      <div class="flex flex-wrap items-center justify-end gap-3 mb-4">
+        <button @click="openCreate"
+          class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs ">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="hidden sm:inline">{{ t('admin.tahunAjaran.tambahAjaran') }}</span>
+        </button>
+      </div>
+
+      <Notification type="error" :message="errorMsg" :show="!!errorMsg" @dismiss="errorMsg = ''" />
+      <Notification type="success" :message="successMsg" :show="!!successMsg" @dismiss="successMsg = ''" />
 
       <!-- Loading skeleton -->
       <div v-if="pending" class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border overflow-hidden">
@@ -202,17 +276,21 @@ function promptDelete(item: TahunAjaran) {
           <table class="w-full text-xs">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
-                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colTahunAjaran') }}</th>
-                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.tahunAjaran.colSemester') }}</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colKelas') }}</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colStatus') }}</th>
-                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
+                <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                  t('admin.tahunAjaran.colTahunAjaran') }}</th>
+                <th
+                  class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
+                  {{ t('admin.tahunAjaran.colSemester') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                  t('admin.tahunAjaran.colKelas') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                  t('admin.tahunAjaran.colStatus') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                  t('admin.tahunAjaran.colAksi') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y admin-accent-divide">
-              <tr v-for="item in data" :key="item.id"
-                class="transition-all duration-150"
-                :class="item.isActive
+              <tr v-for="item in data" :key="item.id" class="transition-all duration-150" :class="item.isActive
                   ? 'border-l-2 border-l-green-500 hover:bg-gray-50 dark:hover:bg-gray-700/30'
                   : 'hover:bg-gray-50 dark:hover:bg-gray-700/30'">
                 <td class="px-4 sm:px-6 py-4">
@@ -224,7 +302,8 @@ function promptDelete(item: TahunAjaran) {
                   </div>
                 </td>
                 <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-slate-600">
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-slate-600">
                     {{ semesterLabel(item.semester) }}
                   </span>
                 </td>
@@ -243,7 +322,8 @@ function promptDelete(item: TahunAjaran) {
                       class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-md transition-all duration-150"
                       :title="t('admin.tahunAjaran.editTitle', { name: fullLabel(item) })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </button>
 
@@ -252,14 +332,16 @@ function promptDelete(item: TahunAjaran) {
                       class="p-2 text-gray-400 hover:text-primary-600 hover:bg-gray-100 rounded-md transition-all duration-150"
                       :title="t('admin.tahunAjaran.aktifkanTitle', { name: fullLabel(item) })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </button>
 
                     <!-- Active indicator icon -->
                     <span v-else class="p-2 text-green-500 cursor-default" :title="t('admin.tahunAjaran.sedangAktif')">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </span>
 
@@ -268,7 +350,8 @@ function promptDelete(item: TahunAjaran) {
                       class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-all duration-150"
                       :title="t('admin.tahunAjaran.hapusTitle', { name: fullLabel(item) })">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
                   </div>
@@ -280,7 +363,8 @@ function promptDelete(item: TahunAjaran) {
                 <td colspan="5" class="px-4 sm:px-6 py-16 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <p class="text-gray-500 ">{{ t('admin.tahunAjaran.empty') }}</p>
                     <button @click="openCreate"
@@ -297,15 +381,18 @@ function promptDelete(item: TahunAjaran) {
           </table>
         </div>
       </div>
+    </div>
 
     <!-- Modal Create/Edit -->
     <Teleport to="body">
       <Transition name="modal">
-        <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="handleCloseClick">
+        <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4"
+          @click.self="handleCloseClick">
           <!-- Backdrop -->
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="handleCloseClick"></div>
 
-          <div class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-md mx-auto overflow-hidden border border-gray-300 dark:border-gray-600">
+          <div
+            class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-md mx-auto overflow-hidden border border-gray-300 dark:border-gray-600">
             <!-- Modal header -->
             <div class="flex items-center justify-between px-4 pt-4 pb-2">
               <h2 class="text-lg  text-gray-900 dark:text-gray-100">
@@ -322,15 +409,18 @@ function promptDelete(item: TahunAjaran) {
             <form @submit.prevent="handleSave" class="p-4 space-y-4">
               <!-- Nama -->
               <div>
-                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.tahunAjaran.labelNama') }}</label>
+                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{
+                  t('admin.tahunAjaran.labelNama') }}</label>
                 <input v-model="form.nama" type="text" @input="onFormChange"
                   :placeholder="t('admin.tahunAjaran.placeholderNama')"
                   :disabled="!!editing && editing._count.kelas > 0"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow placeholder:text-gray-400 dark:placeholder:text-gray-500" />
                 <Transition name="fade">
-                  <p v-if="editing && editing._count.kelas > 0" class="flex items-center gap-1 text-xs text-amber-600 mt-1.5">
+                  <p v-if="editing && editing._count.kelas > 0"
+                    class="flex items-center gap-1 text-xs text-amber-600 mt-1.5">
                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
                     {{ t('admin.tahunAjaran.infoNamaTerkunci', { count: editing._count.kelas }) }}
                   </p>
@@ -339,9 +429,9 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Semester -->
               <div>
-                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{ t('admin.tahunAjaran.labelSemester') }}</label>
-                <select v-model="form.semester" @change="onFormChange"
-                  :disabled="!!editing && editing._count.kelas > 0"
+                <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{
+                  t('admin.tahunAjaran.labelSemester') }}</label>
+                <select v-model="form.semester" @change="onFormChange" :disabled="!!editing && editing._count.kelas > 0"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
                   <option value="GANJIL">{{ t('semester.ganjil') }}</option>
                   <option value="GENAP">{{ t('semester.genap') }}</option>
@@ -349,7 +439,8 @@ function promptDelete(item: TahunAjaran) {
               </div>
 
               <!-- Set Active -->
-              <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-100 dark:border-slate-600">
+              <div
+                class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-100 dark:border-slate-600">
                 <input id="setActive" v-model="form.setActive" type="checkbox" @change="onFormChange"
                   class="mt-0.5 w-4 h-4 rounded border-gray-300 dark:border-slate-600 text-primary-600 focus:ring-primary-500 transition-shadow" />
                 <div class="flex flex-col">
@@ -364,9 +455,11 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Edit mode info -->
               <Transition name="fade">
-                <div v-if="editing && editing.isActive" class="flex items-center gap-2 p-3 bg-primary-50 border border-primary-200 rounded-lg text-xs text-primary-700">
+                <div v-if="editing && editing.isActive"
+                  class="flex items-center gap-2 p-3 bg-primary-50 border border-primary-200 rounded-lg text-xs text-primary-700">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span>{{ t('admin.tahunAjaran.infoEditAktif') }}</span>
                 </div>
@@ -374,9 +467,11 @@ function promptDelete(item: TahunAjaran) {
 
               <!-- Error -->
               <Transition name="fade">
-                <div v-if="errorMsg" class="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
+                <div v-if="errorMsg"
+                  class="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
                   <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span>{{ errorMsg }}</span>
                 </div>
@@ -406,8 +501,10 @@ function promptDelete(item: TahunAjaran) {
       <Transition name="modal">
         <div v-if="confirmClose" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmClose = false"></div>
-          <div class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
-            <h2 class="text-xs  text-gray-900 dark:text-gray-100 mb-2">{{ t('admin.tahunAjaran.confirmCloseTitle') }}</h2>
+          <div
+            class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
+            <h2 class="text-xs  text-gray-900 dark:text-gray-100 mb-2">{{ t('admin.tahunAjaran.confirmCloseTitle') }}
+            </h2>
             <p class="text-xs text-gray-600 dark:text-gray-400 mb-5">{{ t('admin.tahunAjaran.confirmCloseMsg') }}</p>
             <div class="flex justify-end gap-3">
               <button @click="confirmClose = false"
@@ -427,11 +524,14 @@ function promptDelete(item: TahunAjaran) {
       <Transition name="modal">
         <div v-if="confirmToggle" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmToggle = null"></div>
-          <div class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
+          <div
+            class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
             <div class="flex items-center gap-3 mb-4">
               <div class="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
-                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
               <h2 class="text-lg  text-gray-900 dark:text-gray-100">{{ t('admin.tahunAjaran.confirmToggleTitle') }}</h2>
@@ -439,7 +539,8 @@ function promptDelete(item: TahunAjaran) {
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
               {{ t('admin.tahunAjaran.confirmToggleMsg', { name: confirmToggle.nama }) }}
             </p>
-            <p class="text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-lg p-3 mb-4">
+            <p
+              class="text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-lg p-3 mb-4">
               {{ t('admin.tahunAjaran.confirmToggleInfo') }}
             </p>
             <div class="flex justify-end gap-3">
@@ -460,15 +561,19 @@ function promptDelete(item: TahunAjaran) {
       <Transition name="modal">
         <div v-if="confirmDelete" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="confirmDelete = null"></div>
-          <div class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
+          <div
+            class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600">
             <div class="flex items-center gap-3 mb-4">
               <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg  text-gray-900 dark:text-gray-100">{{ t('admin.tahunAjaran.confirmDeleteTitle') }}</h2>
+                <h2 class="text-lg  text-gray-900 dark:text-gray-100">{{ t('admin.tahunAjaran.confirmDeleteTitle') }}
+                </h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ t('admin.tahunAjaran.confirmDeleteSub') }}</p>
               </div>
             </div>
@@ -478,7 +583,8 @@ function promptDelete(item: TahunAjaran) {
             <div v-if="confirmDelete.kelasCount > 0"
               class="mt-3 p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800 rounded-lg text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
               <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <span>
                 {{ t('admin.tahunAjaran.confirmDeleteKelas', { count: confirmDelete.kelasCount }) }}
@@ -505,49 +611,57 @@ function promptDelete(item: TahunAjaran) {
 </template>
 
 <style scoped>
-/* Modal transitions */
-.modal-enter-active {
-  transition: all 0.2s ease-out;
-}
-.modal-leave-active {
-  transition: all 0.15s ease-in;
-}
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-.modal-enter-from > div:last-child,
-.modal-leave-to > div:last-child {
-  transform: scale(0.95);
-}
-.modal-enter-from > div:first-child,
-.modal-leave-to > div:first-child {
-  opacity: 0;
-}
+  /* Modal transitions */
+  .modal-enter-active {
+    transition: all 0.2s ease-out;
+  }
 
-/* Slide transitions for notifications */
-.slide-enter-active {
-  transition: all 0.3s ease-out;
-}
-.slide-leave-active {
-  transition: all 0.2s ease-in;
-}
-.slide-enter-from {
-  transform: translateY(-10px);
-  opacity: 0;
-}
-.slide-leave-to {
-  transform: translateY(-10px);
-  opacity: 0;
-}
+  .modal-leave-active {
+    transition: all 0.15s ease-in;
+  }
 
-/* Fade transition */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+  .modal-enter-from,
+  .modal-leave-to {
+    opacity: 0;
+  }
+
+  .modal-enter-from>div:last-child,
+  .modal-leave-to>div:last-child {
+    transform: scale(0.95);
+  }
+
+  .modal-enter-from>div:first-child,
+  .modal-leave-to>div:first-child {
+    opacity: 0;
+  }
+
+  /* Slide transitions for notifications */
+  .slide-enter-active {
+    transition: all 0.3s ease-out;
+  }
+
+  .slide-leave-active {
+    transition: all 0.2s ease-in;
+  }
+
+  .slide-enter-from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  .slide-leave-to {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+
+  /* Fade transition */
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.2s ease;
+  }
+
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 </style>

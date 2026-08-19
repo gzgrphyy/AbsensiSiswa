@@ -34,7 +34,7 @@ function onBackdropClick() {
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
-          <div class="px-4 py-3">
+          <div class="px-4 py-3 containerModal">
             <slot />
           </div>
           <div v-if="$slots.footer" class="flex justify-end gap-3 px-4 pb-4 pt-3 border-t border-gray-300 dark:border-gray-600">
@@ -55,3 +55,10 @@ function onBackdropClick() {
     </Transition>
   </Teleport>
 </template>
+
+<style> 
+.containerModal{
+  max-height: 500px;
+  overflow-y: auto;
+}
+</style>

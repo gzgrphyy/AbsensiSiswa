@@ -11,6 +11,7 @@ export const createSiswaSchema = z.object({
   namaWali: z.string().optional(),
   emailWali: z.string().email('Format email tidak valid').optional(),
   kontakWali: z.string().max(20).optional(),
+  kontakWali2: z.string().max(20).optional(),
   nomorHp1: z.string().max(20).optional(),
   nomorHp2: z.string().max(20).optional()
 })
@@ -24,6 +25,7 @@ export const updateSiswaSchema = z.object({
   namaWali: z.string().optional().nullable(),
   emailWali: z.string().email('Format email tidak valid').optional().nullable(),
   kontakWali: z.string().max(20).optional().nullable(),
+  kontakWali2: z.string().max(20).optional().nullable(),
   nomorHp1: z.string().max(20).optional().nullable(),
   nomorHp2: z.string().max(20).optional().nullable()
 })

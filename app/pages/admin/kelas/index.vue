@@ -1,181 +1,184 @@
 <script setup lang="ts">
-interface Kelas {
-  id: number
-  nama: string
-  waliKelasId: number | null
-  tahunAjaranId: number
-  waliKelas: { id: number; nama: string; jenisKelamin: string | null; foto: string | null } | null
-  tahunAjaran: { id: number; nama: string; semester: string }
-  _count: { siswa: number; jadwalPelajaran: number }
-}
-
-const { t } = useI18n()
-
-function jenisKelaminLabel(jk: string | null) {
-  if (jk === 'LAKI_LAKI') return t('admin.guru.jenisKelaminL')
-  if (jk === 'PEREMPUAN') return t('admin.guru.jenisKelaminP')
-  return ''
-}
-
-const draftSearch = ref('')
-const draftTa = ref(0)
-const draftJenjang = ref('')
-
-const appliedSearch = ref('')
-const appliedTa = ref(0)
-const appliedJenjang = ref('')
-
-const page = ref(1)
-const pageSize = 10
-
-function jenjangOf(nama: string) {
-  return (nama.match(/^[IVXLCDM]+/)?.[0] || '').toUpperCase()
-}
-
-const { data: kelasList, pending, refresh } = useFetch<Kelas[]>(() => {
-  const params = new URLSearchParams()
-  if (appliedTa.value) params.set('tahunAjaranId', String(appliedTa.value))
-  if (appliedSearch.value) params.set('search', appliedSearch.value)
-  return `/api/admin/kelas?${params.toString()}`
-}, { immediate: true })
-
-const jenjangList = computed(() => {
-  const set = new Set<string>()
-  for (const k of kelasList.value || []) {
-    const j = jenjangOf(k.nama)
-    if (j) set.add(j)
+  interface Kelas {
+    id: number
+    nama: string
+    waliKelasId: number | null
+    tahunAjaranId: number
+    waliKelas: { id: number; nama: string; jenisKelamin: string | null; foto: string | null } | null
+    tahunAjaran: { id: number; nama: string; semester: string }
+    _count: { siswa: number; jadwalPelajaran: number }
   }
-  return [...set].sort()
-})
 
-const filteredData = computed(() => {
-  const list = kelasList.value || []
-  if (!appliedJenjang.value) return list
-  return list.filter(k => jenjangOf(k.nama) === appliedJenjang.value)
-})
+  const { t } = useI18n()
 
-const totalPages = computed(() => Math.max(1, Math.ceil(filteredData.value.length / pageSize)))
-const visibleData = computed(() => {
-  const start = (page.value - 1) * pageSize
-  return filteredData.value.slice(start, start + pageSize)
-})
-
-watch([appliedSearch, appliedTa, appliedJenjang], () => { page.value = 1 })
-
-function applyFilter() {
-  appliedSearch.value = draftSearch.value.trim()
-  appliedTa.value = draftTa.value
-  appliedJenjang.value = draftJenjang.value
-}
-
-function resetFilter() {
-  draftSearch.value = ''
-  draftTa.value = 0
-  draftJenjang.value = ''
-  appliedSearch.value = ''
-  appliedTa.value = 0
-  appliedJenjang.value = ''
-}
-const semesterLabel = (s: string) => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
-
-const { data: guruList } = useFetch<{ id: number; nama: string }[]>('/api/admin/guru', { immediate: true })
-const { data: taList } = useFetch<{ id: number; nama: string; semester: string; isActive: boolean }[]>('/api/admin/tahun-ajaran', { immediate: true })
-
-const showModal = ref(false)
-const editing = ref<Kelas | null>(null)
-const form = ref({ nama: '', waliKelasId: 0, tahunAjaranId: 0 })
-const saving = ref(false)
-const errorMsg = ref('')
-const successMsg = ref('')
-const confirmDelete = ref<{ id: number; nama: string } | null>(null)
-const confirmClose = ref(false)
-const dirtyForm = ref(false)
-
-function showError(msg: string) {
-  errorMsg.value = msg
-  setTimeout(() => { errorMsg.value = '' }, 5000)
-}
-
-function showSuccess(msg: string) {
-  successMsg.value = msg
-  setTimeout(() => { successMsg.value = '' }, 3000)
-}
-
-const activeTa = computed(() => taList.value?.find(t => t.isActive))
-
-function openCreate() {
-  editing.value = null
-  form.value = { nama: '', waliKelasId: 0, tahunAjaranId: activeTa.value?.id || 0 }
-  errorMsg.value = ''
-  dirtyForm.value = false
-  showModal.value = true
-}
-
-function openEdit(item: Kelas) {
-  editing.value = item
-  form.value = {
-    nama: item.nama,
-    waliKelasId: item.waliKelasId || 0,
-    tahunAjaranId: item.tahunAjaranId
+  function jenisKelaminLabel(jk: string | null) {
+    if (jk === 'LAKI_LAKI') return t('admin.guru.jenisKelaminL')
+    if (jk === 'PEREMPUAN') return t('admin.guru.jenisKelaminP')
+    return ''
   }
-  errorMsg.value = ''
-  dirtyForm.value = false
-  showModal.value = true
-}
 
-function onFormChange() { dirtyForm.value = true }
+  const draftSearch = ref('')
+  const draftTa = ref(0)
+  const draftJenjang = ref('')
 
-function handleCloseClick() {
-  showModal.value = false
-}
+  const appliedSearch = ref('')
+  const appliedTa = ref(0)
+  const appliedJenjang = ref('')
 
-async function handleSave() {
-  saving.value = true
-  errorMsg.value = ''
+  const page = ref(1)
+  const pageSize = 10
 
-  try {
-    if (editing.value) {
-      const body: Record<string, unknown> = {}
-      if (form.value.nama !== editing.value.nama) body.nama = form.value.nama
-      if ((form.value.waliKelasId || null) !== editing.value.waliKelasId) body.waliKelasId = form.value.waliKelasId || null
-      if (form.value.tahunAjaranId !== editing.value.tahunAjaranId) body.tahunAjaranId = form.value.tahunAjaranId
+  function jenjangOf(nama: string) {
+    return (nama.match(/^[IVXLCDM]+/)?.[0] || '').toUpperCase()
+  }
 
-      if (Object.keys(body).length === 0) { showModal.value = false; return }
+  const { data: kelasList, pending, refresh } = useFetch < Kelas[] > (() => {
+    const params = new URLSearchParams()
+    if (appliedTa.value) params.set('tahunAjaranId', String(appliedTa.value))
+    if (appliedSearch.value) params.set('search', appliedSearch.value)
+    return `/api/admin/kelas?${params.toString()}`
+  }, { immediate: true })
 
-      const { error } = await useFetch(`/api/admin/kelas/${editing.value.id}`, { method: 'PATCH', body })
-      if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
-      showSuccess(t('admin.kelas.msgBerhasilEdit'))
-    } else {
-      const { error } = await useFetch('/api/admin/kelas', {
-        method: 'POST',
-        body: {
-          nama: form.value.nama,
-          waliKelasId: form.value.waliKelasId || undefined,
-          tahunAjaranId: form.value.tahunAjaranId
-        }
-      })
-      if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
-      showSuccess(t('admin.kelas.msgBerhasilTambah'))
+  const jenjangList = computed(() => {
+    const set = new Set < string > ()
+    for (const k of kelasList.value || []) {
+      const j = jenjangOf(k.nama)
+      if (j) set.add(j)
     }
+    return [...set].sort()
+  })
+
+  const filteredData = computed(() => {
+    const list = kelasList.value || []
+    if (!appliedJenjang.value) return list
+    return list.filter(k => jenjangOf(k.nama) === appliedJenjang.value)
+  })
+
+  const totalPages = computed(() => Math.max(1, Math.ceil(filteredData.value.length / pageSize)))
+  const visibleData = computed(() => {
+    const start = (page.value - 1) * pageSize
+    return filteredData.value.slice(start, start + pageSize)
+  })
+
+  watch([appliedSearch, appliedTa, appliedJenjang], () => { page.value = 1 })
+
+  function applyFilter() {
+    appliedSearch.value = draftSearch.value.trim()
+    appliedTa.value = draftTa.value
+    appliedJenjang.value = draftJenjang.value
+  }
+
+  function resetFilter() {
+    draftSearch.value = ''
+    draftTa.value = 0
+    draftJenjang.value = ''
+    appliedSearch.value = ''
+    appliedTa.value = 0
+    appliedJenjang.value = ''
+  }
+  const semesterLabel = (s: string) => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
+
+  const { data: guruList } = useFetch < { id: number; nama: string }[] > ('/api/admin/guru', { immediate: true })
+  const { data: taList } = useFetch < { id: number; nama: string; semester: string; isActive: boolean }[] > ('/api/admin/tahun-ajaran', { immediate: true })
+
+  const showModal = ref(false)
+  const editing = ref < Kelas | null > (null)
+  const form = ref({ nama: '', waliKelasId: 0, tahunAjaranId: 0 })
+  const saving = ref(false)
+  const errorMsg = ref('')
+  const successMsg = ref('')
+  const confirmDelete = ref < { id: number; nama: string } | null > (null)
+  const confirmClose = ref(false)
+  const dirtyForm = ref(false)
+
+  function showError(msg: string) {
+    errorMsg.value = msg
+    setTimeout(() => { errorMsg.value = '' }, 5000)
+  }
+
+  function showSuccess(msg: string) {
+    successMsg.value = msg
+    setTimeout(() => { successMsg.value = '' }, 3000)
+  }
+
+  const activeTa = computed(() => taList.value?.find(t => t.isActive))
+
+  function openCreate() {
+    editing.value = null
+    form.value = { nama: '', waliKelasId: 0, tahunAjaranId: activeTa.value?.id || 0 }
+    errorMsg.value = ''
+    dirtyForm.value = false
+    showModal.value = true
+  }
+
+  function openEdit(item: Kelas) {
+    editing.value = item
+    form.value = {
+      nama: item.nama,
+      waliKelasId: item.waliKelasId || 0,
+      tahunAjaranId: item.tahunAjaranId
+    }
+    errorMsg.value = ''
+    dirtyForm.value = false
+    showModal.value = true
+  }
+
+  function onFormChange() { dirtyForm.value = true }
+
+  function handleCloseClick() {
     showModal.value = false
-    confirmClose.value = false
+  }
+
+  async function handleSave() {
+    saving.value = true
+    errorMsg.value = ''
+
+    try {
+      if (editing.value) {
+        const body: Record<string, unknown> = {}
+        if (form.value.nama !== editing.value.nama) body.nama = form.value.nama
+        if ((form.value.waliKelasId || null) !== editing.value.waliKelasId) body.waliKelasId = form.value.waliKelasId || null
+        if (form.value.tahunAjaranId !== editing.value.tahunAjaranId) body.tahunAjaranId = form.value.tahunAjaranId
+
+        if (Object.keys(body).length === 0) { showModal.value = false; return }
+
+        const { error } = await useFetch(`/api/admin/kelas/${editing.value.id}`, { method: 'PATCH', body })
+        if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
+        showSuccess(t('admin.kelas.msgBerhasilEdit'))
+      } else {
+        const { error } = await useFetch('/api/admin/kelas', {
+          method: 'POST',
+          body: {
+            nama: form.value.nama,
+            waliKelasId: form.value.waliKelasId || undefined,
+            tahunAjaranId: form.value.tahunAjaranId
+          }
+        })
+        if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
+        showSuccess(t('admin.kelas.msgBerhasilTambah'))
+      }
+      showModal.value = false
+      confirmClose.value = false
+      await refresh()
+    } finally { saving.value = false }
+  }
+
+  function promptDelete(item: Kelas) {
+    confirmDelete.value = { id: item.id, nama: item.nama }
+  }
+
+  async function handleDelete() {
+    if (!confirmDelete.value) return
+    const { id } = confirmDelete.value
+    confirmDelete.value = null
+    const { error } = await useFetch(`/api/admin/kelas/${id}`, { method: 'DELETE' })
+    if (error.value) { showError(error.value.statusMessage || 'Gagal menghapus'); return }
+    showSuccess(t('admin.kelas.msgBerhasilHapus'))
     await refresh()
-  } finally { saving.value = false }
-}
+  }
 
-function promptDelete(item: Kelas) {
-  confirmDelete.value = { id: item.id, nama: item.nama }
-}
-
-async function handleDelete() {
-  if (!confirmDelete.value) return
-  const { id } = confirmDelete.value
-  confirmDelete.value = null
-  const { error } = await useFetch(`/api/admin/kelas/${id}`, { method: 'DELETE' })
-  if (error.value) { showError(error.value.statusMessage || 'Gagal menghapus'); return }
-  showSuccess(t('admin.kelas.msgBerhasilHapus'))
-  await refresh()
-}
+  const myValue = ref('')
+  const myOptions = [{ id: 1, text: 'Opsi 1' }, { id: 2, text: 'Opsi 2' }]
 </script>
 
 <template>
@@ -185,8 +188,10 @@ async function handleDelete() {
     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
       <div class="flex flex-wrap items-center gap-3">
         <div class="relative">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input v-model="draftSearch" type="text" :placeholder="t('admin.kelas.searchPlaceholder')"
             class="pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
@@ -229,17 +234,27 @@ async function handleDelete() {
         <table class="w-full text-xs">
           <thead>
             <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.kelas.colNama') }}</th>
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">{{ t('admin.kelas.colWali') }}</th>
-              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">{{ t('admin.kelas.colTa') }}</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.kelas.colMurid') }}</th>
-              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.tahunAjaran.colAksi') }}</th>
+              <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                t('admin.kelas.colNama') }}</th>
+              <th
+                class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
+                {{ t('admin.kelas.colWali') }}</th>
+              <th
+                class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">
+                {{ t('admin.kelas.colTa') }}</th>
+              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                t('admin.kelas.colMurid') }}</th>
+              <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
+                t('admin.tahunAjaran.colAksi') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y admin-accent-divide">
-            <tr v-for="item in visibleData" :key="item.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+            <tr v-for="item in visibleData" :key="item.id"
+              class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
               <td class="px-4 py-3">
-                <NuxtLink :to="`/admin/kelas/${item.id}`" class="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" :title="t('admin.kelas.lihatDetail')">
+                <NuxtLink :to="`/admin/kelas/${item.id}`"
+                  class="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  :title="t('admin.kelas.lihatDetail')">
                   {{ item.nama }}
                 </NuxtLink>
               </td>
@@ -252,25 +267,35 @@ async function handleDelete() {
                 </div>
                 <span v-else class="text-gray-600 dark:text-gray-300">-</span>
               </td>
-              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden md:table-cell">{{ item.tahunAjaran.nama }}</td>
+              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden md:table-cell">{{
+                item.tahunAjaran.nama }}</td>
               <td class="px-4 py-3 text-center">
                 <span class="text-gray-700 dark:text-gray-200 ">{{ item._count.siswa }}</span>
               </td>
               <td class="px-4 py-3">
                 <div class="flex items-center justify-center gap-1">
-                  <NuxtLink :to="`/admin/kelas/${item.id}`" class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md" :title="t('admin.kelas.lihatDetail')">
+                  <NuxtLink :to="`/admin/kelas/${item.id}`"
+                    class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                    :title="t('admin.kelas.lihatDetail')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                   </NuxtLink>
-                  <button @click="openEdit(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md" :title="t('common.edit')">
+                  <button @click="openEdit(item)"
+                    class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                    :title="t('common.edit')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                  <button @click="promptDelete(item)" class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md" :title="t('common.hapus')">
+                  <button @click="promptDelete(item)"
+                    class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md"
+                    :title="t('common.hapus')">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
                 </div>
@@ -278,8 +303,10 @@ async function handleDelete() {
             </tr>
             <tr v-if="filteredData.length === 0">
               <td colspan="5" class="px-4 py-16 text-center">
-                <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 <p class="text-gray-500 dark:text-gray-400 ">{{ t('admin.kelas.empty') }}</p>
               </td>
@@ -287,27 +314,24 @@ async function handleDelete() {
           </tbody>
         </table>
       </div>
-      <div v-if="filteredData.length > pageSize" class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
+      <div v-if="filteredData.length > pageSize"
+        class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3">
         <p class="text-xs text-gray-400 dark:text-gray-500">
-          {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize, filteredData.length), total: filteredData.length, unit: t('admin.kelas.unitKelas') }) }}
+          {{ t('common.menampilkan', { from: ((page - 1) * pageSize) + 1, to: Math.min(page * pageSize,
+          filteredData.length), total: filteredData.length, unit: t('admin.kelas.unitKelas') }) }}
         </p>
         <div class="ml-auto flex items-center gap-2">
-          <button
-            @click="page--"
-            :disabled="page <= 1"
-            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
+          <button @click="page--" :disabled="page <= 1"
+            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
             {{ t('common.sebelumnya') }}
           </button>
-          <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages }) }}</span>
-          <button
-            @click="page++"
-            :disabled="page >= totalPages"
-            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
+          <span class="text-xs text-gray-400 dark:text-gray-500">{{ t('common.halaman', { page, total: totalPages })
+            }}</span>
+          <button @click="page++" :disabled="page >= totalPages"
+            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs  text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
             {{ t('common.selanjutnya') }}
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -318,13 +342,15 @@ async function handleDelete() {
     </div>
 
     <!-- Modal -->
-    <BaseModal :show="showModal" :title="editing ? t('admin.kelas.modalEdit') : t('admin.kelas.modalCreate')" @close="handleCloseClick">
+    <BaseModal :show="showModal" :title="editing ? t('admin.kelas.modalEdit') : t('admin.kelas.modalCreate')"
+      @close="handleCloseClick">
       <form @submit.prevent="handleSave" class="space-y-4">
         <BaseFormField :label="t('admin.kelas.labelNama')" required>
           <input v-model="form.nama" type="text" @input="onFormChange" required
             :placeholder="t('admin.kelas.placeholderNama')"
             class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </BaseFormField>
+
 
         <BaseFormField :label="t('admin.kelas.labelWali')">
           <select v-model="form.waliKelasId" @change="onFormChange"
@@ -337,27 +363,44 @@ async function handleDelete() {
         <BaseFormField :label="t('admin.kelas.labelTa')" required>
           <select v-model="form.tahunAjaranId" @change="onFormChange" required
             class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary-500 bg-white">
-            <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})</option>
+            <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})
+            </option>
           </select>
         </BaseFormField>
       </form>
       <template #footer>
-        <button type="button" @click="handleCloseClick" class="px-4 py-2 text-xs  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md">{{ t('common.batal') }}</button>
+        <button type="button" @click="handleCloseClick"
+          class="px-4 py-2 text-xs  text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md">{{
+          t('common.batal') }}</button>
         <button type="submit" @click="handleSave" :disabled="saving"
           class="px-5 py-2 text-xs  text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2">
-          <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+          <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
           {{ saving ? t('common.menyimpan') : t('common.simpan') }}
         </button>
       </template>
     </BaseModal>
 
-    <ConfirmDialog
-      :show="!!confirmDelete"
-      :title="t('admin.kelas.confirmDeleteTitle')"
-      :message="t('admin.kelas.confirmDeleteMsg', { nama: confirmDelete?.nama })"
-      variant="danger"
-      @confirm="handleDelete"
-      @cancel="confirmDelete = null"
-    />
+    <ConfirmDialog :show="!!confirmDelete" :title="t('admin.kelas.confirmDeleteTitle')"
+      :message="t('admin.kelas.confirmDeleteMsg', { nama: confirmDelete?.nama })" variant="danger"
+      @confirm="handleDelete" @cancel="confirmDelete = null" />
   </AppLayout>
 </template>
+
+<style>
+  select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    padding: 10px 40px 10px 15px !important;
+    /* Atur jarak kanan lebih besar */
+    background-image: url('/icon/down.png') !important;
+    /* Masukkan ikon SVG */
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    /* Mengatur posisi jarak ikon */
+    background-size: 14px;
+  }
+</style>
