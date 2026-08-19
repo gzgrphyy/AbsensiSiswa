@@ -5,6 +5,8 @@
     nama: string
     semester: 'GANJIL' | 'GENAP'
     isActive: boolean
+    tanggalMulai: string | null
+    tanggalAkhir: string | null
     deletedAt: string | null
     createdAt: string
     updatedAt: string
@@ -72,7 +74,7 @@
 
   const showModal = ref(false)
   const editing = ref < TahunAjaran | null > (null)
-  const form = ref({ nama: '', semester: 'GANJIL' as 'GANJIL' | 'GENAP', setActive: false })
+  const form = ref({ nama: '', semester: 'GANJIL' as 'GANJIL' | 'GENAP', setActive: false, tanggalMulai: '', tanggalAkhir: '' })
   const saving = ref(false)
   const confirmToggle = ref < { id: number; nama: string; active: boolean } | null > (null)
   const confirmDelete = ref < { id: number; nama: string; kelasCount: number } | null > (null)
@@ -87,7 +89,7 @@
 
   function openCreate() {
     editing.value = null
-    form.value = { nama: '', semester: 'GANJIL', setActive: false }
+    form.value = { nama: '', semester: 'GANJIL', setActive: false, tanggalMulai: '', tanggalAkhir: '' }
     errorMsg.value = ''
     successMsg.value = ''
     dirtyForm.value = false
@@ -99,7 +101,9 @@
     form.value = {
       nama: item.nama,
       semester: item.semester,
-      setActive: false
+      setActive: false,
+      tanggalMulai: item.tanggalMulai ? item.tanggalMulai.substring(0, 10) : '',
+      tanggalAkhir: item.tanggalAkhir ? item.tanggalAkhir.substring(0, 10) : ''
     }
     errorMsg.value = ''
     successMsg.value = ''
@@ -145,6 +149,8 @@
         if (form.value.setActive) {
           body.isActive = true
         }
+        body.tanggalMulai = form.value.tanggalMulai || null
+        body.tanggalAkhir = form.value.tanggalAkhir || null
         if (Object.keys(body).length === 0) {
           showModal.value = false
           return
@@ -228,17 +234,24 @@
     <Notification type="success" :message="successMsgPengaturan" :show="!!successMsgPengaturan"
       @dismiss="successMsgPengaturan = ''" />
 
-    <div class="flex border-b admin-accent-border mb-5"
+    <div class="flex gap-6 border-b admin-accent-border mb-5"
       :style="{ '--tab-accent': pengaturan?.warnaUtama || '#0A66A0' }">
-      <button @click="activeTab = 'data'"
-        class="relative flex-1 py-2.5 px-4 text-sm font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--tab-accent)] after:transition-all"
-        :class="activeTab === 'data' ? 'text-[var(--tab-accent)] after:w-full' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 after:w-0 hover:after:w-full'">
-        {{ t('admin.tahunAjaran.tabData') }}
+      <button @click="activeTab = 'data'" class="py-2.5 text-[12px] font-medium transition-colors"
+        :class="activeTab === 'data' ? 'text-[var(--tab-accent)]' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
+        <span
+          class="relative inline-block after:absolute after:-bottom-2.5 after:left-0 after:h-0.5 after:rounded-full after:bg-[var(--tab-accent)] after:transition-all"
+          :class="activeTab === 'data' ? 'after:w-full' : 'after:w-0 hover:after:w-full'">
+          {{ t('admin.tahunAjaran.tabData') }}
+        </span>
       </button>
-      <button @click="activeTab = 'absensi'"
-        class="relative flex-1 py-2.5 px-4 text-sm font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--tab-accent)] after:transition-all"
-        :class="activeTab === 'absensi' ? 'text-[var(--tab-accent)] after:w-full' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 after:w-0 hover:after:w-full'">
-        {{ t('admin.tahunAjaran.tabTahunAjaran') }}
+
+      <button @click="activeTab = 'absensi'" class="py-2.5 text-[12px] font-medium transition-colors"
+        :class="activeTab === 'absensi' ? 'text-[var(--tab-accent)]' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'">
+        <span
+          class="relative inline-block after:absolute after:-bottom-2.5 after:left-0 after:h-0.5 after:rounded-full after:bg-[var(--tab-accent)] after:transition-all"
+          :class="activeTab === 'absensi' ? 'after:w-full' : 'after:w-0 hover:after:w-full'">
+          {{ t('admin.tahunAjaran.tabTahunAjaran') }}
+        </span>
       </button>
     </div>
 
@@ -277,10 +290,18 @@
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
-                  t('admin.tahunAjaran.colTahunAjaran') }}</th>
+                  t('admin.tahunAjaran.colSemester') }}</th>
                 <th
-                  class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
-                  {{ t('admin.tahunAjaran.colSemester') }}</th>
+                  class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
+                  {{ t('admin.tahunAjaran.colAngka') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
+                  <div>{{ t('admin.tahunAjaran.colTanggalAktif') }}</div>
+                  <div class="flex items-center justify-center gap-1.5 mt-0.5">
+                    <span class="text-[10px] text-gray-400">{{ t('admin.tahunAjaran.colMulai') }}</span>
+                    <span class="text-[10px] text-gray-400">|</span>
+                    <span class="text-[10px] text-gray-400">{{ t('admin.tahunAjaran.colAkhir') }}</span>
+                  </div>
+                </th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
                   t('admin.tahunAjaran.colKelas') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
@@ -294,18 +315,20 @@
                   ? 'border-l-2 border-l-green-500 hover:bg-gray-50 dark:hover:bg-gray-700/30'
                   : 'hover:bg-gray-50 dark:hover:bg-gray-700/30'">
                 <td class="px-4 sm:px-6 py-4">
-                  <div class="flex items-center gap-2">
-                    <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
-                    <span class="sm:hidden text-xs text-gray-500 dark:text-gray-400">
-                      {{ semesterLabel(item.semester) }}
-                    </span>
-                  </div>
+                  <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
                 </td>
-                <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
+                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
                   <span
                     class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-slate-600">
-                    {{ semesterLabel(item.semester) }}
+                    {{ item.semester === 'GANJIL' ? '1' : '2' }}
                   </span>
+                </td>
+                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
+                  <div class="flex items-center justify-center gap-1 text-xs text-gray-600 dark:text-gray-300">
+                    <span>{{ item.tanggalMulai ? new Date(item.tanggalMulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' }}</span>
+                    <span class="text-gray-400">|</span>
+                    <span>{{ item.tanggalAkhir ? new Date(item.tanggalAkhir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' }}</span>
+                  </div>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
                   <span class="text-gray-600 ">{{ item._count.kelas }}</span>
@@ -360,7 +383,7 @@
 
               <!-- Empty state -->
               <tr v-if="!data || data.length === 0">
-                <td colspan="5" class="px-4 sm:px-6 py-16 text-center">
+                <td colspan="6" class="px-4 sm:px-6 py-16 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -418,10 +441,18 @@
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
-                  t('admin.tahunAjaran.colTahunAjaran') }}</th>
+                  t('admin.tahunAjaran.colSemester') }}</th>
                 <th
-                  class="text-left px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
-                  {{ t('admin.tahunAjaran.colSemester') }}</th>
+                  class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
+                  {{ t('admin.tahunAjaran.colAngka') }}</th>
+                <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
+                  <div>{{ t('admin.tahunAjaran.colTanggalAktif') }}</div>
+                  <div class="flex items-center justify-center gap-1.5 mt-0.5">
+                    <span class="text-[10px] text-gray-400">{{ t('admin.tahunAjaran.colMulai') }}</span>
+                    <span class="text-[10px] text-gray-400">|</span>
+                    <span class="text-[10px] text-gray-400">{{ t('admin.tahunAjaran.colAkhir') }}</span>
+                  </div>
+                </th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
                   t('admin.tahunAjaran.colKelas') }}</th>
                 <th class="text-center px-4 sm:px-6 py-3.5  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
@@ -435,18 +466,20 @@
                   ? 'border-l-2 border-l-green-500 hover:bg-gray-50 dark:hover:bg-gray-700/30'
                   : 'hover:bg-gray-50 dark:hover:bg-gray-700/30'">
                 <td class="px-4 sm:px-6 py-4">
-                  <div class="flex items-center gap-2">
-                    <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
-                    <span class="sm:hidden text-xs text-gray-500 dark:text-gray-400">
-                      {{ semesterLabel(item.semester) }}
-                    </span>
-                  </div>
+                  <span class=" text-gray-900 dark:text-gray-100">{{ item.nama }}</span>
                 </td>
-                <td class="px-4 sm:px-6 py-4 hidden sm:table-cell">
+                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
                   <span
                     class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 ring-1 ring-gray-200 dark:ring-slate-600">
-                    {{ semesterLabel(item.semester) }}
+                    {{ item.semester === 'GANJIL' ? '1' : '2' }}
                   </span>
+                </td>
+                <td class="px-4 sm:px-6 py-4 text-center hidden sm:table-cell">
+                  <div class="flex items-center justify-center gap-1 text-xs text-gray-600 dark:text-gray-300">
+                    <span>{{ item.tanggalMulai ? new Date(item.tanggalMulai).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' }}</span>
+                    <span class="text-gray-400">|</span>
+                    <span>{{ item.tanggalAkhir ? new Date(item.tanggalAkhir).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-' }}</span>
+                  </div>
                 </td>
                 <td class="px-4 sm:px-6 py-4 text-center">
                   <span class="text-gray-600 ">{{ item._count.kelas }}</span>
@@ -501,7 +534,7 @@
 
               <!-- Empty state -->
               <tr v-if="!data || data.length === 0">
-                <td colspan="5" class="px-4 sm:px-6 py-16 text-center">
+                <td colspan="6" class="px-4 sm:px-6 py-16 text-center">
                   <div class="flex flex-col items-center gap-3">
                     <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -548,7 +581,7 @@
             </div>
 
             <form @submit.prevent="handleSave" class="p-4 space-y-4">
-              <!-- Nama -->
+              <!-- Semester (Nama Tahun Ajaran) -->
               <div>
                 <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{
                   t('admin.tahunAjaran.labelNama') }}</label>
@@ -568,15 +601,31 @@
                 </Transition>
               </div>
 
-              <!-- Semester -->
+              <!-- Nomor Semester -->
               <div>
                 <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{
-                  t('admin.tahunAjaran.labelSemester') }}</label>
+                  t('admin.tahunAjaran.labelNomorSemester') }}</label>
                 <select v-model="form.semester" @change="onFormChange" :disabled="!!editing && editing._count.kelas > 0"
                   class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 dark:disabled:bg-slate-700 disabled:text-gray-400 dark:disabled:text-gray-500 disabled:cursor-not-allowed transition-shadow appearance-none bg-white dark:bg-slate-700">
-                  <option value="GANJIL">{{ t('semester.ganjil') }}</option>
-                  <option value="GENAP">{{ t('semester.genap') }}</option>
+                  <option value="GANJIL">1</option>
+                  <option value="GENAP">2</option>
                 </select>
+              </div>
+
+              <!-- Tanggal Aktif -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{
+                    t('admin.tahunAjaran.labelTanggalMulai') }}</label>
+                  <input v-model="form.tanggalMulai" type="date" @change="onFormChange"
+                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow" />
+                </div>
+                <div>
+                  <label class="block text-xs  text-gray-700 dark:text-gray-300 mb-1.5">{{
+                    t('admin.tahunAjaran.labelTanggalAkhir') }}</label>
+                  <input v-model="form.tanggalAkhir" type="date" @change="onFormChange"
+                    class="w-full px-3.5 py-2.5 border border-gray-300 dark:border-slate-600 rounded-lg text-xs dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow" />
+                </div>
               </div>
 
               <!-- Set Active -->

@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Tahun ajaran tidak ditemukan' })
 
-  const { nama, semester, isActive } = result.data
+  const { nama, semester, isActive, tanggalMulai, tanggalAkhir } = result.data
 
   if (existing._count.kelas > 0 && (nama !== undefined || semester !== undefined)) {
     throw createError({
@@ -58,7 +58,9 @@ export default defineEventHandler(async (event) => {
       data: {
         ...(nama !== undefined && { nama }),
         ...(semester !== undefined && { semester }),
-        ...(isActive !== undefined && { isActive })
+        ...(isActive !== undefined && { isActive }),
+        ...(tanggalMulai !== undefined && { tanggalMulai: tanggalMulai ? new Date(tanggalMulai) : null }),
+        ...(tanggalAkhir !== undefined && { tanggalAkhir: tanggalAkhir ? new Date(tanggalAkhir) : null })
       }
     })
   })

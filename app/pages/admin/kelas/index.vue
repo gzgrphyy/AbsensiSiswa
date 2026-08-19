@@ -177,8 +177,13 @@
     await refresh()
   }
 
-  const myValue = ref('')
-  const myOptions = [{ id: 1, text: 'Opsi 1' }, { id: 2, text: 'Opsi 2' }]
+  const guruOptions = computed(() => {
+    const opts = [{ id: 0, text: t('common.tidakAda') }]
+    for (const g of guruList.value || []) {
+      opts.push({ id: g.id, text: g.nama })
+    }
+    return opts
+  })
 </script>
 
 <template>
@@ -353,11 +358,9 @@
 
 
         <BaseFormField :label="t('admin.kelas.labelWali')">
-          <select v-model="form.waliKelasId" @change="onFormChange"
-            class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary-500 bg-white">
-            <option :value="0">{{ t('common.tidakAda') }}</option>
-            <option v-for="g in guruList" :key="g.id" :value="g.id">{{ g.nama }}</option>
-          </select>
+          <Select2 v-model="form.waliKelasId" :options="guruOptions"
+            :settings="{ width: '100%', placeholder: t('common.tidakAda') }"
+            @change="onFormChange" />
         </BaseFormField>
 
         <BaseFormField :label="t('admin.kelas.labelTa')" required>
@@ -402,5 +405,9 @@
     background-position: right 15px center !important;
     /* Mengatur posisi jarak ikon */
     background-size: 14px;
+  }
+
+  .select2-container.select2-container--open {
+    z-index: 9999 !important;
   }
 </style>

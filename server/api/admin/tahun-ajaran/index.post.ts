@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { nama, semester, setActive } = result.data
+  const { nama, semester, setActive, tanggalMulai, tanggalAkhir } = result.data
 
   const existing = await prisma.tahunAjaran.findFirst({
     where: { nama, semester, deletedAt: null }
@@ -30,7 +30,13 @@ export default defineEventHandler(async (event) => {
     }
 
     return await tx.tahunAjaran.create({
-      data: { nama, semester, isActive: setActive }
+      data: {
+        nama,
+        semester,
+        isActive: setActive,
+        ...(tanggalMulai && { tanggalMulai: new Date(tanggalMulai) }),
+        ...(tanggalAkhir && { tanggalAkhir: new Date(tanggalAkhir) })
+      }
     })
   })
 

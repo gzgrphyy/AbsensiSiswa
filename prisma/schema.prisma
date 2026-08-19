@@ -93,13 +93,15 @@ model User {
 }
 
 model TahunAjaran {
-  id        Int       @id @default(autoincrement())
-  nama      String    @db.VarChar(20)
-  semester  Semester
-  isActive  Boolean   @default(false) @map("is_active")
-  deletedAt DateTime? @map("deleted_at")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  id           Int        @id @default(autoincrement())
+  nama         String     @db.VarChar(20)
+  semester     Semester
+  isActive     Boolean    @default(false) @map("is_active")
+  tanggalMulai DateTime?  @map("tanggal_mulai")
+  tanggalAkhir DateTime?  @map("tanggal_akhir")
+  deletedAt    DateTime?  @map("deleted_at")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
 
   kelas Kelas[]
 
