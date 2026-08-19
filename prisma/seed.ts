@@ -195,7 +195,7 @@ async function main() {
     })
   )
 
-  const guruTambahanCount = 30 - gurus.length
+  const guruTambahanCount = 70 - gurus.length
   for (let i = 0; i < guruTambahanCount; i++) {
     const g = generatePtk(i)
     const jk = inferJK(g.nama)
@@ -241,16 +241,14 @@ async function main() {
   console.log(`✓ ${ptkPendampingCount} PTK pendamping dibuat`)
 
   // ============================================
-  // KELAS
+  // KELAS (X, XI, XII A–J)
   // ============================================
-  const kelasData = [
-    { nama: 'X-A', wali: gurus[0] },   // Ahmad Fauzi
-    { nama: 'X-B', wali: gurus[3] },   // Dewi Lestari
-    { nama: 'XI-A', wali: gurus[1] },  // Siti Nurhaliza
-    { nama: 'XI-B', wali: gurus[2] },  // Budi Santoso
-    { nama: 'XII-A', wali: gurus[4] }, // Joko Susilo
-    { nama: 'XII-B', wali: gurus[5] }, // Rina Wijaya
-  ]
+  const JENJANG = ['X', 'XI', 'XII']
+  const ABJAD = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+
+  const kelasData = JENJANG.flatMap((jenjang, j) =>
+    ABJAD.map((abjad, a) => ({ nama: `${jenjang}-${abjad}`, wali: gurus[j * 10 + a] }))
+  )
 
   const kelasList = await Promise.all(
     kelasData.map(k =>
@@ -274,16 +272,18 @@ async function main() {
   const kelasByName = new Map(kelasList.map(k => [k.nama, k.id]))
 
   const ruanganData = [
-    { nama: 'XII-A', jenis: 'KELAS', qrCode: 'R-001' },
-    { nama: 'XII-B', jenis: 'KELAS', qrCode: 'R-002' },
-    { nama: 'XI-A', jenis: 'KELAS', qrCode: 'R-003' },
-    { nama: 'XI-B', jenis: 'KELAS', qrCode: 'R-004' },
-    { nama: 'X-A', jenis: 'KELAS', qrCode: 'R-009' },
-    { nama: 'X-B', jenis: 'KELAS', qrCode: 'R-010' },
-    { nama: 'Lab Komputer', jenis: 'LAB', qrCode: 'R-005' },
-    { nama: 'Lab IPA', jenis: 'LAB', qrCode: 'R-006' },
-    { nama: 'Lab Bahasa', jenis: 'LAB', qrCode: 'R-007' },
-    { nama: 'Perpustakaan', jenis: 'PERPUSTAKAAN', qrCode: 'R-008' },
+    // Ruang kelas X-A..X-J, XI-A..X-J, XII-A..X-J (QR R-001..R-030)
+    ...JENJANG.flatMap((jenjang, j) =>
+      ABJAD.map((abjad, a) => ({
+        nama: `${jenjang}-${abjad}`,
+        jenis: 'KELAS',
+        qrCode: `R-${String(j * 10 + a + 1).padStart(3, '0')}`
+      }))
+    ),
+    { nama: 'Lab Komputer', jenis: 'LAB', qrCode: 'R-031' },
+    { nama: 'Lab IPA', jenis: 'LAB', qrCode: 'R-032' },
+    { nama: 'Lab Bahasa', jenis: 'LAB', qrCode: 'R-033' },
+    { nama: 'Perpustakaan', jenis: 'PERPUSTAKAAN', qrCode: 'R-034' },
   ]
 
   await Promise.all(
@@ -302,7 +302,7 @@ async function main() {
   console.log(`✓ ${ruanganData.length} ruangan dibuat`)
 
   // ============================================
-  // MURID / SISWA (masing-masing kelas 5 murid)
+  // MURID / SISWA (jumlah per kelas mengikuti targetMuridPerKelas)
   // ============================================
   const muridPerKelas = [
     // X-A
@@ -343,7 +343,15 @@ async function main() {
     { nama: 'Elsa Nathania', nisn: '3234567899', nomorHp1: null, namaWali: 'Nathan', kontakWali: null },
   ]
 
-  const targetMuridPerKelas = [34, 34, 33, 33, 33, 33]
+  // Jumlah murid per kelas selang-seling (30-35), tidak ada yang sama berurutan & tidak urut naik/turun
+  const targetMuridPerKelas = [
+    // X-A .. X-J
+    30, 35, 31, 34, 32, 33, 30, 35, 31, 34,
+    // XI-A .. XI-J
+    33, 30, 35, 31, 34, 32, 33, 30, 35, 31,
+    // XII-A .. XII-J
+    31, 34, 32, 33, 30, 35, 31, 34, 32, 33,
+  ]
   const NAMED_PER_KELAS = 5
 
   let idx = 0
@@ -397,14 +405,15 @@ async function main() {
   // ============================================
   // JADWAL PELAJARAN (lengkap Senin–Jumat per kelas)
   // ============================================
-  const [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10] = await prisma.ruangan.findMany({ orderBy: { id: 'asc' } })
+  const semuaRuangan = await prisma.ruangan.findMany({ orderBy: { id: 'asc' } })
+  const ruanganByNama = new Map(semuaRuangan.map(r => [r.nama, r]))
 
-  // Ruang kelas utama per kelas (urutan kelasList): X-A, X-B, XI-A, XI-B, XII-A, XII-B
-  const ruangKelasUtama = [r5, r6, r3, r4, r1, r2]
-  const ruangLabKomputer = r7
-  const ruangLabIpa = r8
-  const ruangLabBahasa = r9
-  const ruangPerpus = r10
+  // Ruang kelas utama per kelas (auto-map sesuai nama kelas)
+  const ruangKelasUtama = kelasList.map(k => ruanganByNama.get(k.nama)!)
+  const ruangLabKomputer = ruanganByNama.get('Lab Komputer')!
+  const ruangLabIpa = ruanganByNama.get('Lab IPA')!
+  const ruangLabBahasa = ruanganByNama.get('Lab Bahasa')!
+  const ruangPerpus = ruanganByNama.get('Perpustakaan')!
 
   // Mapel yang memakai ruang khusus
   const RUANG_KHUSUS: Record<string, number> = {
@@ -585,7 +594,7 @@ async function main() {
       }
     }
 
-    // Kelas 2 & 5 juga bikin sesi SELESAI tambahan (minggu lalu)
+    // Kelas idx 1 & 4 juga bikin sesi SELESAI tambahan (minggu lalu)
     const tambahanTanggal = ji === 1 || ji === 4 ? lastWeek : null
     if (tambahanTanggal) {
       const sesiLama = await prisma.sesiAbsensi.create({

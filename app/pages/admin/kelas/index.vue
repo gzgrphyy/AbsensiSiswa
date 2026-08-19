@@ -18,12 +18,12 @@
   }
 
   const draftSearch = ref('')
-  const draftSemester = ref(0)
   const draftJenjang = ref('')
+  const draftKelas = ref('')
 
   const appliedSearch = ref('')
-  const appliedSemester = ref(0)
   const appliedJenjang = ref('')
+  const appliedKelas = ref('')
 
   const page = ref(1)
   const pageSize = 10
@@ -34,7 +34,6 @@
 
   const { data: kelasList, pending, refresh } = useFetch < Kelas[] > (() => {
     const params = new URLSearchParams()
-    if (appliedSemester.value) params.set('semesterId', String(appliedSemester.value))
     if (appliedSearch.value) params.set('search', appliedSearch.value)
     return `/api/admin/kelas?${params.toString()}`
   }, { immediate: true })
@@ -48,10 +47,19 @@
     return [...set].sort()
   })
 
+  const kelasOptions = computed(() => {
+    const list = kelasList.value || []
+    if (!draftJenjang.value) return list
+    return list.filter(k => jenjangOf(k.nama) === draftJenjang.value)
+  })
+
+  watch(draftJenjang, () => { draftKelas.value = '' })
+
   const filteredData = computed(() => {
     const list = kelasList.value || []
-    if (!appliedJenjang.value) return list
-    return list.filter(k => jenjangOf(k.nama) === appliedJenjang.value)
+    const byJenjang = appliedJenjang.value ? list.filter(k => jenjangOf(k.nama) === appliedJenjang.value) : list
+    if (!appliedKelas.value) return byJenjang
+    return byJenjang.filter(k => k.nama === appliedKelas.value)
   })
 
   const totalPages = computed(() => Math.max(1, Math.ceil(filteredData.value.length / pageSize)))
@@ -60,21 +68,21 @@
     return filteredData.value.slice(start, start + pageSize)
   })
 
-  watch([appliedSearch, appliedSemester, appliedJenjang], () => { page.value = 1 })
+  watch([appliedSearch, appliedJenjang, appliedKelas], () => { page.value = 1 })
 
   function applyFilter() {
     appliedSearch.value = draftSearch.value.trim()
-    appliedSemester.value = draftSemester.value
     appliedJenjang.value = draftJenjang.value
+    appliedKelas.value = draftKelas.value
   }
 
   function resetFilter() {
     draftSearch.value = ''
-    draftSemester.value = 0
     draftJenjang.value = ''
+    draftKelas.value = ''
     appliedSearch.value = ''
-    appliedSemester.value = 0
     appliedJenjang.value = ''
+    appliedKelas.value = ''
   }
   const { data: guruList } = useFetch < { id: number; nama: string }[] > ('/api/admin/guru', { immediate: true })
   const { data: semesterList } = useFetch < { id: number; nama: string; kodeAngka: number | null; pakaiRomawi: boolean; isActive: boolean; tahunAjaran: { id: number; nama: string } }[] > ('/api/admin/semester', { immediate: true })
@@ -204,10 +212,10 @@
           <option value="">{{ t('admin.kelas.semuaJenjang') }}</option>
           <option v-for="j in jenjangList" :key="j" :value="j">{{ j }}</option>
         </select>
-        <select v-model="draftSemester"
+        <select v-model="draftKelas"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option :value="0">{{ t('admin.kelas.semuaTa') }}</option>
-          <option v-for="s in semesterList" :key="s.id" :value="s.id">{{ s.tahunAjaran.nama }} ({{ semesterFullLabel(s, t) }})</option>
+          <option value="">{{ t('admin.kelas.semuaKelas') }}</option>
+          <option v-for="k in kelasOptions" :key="k.id" :value="k.nama">{{ k.nama }}</option>
         </select>
         <button @click="applyFilter"
           class="px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md border border-blue-600 transition-colors">
