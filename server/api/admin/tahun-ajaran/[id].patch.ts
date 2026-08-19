@@ -15,32 +15,30 @@ export default defineEventHandler(async (event) => {
 
   const existing = await prisma.tahunAjaran.findFirst({
     where: { id, deletedAt: null },
-    include: { _count: { select: { kelas: true } } }
+    include: { _count: { select: { semester: true } } }
   })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Tahun ajaran tidak ditemukan' })
 
-  const { nama, semester, isActive, tanggalMulai, tanggalAkhir } = result.data
+  const { nama, kodeAngka, pakaiRomawi, isActive, tanggalMulai, tanggalAkhir } = result.data
 
-  if (existing._count.kelas > 0 && (nama !== undefined || semester !== undefined)) {
+  if (existing._count.semester > 0 && nama !== undefined) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Tahun ajaran yang sudah memiliki kelas tidak bisa diubah nama/semesternya'
+      statusMessage: 'Tahun ajaran yang sudah memiliki semester tidak bisa diubah namanya'
     })
   }
 
-  if (nama !== undefined || semester !== undefined) {
+  if (nama !== undefined) {
     const duplicate = await prisma.tahunAjaran.findFirst({
       where: {
-        nama: nama ?? existing.nama,
-        semester: semester ?? existing.semester,
-        id: { not: id },
-        deletedAt: null
+        nama,
+        id: { not: id }
       }
     })
     if (duplicate) {
       throw createError({
         statusCode: 409,
-        statusMessage: `Tahun ajaran "${nama ?? existing.nama} ${semester ?? existing.semester}" sudah ada`
+        statusMessage: `Tahun ajaran "${nama}" sudah ada`
       })
     }
   }
@@ -57,7 +55,8 @@ export default defineEventHandler(async (event) => {
       where: { id },
       data: {
         ...(nama !== undefined && { nama }),
-        ...(semester !== undefined && { semester }),
+        ...(kodeAngka !== undefined && { kodeAngka }),
+        ...(pakaiRomawi !== undefined && { pakaiRomawi }),
         ...(isActive !== undefined && { isActive }),
         ...(tanggalMulai !== undefined && { tanggalMulai: tanggalMulai ? new Date(tanggalMulai) : null }),
         ...(tanggalAkhir !== undefined && { tanggalAkhir: tanggalAkhir ? new Date(tanggalAkhir) : null })

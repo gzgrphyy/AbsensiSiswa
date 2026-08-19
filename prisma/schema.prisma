@@ -18,7 +18,7 @@ enum JenisKelamin {
   PEREMPUAN
 }
 
-enum Semester {
+enum NamaSemester {
   GANJIL
   GENAP
 }
@@ -95,7 +95,8 @@ model User {
 model TahunAjaran {
   id           Int        @id @default(autoincrement())
   nama         String     @db.VarChar(20)
-  semester     Semester
+  kodeAngka    Int?       @map("kode_angka")
+  pakaiRomawi  Boolean    @default(false) @map("pakai_romawi")
   isActive     Boolean    @default(false) @map("is_active")
   tanggalMulai DateTime?  @map("tanggal_mulai")
   tanggalAkhir DateTime?  @map("tanggal_akhir")
@@ -103,27 +104,47 @@ model TahunAjaran {
   createdAt    DateTime   @default(now()) @map("created_at")
   updatedAt    DateTime   @updatedAt @map("updated_at")
 
-  kelas Kelas[]
+  semester Semester[]
 
-  @@unique([nama, semester])
+  @@unique([nama])
   @@map("tahun_ajaran")
 }
 
+model Semester {
+  id            Int          @id @default(autoincrement())
+  tahunAjaranId Int          @map("tahun_ajaran_id")
+  nama          NamaSemester
+  kodeAngka     Int?         @map("kode_angka")
+  pakaiRomawi   Boolean      @default(false) @map("pakai_romawi")
+  isActive      Boolean      @default(false) @map("is_active")
+  tanggalMulai  DateTime?    @map("tanggal_mulai")
+  tanggalAkhir  DateTime?    @map("tanggal_akhir")
+  deletedAt     DateTime?    @map("deleted_at")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  tahunAjaran TahunAjaran @relation(fields: [tahunAjaranId], references: [id])
+  kelas       Kelas[]
+
+  @@unique([tahunAjaranId, nama, kodeAngka])
+  @@map("semester")
+}
+
 model Kelas {
-  id            Int      @id @default(autoincrement())
-  nama          String   @db.VarChar(50)
-  waliKelasId   Int?     @map("wali_kelas_id")
-  tahunAjaranId Int      @map("tahun_ajaran_id")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id         Int      @id @default(autoincrement())
+  nama       String   @db.VarChar(50)
+  waliKelasId Int?    @map("wali_kelas_id")
+  semesterId Int      @map("semester_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   waliKelas       User?              @relation("WaliKelas", fields: [waliKelasId], references: [id])
-  tahunAjaran     TahunAjaran        @relation(fields: [tahunAjaranId], references: [id])
+  semester        Semester           @relation(fields: [semesterId], references: [id])
   siswa           Siswa[]
   jadwalPelajaran JadwalPelajaran[]
   ruangan         Ruangan[]
 
-  @@unique([nama, tahunAjaranId])
+  @@unique([nama, semesterId])
   @@map("kelas")
 }
 

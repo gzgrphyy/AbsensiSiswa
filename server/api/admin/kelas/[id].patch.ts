@@ -16,20 +16,20 @@ export default defineEventHandler(async (event) => {
   const existing = await prisma.kelas.findUnique({ where: { id } })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Kelas tidak ditemukan' })
 
-  const { nama, waliKelasId, tahunAjaranId } = result.data
+  const { nama, waliKelasId, semesterId } = result.data
 
   if (nama) {
     const duplicate = await prisma.kelas.findFirst({
       where: {
         nama,
-        tahunAjaranId: tahunAjaranId ?? existing.tahunAjaranId,
+        semesterId: semesterId ?? existing.semesterId,
         id: { not: id }
       }
     })
     if (duplicate) {
       throw createError({
         statusCode: 409,
-        statusMessage: `Kelas "${nama}" sudah ada di tahun ajaran ini`
+        statusMessage: `Kelas "${nama}" sudah ada di semester ini`
       })
     }
   }
@@ -43,16 +43,25 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  if (semesterId !== undefined) {
+    const semester = await prisma.semester.findFirst({
+      where: { id: semesterId, deletedAt: null }
+    })
+    if (!semester) {
+      throw createError({ statusCode: 404, statusMessage: 'Semester tidak ditemukan' })
+    }
+  }
+
   return await prisma.kelas.update({
     where: { id },
     data: {
       ...(nama !== undefined && { nama }),
       ...(waliKelasId !== undefined && { waliKelasId: waliKelasId || null }),
-      ...(tahunAjaranId !== undefined && { tahunAjaranId })
+      ...(semesterId !== undefined && { semesterId })
     },
     include: {
       waliKelas: { select: { id: true, nama: true, nip: true } },
-      tahunAjaran: true
+      semester: { include: { tahunAjaran: true } }
     }
   })
 })

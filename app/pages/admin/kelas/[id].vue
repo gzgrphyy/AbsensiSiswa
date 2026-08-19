@@ -14,9 +14,9 @@ interface KelasDetail {
   id: number
   nama: string
   waliKelasId: number | null
-  tahunAjaranId: number
+  semesterId: number
   waliKelas: { id: number; nama: string; nip: string | null; jenisKelamin: string | null; foto: string | null } | null
-  tahunAjaran: { id: number; nama: string; semester: string }
+  semester: { id: number; nama: string; kodeAngka: number | null; pakaiRomawi: boolean; tahunAjaran: { id: number; nama: string } }
   _count: { siswa: number; jadwalPelajaran: number }
   siswa: SiswaItem[]
 }
@@ -36,7 +36,6 @@ const { data: kelas, pending, error } = useFetch<KelasDetail>(`/api/admin/kelas/
   immediate: true
 })
 
-const semesterLabel = (s: string) => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
 const allSiswa = computed(() => kelas.value?.siswa || [])
 const totalSiswa = computed(() => allSiswa.value.length)
 const totalJadwal = computed(() => kelas.value?._count.jadwalPelajaran || 0)
@@ -107,7 +106,7 @@ watch(searchSiswa, () => { page.value = 1 })
           </div>
           <div class="flex items-center justify-between gap-3">
             <dt class="text-gray-500 dark:text-gray-400">{{ t('admin.kelas.colTa') }}</dt>
-            <dd class="font-semibold text-gray-900 dark:text-gray-100">{{ kelas.tahunAjaran.nama }} ({{ semesterLabel(kelas.tahunAjaran.semester) }})</dd>
+            <dd class="font-semibold text-gray-900 dark:text-gray-100">{{ kelas.semester.tahunAjaran.nama }} ({{ semesterFullLabel(kelas.semester, t) }})</dd>
           </div>
           <div class="flex items-center justify-between gap-3">
             <dt class="text-gray-500 dark:text-gray-400">{{ t('admin.kelas.colMurid') }}</dt>

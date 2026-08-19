@@ -24,7 +24,7 @@ const { t } = useI18n()
 const page = ref(1)
 const pageSize = 10
 
-const selectedTa = ref<number | ''>('')
+const selectedSemester = ref<number | ''>('')
 const selectedJenjang = ref('')
 const selectedKelas = ref<number | ''>('')
 const selectedDari = ref('')
@@ -32,34 +32,32 @@ const selectedSampai = ref('')
 const selectedStatus = ref('')
 const searchQuery = ref('')
 
-const appliedTa = ref<number | ''>('')
+const appliedSemester = ref<number | ''>('')
 const appliedJenjang = ref('')
 const appliedKelas = ref<number | ''>('')
 const appliedDari = ref('')
 const appliedSampai = ref('')
 const appliedStatus = ref('')
 
-const { data: taList } = useFetch<{ id: number; nama: string; semester: string; isActive: boolean }[]>('/api/admin/tahun-ajaran', { immediate: true })
+const { data: semesterList } = useFetch<{ id: number; nama: string; kodeAngka: number | null; pakaiRomawi: boolean; isActive: boolean; tahunAjaran: { id: number; nama: string } }[]>('/api/admin/semester', { immediate: true })
 
-const semesterLabel = (s: string) => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
-
-function activeTaId() {
-  return taList.value?.find(t => t.isActive)?.id ?? ''
+function activeSemesterId() {
+  return semesterList.value?.find(s => s.isActive)?.id ?? ''
 }
 
 watch(
-  taList,
+  semesterList,
   (list) => {
-    if (!list?.some(t => t.isActive)) return
-    if (appliedTa.value !== '') return
-    selectedTa.value = activeTaId()
-    appliedTa.value = activeTaId()
+    if (!list?.some(s => s.isActive)) return
+    if (appliedSemester.value !== '') return
+    selectedSemester.value = activeSemesterId()
+    appliedSemester.value = activeSemesterId()
   },
   { immediate: true }
 )
 
 const kelasQuery = computed(() => ({
-  ...(selectedTa.value ? { tahunAjaranId: selectedTa.value } : {})
+  ...(selectedSemester.value ? { semesterId: selectedSemester.value } : {})
 }))
 
 const { data: kelasList } = useFetch<{ id: number; nama: string }[]>('/api/admin/kelas', {
@@ -86,7 +84,7 @@ const filteredKelasList = computed(() => {
 })
 
 const queryParams = computed(() => ({
-  ...(appliedTa.value ? { tahunAjaranId: appliedTa.value } : {}),
+  ...(appliedSemester.value ? { semesterId: appliedSemester.value } : {}),
   ...(appliedKelas.value ? { kelasId: appliedKelas.value } : {}),
   ...(appliedDari.value ? { tanggalMulai: appliedDari.value } : {}),
   ...(appliedSampai.value ? { tanggalAkhir: appliedSampai.value } : {}),
@@ -101,7 +99,7 @@ const { data, pending } = useFetch<SesiItem[]>('/api/admin/rekap/sesi', {
 })
 
 function applyFilter() {
-  appliedTa.value = selectedTa.value
+  appliedSemester.value = selectedSemester.value
   appliedJenjang.value = selectedJenjang.value
   appliedKelas.value = selectedKelas.value
   appliedDari.value = selectedDari.value
@@ -111,15 +109,15 @@ function applyFilter() {
 }
 
 function resetFilter() {
-  const defaultTa = activeTaId()
-  selectedTa.value = defaultTa
+  const defaultSemester = activeSemesterId()
+  selectedSemester.value = defaultSemester
   selectedJenjang.value = ''
   selectedKelas.value = ''
   selectedDari.value = ''
   selectedSampai.value = ''
   selectedStatus.value = ''
   searchQuery.value = ''
-  appliedTa.value = defaultTa
+  appliedSemester.value = defaultSemester
   appliedJenjang.value = ''
   appliedKelas.value = ''
   appliedDari.value = ''
@@ -173,11 +171,11 @@ function dateLabel(tanggal: string) {
 
     <div class="flex flex-wrap items-end gap-3 mb-5">
       <div class="flex flex-col gap-1 min-w-[180px]">
-        <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelTa') }}</label>
-        <select v-model="selectedTa"
+        <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelSemester') }}</label>
+        <select v-model="selectedSemester"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option :value="''">{{ t('admin.kelas.semuaTa') }}</option>
-          <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})</option>
+          <option :value="''">{{ t('admin.rekap.semuaSemester') }}</option>
+          <option v-for="s in semesterList" :key="s.id" :value="s.id">{{ s.tahunAjaran.nama }} ({{ semesterFullLabel(s, t) }})</option>
         </select>
       </div>
 

@@ -15,12 +15,12 @@
   const { pengaturan } = usePengaturan()
 
   const { data, pending, refresh } = useFetch < Ruangan[] > ('/api/admin/ruangan', { immediate: true })
-  const { data: kelasList } = useFetch < { id: number; nama: string; tahunAjaran: { isActive: boolean } }[] > ('/api/admin/kelas', { immediate: true })
+  const { data: kelasList } = useFetch < { id: number; nama: string; semester: { isActive: boolean } }[] > ('/api/admin/kelas', { immediate: true })
 
-  // Dropdown kelas: hanya kelas dari tahun ajaran aktif
+  // Dropdown kelas: hanya kelas dari semester aktif
   const kelasOptions = computed(() =>
     (kelasList.value || [])
-      .filter(k => k.tahunAjaran.isActive)
+      .filter(k => k.semester.isActive)
       .map(k => ({ id: k.id, nama: k.nama }))
   )
 

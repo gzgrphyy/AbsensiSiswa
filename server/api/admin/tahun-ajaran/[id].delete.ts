@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
 
   const existing = await prisma.tahunAjaran.findFirst({
     where: { id, deletedAt: null },
-    include: { _count: { select: { kelas: true } } }
+    include: { _count: { select: { semester: true } } }
   })
   if (!existing) throw createError({ statusCode: 404, statusMessage: 'Tahun ajaran tidak ditemukan' })
 
@@ -15,17 +15,20 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (existing._count.semester > 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Tahun ajaran yang masih memiliki semester tidak bisa dihapus. Hapus semester-nya terlebih dahulu.'
+    })
+  }
+
   await prisma.tahunAjaran.update({
     where: { id },
     data: { deletedAt: new Date() }
   })
 
-  const kelasCount = existing._count.kelas
-
   return {
-    message: kelasCount > 0
-      ? `Tahun ajaran berhasil dihapus. ${kelasCount} kelas terkait masih tersimpan di database.`
-      : 'Tahun ajaran berhasil dihapus.',
-    kelasCount
+    message: 'Tahun ajaran berhasil dihapus.',
+    kelasCount: 0
   }
 })

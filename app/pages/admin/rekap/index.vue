@@ -18,30 +18,28 @@ const currentBulan = () => {
 }
 
 const selectedBulan = ref(currentBulan())
-const selectedTa = ref<number | ''>('')
+const selectedSemester = ref<number | ''>('')
 const selectedKelas = ref<number | ''>('')
 
 const appliedBulan = ref(currentBulan())
-const appliedTa = ref<number | ''>('')
+const appliedSemester = ref<number | ''>('')
 const appliedKelas = ref<number | ''>('')
 
-const { data: taList } = useFetch<{ id: number; nama: string; semester: string; isActive: boolean }[]>('/api/admin/tahun-ajaran', { immediate: true })
+const { data: semesterList } = useFetch<{ id: number; nama: string; kodeAngka: number | null; pakaiRomawi: boolean; isActive: boolean; tahunAjaran: { id: number; nama: string } }[]>('/api/admin/semester', { immediate: true })
 
-const semesterLabel = (s: string) => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
-
-function activeTaId() {
-  return taList.value?.find(t => t.isActive)?.id ?? ''
+function activeSemesterId() {
+  return semesterList.value?.find(s => s.isActive)?.id ?? ''
 }
 
-// Default tahun ajaran = tahun ajaran yang aktif (isActive).
+// Default semester = semester yang aktif (isActive).
 // Kelas default-nya nanti dipilih lewat watcher kelasList.
 watch(
-  taList,
+  semesterList,
   (list) => {
-    if (!list?.some(t => t.isActive)) return
-    if (appliedTa.value !== '') return
-    selectedTa.value = activeTaId()
-    appliedTa.value = activeTaId()
+    if (!list?.some(s => s.isActive)) return
+    if (appliedSemester.value !== '') return
+    selectedSemester.value = activeSemesterId()
+    appliedSemester.value = activeSemesterId()
     selectedKelas.value = ''
     appliedKelas.value = ''
   },
@@ -49,23 +47,23 @@ watch(
 )
 
 const kelasQuery = computed(() => ({
-  ...(selectedTa.value ? { tahunAjaranId: selectedTa.value } : {})
+  ...(selectedSemester.value ? { semesterId: selectedSemester.value } : {})
 }))
 
-const { data: kelasList, refresh: refreshKelas } = useFetch<{ id: number; nama: string; tahunAjaranId: number }[]>('/api/admin/kelas', {
+const { data: kelasList, refresh: refreshKelas } = useFetch<{ id: number; nama: string; semesterId: number }[]>('/api/admin/kelas', {
   query: kelasQuery,
   immediate: true
 })
 
 // Default kelas = kelas pertama dari daftar yang sedang aktif.
-// Saat tahun ajaran berubah, draft kelas ikut di-reset ke kelas pertama daftar barunya.
+// Saat semester berubah, draft kelas ikut di-reset ke kelas pertama daftar barunya.
 watch(
   kelasList,
   (list) => {
     if (!list?.length) return
     selectedKelas.value = list[0].id
-    // Terapkan default kelas hanya jika daftar ini sesuai tahun ajaran yang dipakai
-    if (!appliedKelas.value && (!appliedTa.value || list[0].tahunAjaranId === appliedTa.value)) {
+    // Terapkan default kelas hanya jika daftar ini sesuai semester yang dipakai
+    if (!appliedKelas.value && (!appliedSemester.value || list[0].semesterId === appliedSemester.value)) {
       appliedKelas.value = list[0].id
     }
   },
@@ -74,7 +72,7 @@ watch(
 
 const queryParams = computed(() => ({
   ...(appliedBulan.value ? { bulan: appliedBulan.value } : {}),
-  ...(appliedTa.value ? { tahunAjaranId: appliedTa.value } : {}),
+  ...(appliedSemester.value ? { semesterId: appliedSemester.value } : {}),
   ...(appliedKelas.value ? { kelasId: appliedKelas.value } : {}),
 }))
 
@@ -87,19 +85,19 @@ const { data, pending } = useFetch<RekapItem[]>('/api/admin/rekap', {
 // Terapkan filter: salin nilai draft ke nilai applied (useFetch otomatis refetch)
 function applyFilter() {
   appliedBulan.value = selectedBulan.value
-  appliedTa.value = selectedTa.value
+  appliedSemester.value = selectedSemester.value
   appliedKelas.value = selectedKelas.value
 }
 
-// Atur Ulang: kembalikan ke default (tahun ajaran aktif, bulan berjalan, kelas pertama) lalu terapkan langsung
+// Atur Ulang: kembalikan ke default (semester aktif, bulan berjalan, kelas pertama) lalu terapkan langsung
 // refreshKelas() memastikan watcher kelasList dijalankan dan kelas pertama dipakai sebagai default.
 async function resetFilter() {
-  const defaultTa = activeTaId()
+  const defaultSemester = activeSemesterId()
   selectedBulan.value = currentBulan()
-  selectedTa.value = defaultTa
+  selectedSemester.value = defaultSemester
   selectedKelas.value = ''
   appliedBulan.value = currentBulan()
-  appliedTa.value = defaultTa
+  appliedSemester.value = defaultSemester
   appliedKelas.value = ''
 
   await refreshKelas()
@@ -135,13 +133,13 @@ const rataPersentase = computed(() =>
     <PageHeader :title="t('admin.rekap.title')" :description="t('admin.rekap.desc')" />
 
     <div class="flex flex-wrap items-end gap-3 mb-5">
-      <!-- Filter: Tahun Ajaran -->
+      <!-- Filter: Semester -->
       <div class="flex flex-col gap-1 min-w-[180px]">
-        <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelTa') }}</label>
-        <select v-model="selectedTa"
+        <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelSemester') }}</label>
+        <select v-model="selectedSemester"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          <option :value="''">{{ t('admin.kelas.semuaTa') }}</option>
-          <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})</option>
+          <option :value="''">{{ t('admin.rekap.semuaSemester') }}</option>
+          <option v-for="s in semesterList" :key="s.id" :value="s.id">{{ s.tahunAjaran.nama }} ({{ semesterFullLabel(s, t) }})</option>
         </select>
       </div>
 

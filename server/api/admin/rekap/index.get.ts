@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 const querySchema = z.object({
   bulan: z.string().optional(),
-  tahunAjaranId: z.coerce.number().int().positive().optional(),
+  semesterId: z.coerce.number().int().positive().optional(),
   kelasId: z.coerce.number().int().positive().optional()
 })
 
@@ -23,9 +23,9 @@ export default defineEventHandler(async (event) => {
   if (query.kelasId) {
     jadwalFilter.kelasId = query.kelasId
   }
-  if (query.tahunAjaranId) {
+  if (query.semesterId) {
     jadwalFilter.kelas = {
-      tahunAjaranId: query.tahunAjaranId
+      semesterId: query.semesterId
     }
   }
 

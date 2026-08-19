@@ -3,9 +3,9 @@
     id: number
     nama: string
     waliKelasId: number | null
-    tahunAjaranId: number
+    semesterId: number
     waliKelas: { id: number; nama: string; jenisKelamin: string | null; foto: string | null } | null
-    tahunAjaran: { id: number; nama: string; semester: string }
+    semester: { id: number; nama: string; kodeAngka: number | null; pakaiRomawi: boolean; tahunAjaran: { id: number; nama: string } }
     _count: { siswa: number; jadwalPelajaran: number }
   }
 
@@ -18,11 +18,11 @@
   }
 
   const draftSearch = ref('')
-  const draftTa = ref(0)
+  const draftSemester = ref(0)
   const draftJenjang = ref('')
 
   const appliedSearch = ref('')
-  const appliedTa = ref(0)
+  const appliedSemester = ref(0)
   const appliedJenjang = ref('')
 
   const page = ref(1)
@@ -34,7 +34,7 @@
 
   const { data: kelasList, pending, refresh } = useFetch < Kelas[] > (() => {
     const params = new URLSearchParams()
-    if (appliedTa.value) params.set('tahunAjaranId', String(appliedTa.value))
+    if (appliedSemester.value) params.set('semesterId', String(appliedSemester.value))
     if (appliedSearch.value) params.set('search', appliedSearch.value)
     return `/api/admin/kelas?${params.toString()}`
   }, { immediate: true })
@@ -60,30 +60,28 @@
     return filteredData.value.slice(start, start + pageSize)
   })
 
-  watch([appliedSearch, appliedTa, appliedJenjang], () => { page.value = 1 })
+  watch([appliedSearch, appliedSemester, appliedJenjang], () => { page.value = 1 })
 
   function applyFilter() {
     appliedSearch.value = draftSearch.value.trim()
-    appliedTa.value = draftTa.value
+    appliedSemester.value = draftSemester.value
     appliedJenjang.value = draftJenjang.value
   }
 
   function resetFilter() {
     draftSearch.value = ''
-    draftTa.value = 0
+    draftSemester.value = 0
     draftJenjang.value = ''
     appliedSearch.value = ''
-    appliedTa.value = 0
+    appliedSemester.value = 0
     appliedJenjang.value = ''
   }
-  const semesterLabel = (s: string) => s === 'GANJIL' ? t('semester.ganjil') : t('semester.genap')
-
   const { data: guruList } = useFetch < { id: number; nama: string }[] > ('/api/admin/guru', { immediate: true })
-  const { data: taList } = useFetch < { id: number; nama: string; semester: string; isActive: boolean }[] > ('/api/admin/tahun-ajaran', { immediate: true })
+  const { data: semesterList } = useFetch < { id: number; nama: string; kodeAngka: number | null; pakaiRomawi: boolean; isActive: boolean; tahunAjaran: { id: number; nama: string } }[] > ('/api/admin/semester', { immediate: true })
 
   const showModal = ref(false)
   const editing = ref < Kelas | null > (null)
-  const form = ref({ nama: '', waliKelasId: 0, tahunAjaranId: 0 })
+  const form = ref({ nama: '', waliKelasId: 0, semesterId: 0 })
   const saving = ref(false)
   const errorMsg = ref('')
   const successMsg = ref('')
@@ -101,11 +99,11 @@
     setTimeout(() => { successMsg.value = '' }, 3000)
   }
 
-  const activeTa = computed(() => taList.value?.find(t => t.isActive))
+  const activeSemester = computed(() => semesterList.value?.find(s => s.isActive))
 
   function openCreate() {
     editing.value = null
-    form.value = { nama: '', waliKelasId: 0, tahunAjaranId: activeTa.value?.id || 0 }
+    form.value = { nama: '', waliKelasId: 0, semesterId: activeSemester.value?.id || 0 }
     errorMsg.value = ''
     dirtyForm.value = false
     showModal.value = true
@@ -116,7 +114,7 @@
     form.value = {
       nama: item.nama,
       waliKelasId: item.waliKelasId || 0,
-      tahunAjaranId: item.tahunAjaranId
+      semesterId: item.semesterId
     }
     errorMsg.value = ''
     dirtyForm.value = false
@@ -138,7 +136,7 @@
         const body: Record<string, unknown> = {}
         if (form.value.nama !== editing.value.nama) body.nama = form.value.nama
         if ((form.value.waliKelasId || null) !== editing.value.waliKelasId) body.waliKelasId = form.value.waliKelasId || null
-        if (form.value.tahunAjaranId !== editing.value.tahunAjaranId) body.tahunAjaranId = form.value.tahunAjaranId
+        if (form.value.semesterId !== editing.value.semesterId) body.semesterId = form.value.semesterId
 
         if (Object.keys(body).length === 0) { showModal.value = false; return }
 
@@ -151,7 +149,7 @@
           body: {
             nama: form.value.nama,
             waliKelasId: form.value.waliKelasId || undefined,
-            tahunAjaranId: form.value.tahunAjaranId
+            semesterId: form.value.semesterId
           }
         })
         if (error.value) { showError(error.value.statusMessage || 'Gagal menyimpan'); return }
@@ -206,10 +204,10 @@
           <option value="">{{ t('admin.kelas.semuaJenjang') }}</option>
           <option v-for="j in jenjangList" :key="j" :value="j">{{ j }}</option>
         </select>
-        <select v-model="draftTa"
+        <select v-model="draftSemester"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="0">{{ t('admin.kelas.semuaTa') }}</option>
-          <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})</option>
+          <option v-for="s in semesterList" :key="s.id" :value="s.id">{{ s.tahunAjaran.nama }} ({{ semesterFullLabel(s, t) }})</option>
         </select>
         <button @click="applyFilter"
           class="px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md border border-blue-600 transition-colors">
@@ -273,7 +271,7 @@
                 <span v-else class="text-gray-600 dark:text-gray-300">-</span>
               </td>
               <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden md:table-cell">{{
-                item.tahunAjaran.nama }}</td>
+                item.semester.tahunAjaran.nama }} ({{ semesterFullLabel(item.semester, t) }})</td>
               <td class="px-4 py-3 text-center">
                 <span class="text-gray-700 dark:text-gray-200 ">{{ item._count.siswa }}</span>
               </td>
@@ -364,9 +362,9 @@
         </BaseFormField>
 
         <BaseFormField :label="t('admin.kelas.labelTa')" required>
-          <select v-model="form.tahunAjaranId" @change="onFormChange" required
+          <select v-model="form.semesterId" @change="onFormChange" required
             class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary-500 bg-white">
-            <option v-for="t in taList" :key="t.id" :value="t.id">{{ t.nama }} ({{ semesterLabel(t.semester) }})
+            <option v-for="s in semesterList" :key="s.id" :value="s.id">{{ s.tahunAjaran.nama }} ({{ semesterFullLabel(s, t) }})
             </option>
           </select>
         </BaseFormField>

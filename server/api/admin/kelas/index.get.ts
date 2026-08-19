@@ -1,16 +1,16 @@
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
-  const tahunAjaranId = query.tahunAjaranId ? parseInt(query.tahunAjaranId as string) : undefined
+  const semesterId = query.semesterId ? parseInt(query.semesterId as string) : undefined
   const search = query.search as string | undefined
 
   return await prisma.kelas.findMany({
     where: {
-      ...(tahunAjaranId && { tahunAjaranId }),
+      ...(semesterId && { semesterId }),
       ...(search && {
         OR: [
           { nama: { contains: search } },
           { waliKelas: { nama: { contains: search } } },
-          { tahunAjaran: { nama: { contains: search } } }
+          { semester: { tahunAjaran: { nama: { contains: search } } } }
         ]
       })
     },
@@ -19,7 +19,9 @@ export default defineEventHandler(async (event) => {
       waliKelas: {
         select: { id: true, nama: true, nip: true, jenisKelamin: true, foto: true }
       },
-      tahunAjaran: true,
+      semester: {
+        include: { tahunAjaran: true }
+      },
       _count: {
         select: { siswa: true }
       }

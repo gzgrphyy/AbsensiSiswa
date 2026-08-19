@@ -112,6 +112,7 @@ async function main() {
   await prisma.ptkPendamping.deleteMany()
   await prisma.siswa.deleteMany()
   await prisma.kelas.deleteMany()
+  await prisma.semester.deleteMany()
   await prisma.ruangan.deleteMany()
   await prisma.user.deleteMany()
   await prisma.pengaturan.deleteMany()
@@ -139,16 +140,26 @@ async function main() {
   // TAHUN AJARAN
   // ============================================
   const ta1 = await prisma.tahunAjaran.create({
-    data: { nama: '2025/2026', semester: 'GANJIL', isActive: false }
+    data: { nama: '2025/2026', isActive: false }
   })
   const ta2 = await prisma.tahunAjaran.create({
-    data: { nama: '2025/2026', semester: 'GENAP', isActive: false }
-  })
-  const ta3 = await prisma.tahunAjaran.create({
-    data: { nama: '2026/2027', semester: 'GANJIL', isActive: true }
+    data: { nama: '2026/2027', isActive: true }
   })
 
-  console.log('✓ Tahun Ajaran dibuat')
+  const sm1 = await prisma.semester.create({
+    data: { tahunAjaranId: ta1.id, nama: 'GANJIL', kodeAngka: 1, isActive: false }
+  })
+  const sm2 = await prisma.semester.create({
+    data: { tahunAjaranId: ta1.id, nama: 'GENAP', kodeAngka: 2, isActive: false }
+  })
+  const sm3 = await prisma.semester.create({
+    data: { tahunAjaranId: ta2.id, nama: 'GANJIL', kodeAngka: 1, isActive: true }
+  })
+  const sm4 = await prisma.semester.create({
+    data: { tahunAjaranId: ta2.id, nama: 'GENAP', kodeAngka: 2, isActive: false }
+  })
+
+  console.log('✓ Tahun Ajaran & Semester dibuat')
 
   // ============================================
   // PTK / GURU
@@ -247,7 +258,7 @@ async function main() {
         data: {
           nama: k.nama,
           waliKelasId: k.wali.id,
-          tahunAjaranId: ta3.id
+          semesterId: sm3.id
         }
       })
     )

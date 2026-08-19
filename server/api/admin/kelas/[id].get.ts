@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     where: { id },
     include: {
       waliKelas: { select: { id: true, nama: true, nip: true, jenisKelamin: true, foto: true } },
-      tahunAjaran: true,
+      semester: { include: { tahunAjaran: true } },
       _count: { select: { siswa: true, jadwalPelajaran: true } },
       siswa: {
         include: {
