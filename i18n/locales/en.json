@@ -29,7 +29,8 @@
     "jika": "If",
     "yaAktifkan": "Yes, Activate",
     "yaHapus": "Yes, Delete",
-    "muatLagi": "Reload"
+    "muatLagi": "Reload",
+    "tutup": "Close"
   },
   "role": {
     "admin": "Administrator",
@@ -218,7 +219,25 @@
       "colSakit": "Sick",
       "colIzin": "Leave",
       "colAlpha": "Absent",
-      "colPersentase": "% Attendance"
+      "colPersentase": "% Attendance",
+      "colAksi": "Action",
+      "lihatDetail": "View Detail",
+      "detailModalTitle": "Class Attendance Detail",
+      "tabMurid": "Student Details",
+      "tabSesi": "Session History",
+      "semuaMapel": "All Subjects",
+      "filterMapel": "Filter Subject",
+      "sedangMelihatMapel": "Showing attendance data for subject:",
+      "sedangMelihatSemua": "Showing accumulated data across all subjects",
+      "cariMurid": "Search student (name/NISN)...",
+      "cariSesi": "Search subject/teacher/room...",
+      "bukaHalamanKelas": "Class Page",
+      "totalSesi": "Total Sessions",
+      "pendingReviewAction": "Review",
+      "pendingAlert": "{count} attendances pending teacher confirmation in this class",
+      "emptyMurid": "No students in this class",
+      "emptySesi": "No attendance sessions found for this period",
+      "belumAdaData": "No data available"
     },
     "rekapSesi": {
       "title": "Per-Session Recap",

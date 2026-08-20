@@ -88,6 +88,11 @@ onMounted(() => {
     <LoadingSkeleton v-if="pending" type="table" :rows="4" :columns="5" />
 
     <template v-else>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+        <StatCard :label="t('admin.monitoring.statSudahAbsen')" :value="totalSudahAbsen" variant="blue" />
+        <StatCard :label="t('admin.monitoring.statBelumAbsen')" :value="totalBelumAbsen" variant="amber" />
+      </div>
+
       <!-- Search -->
       <div class="flex flex-wrap items-center gap-3 mb-4">
         <div class="relative flex-1 max-w-xs">
@@ -97,11 +102,6 @@ onMounted(() => {
           <input v-model="searchQuery" type="text" :placeholder="t('admin.monitoring.searchPlaceholder')"
             class="w-full pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-        <StatCard :label="t('admin.monitoring.statSudahAbsen')" :value="totalSudahAbsen" variant="blue" />
-        <StatCard :label="t('admin.monitoring.statBelumAbsen')" :value="totalBelumAbsen" variant="amber" />
       </div>
 
       <BaseCard>

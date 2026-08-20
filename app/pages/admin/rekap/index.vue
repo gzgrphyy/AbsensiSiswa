@@ -1,5 +1,6 @@
 <script setup lang="ts">
 interface RekapItem {
+  kelasId: number
   kelas: string
   totalSiswa: number
   hadir: number
@@ -8,6 +9,69 @@ interface RekapItem {
   alpha: number
   pending: number
   persentase: number
+}
+
+interface DetailSiswaItem {
+  siswaId: number
+  nama: string
+  nisn: string
+  foto: string | null
+  hadir: number
+  sakit: number
+  izin: number
+  alpha: number
+  pending: number
+  totalSesi: number
+  persentase: number
+  pelajaran?: Record<string, {
+    hadir: number
+    sakit: number
+    izin: number
+    alpha: number
+    pending: number
+    totalSesi: number
+    persentase: number
+  }>
+}
+
+interface DetailSesiItem {
+  id: number
+  tanggal: string
+  hari: string
+  mapel: string
+  jamMulai: string
+  jamSelesai: string
+  ruangan: string
+  guru: string
+  status: string
+  totalSiswa: number
+  hadir: number
+  sakit: number
+  izin: number
+  alpha: number
+  pending: number
+  persentase: number
+}
+
+interface DetailKelasResponse {
+  kelas: {
+    id: number
+    nama: string
+    waliKelas: { id: number; nama: string; nip: string | null; jenisKelamin: string | null } | null
+    semester: { id: number; nama: string; kodeAngka: number | null; pakaiRomawi: boolean; tahunAjaran: { id: number; nama: string } }
+    totalMurid: number
+  }
+  summary: {
+    totalSesi: number
+    totalHadir: number
+    totalSakit: number
+    totalIzin: number
+    totalAlpha: number
+    totalPending: number
+  }
+  daftarMapel: string[]
+  siswa: DetailSiswaItem[]
+  sesi: DetailSesiItem[]
 }
 
 const { t } = useI18n()
@@ -24,6 +88,127 @@ const selectedKelas = ref<number | ''>('')
 const appliedBulan = ref(currentBulan())
 const appliedSemester = ref<number | ''>('')
 const appliedKelas = ref<number | ''>('')
+
+// State modal detail kelas
+const detailKelas = ref<{ id: number; nama: string } | null>(null)
+const activeTab = ref<'murid' | 'sesi'>('murid')
+const searchMurid = ref('')
+const searchSesi = ref('')
+const selectedDetailMapel = ref('')
+
+const detailQueryParams = computed(() => ({
+  ...(appliedBulan.value ? { bulan: appliedBulan.value } : {}),
+  ...(appliedSemester.value ? { semesterId: appliedSemester.value } : {})
+}))
+
+const { data: detailData, pending: detailPending, refresh: refreshDetail } = useFetch<DetailKelasResponse>(
+  () => detailKelas.value ? `/api/admin/rekap/detail/${detailKelas.value.id}` : '',
+  {
+    query: detailQueryParams,
+    immediate: false,
+    watch: false
+  }
+)
+
+function formatStatusSesi(status: string) {
+  if (status === 'AKTIF') return t('admin.rekapSesi.sesiAktif') || 'Aktif'
+  if (status === 'SELESAI') return t('admin.rekapSesi.sesiSelesai') || 'Selesai'
+  return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+}
+
+function openDetailModal(item: RekapItem) {
+  detailKelas.value = { id: item.kelasId, nama: item.kelas }
+  activeTab.value = 'murid'
+  searchMurid.value = ''
+  searchSesi.value = ''
+  selectedDetailMapel.value = ''
+  refreshDetail()
+}
+
+function closeDetailModal() {
+  detailKelas.value = null
+}
+
+const filteredDetailSiswa = computed(() => {
+  const q = searchMurid.value.trim().toLowerCase()
+  const mapel = selectedDetailMapel.value
+  const list = detailData.value?.siswa || []
+
+  return list
+    .filter(s => !q || s.nama.toLowerCase().includes(q) || s.nisn.toLowerCase().includes(q))
+    .map(s => {
+      if (!mapel || !s.pelajaran || !s.pelajaran[mapel]) {
+        return {
+          siswaId: s.siswaId,
+          nama: s.nama,
+          nisn: s.nisn,
+          hadir: s.hadir,
+          sakit: s.sakit,
+          izin: s.izin,
+          alpha: s.alpha,
+          pending: s.pending,
+          totalSesi: s.totalSesi,
+          persentase: s.persentase
+        }
+      }
+      const pel = s.pelajaran[mapel]
+      return {
+        siswaId: s.siswaId,
+        nama: s.nama,
+        nisn: s.nisn,
+        hadir: pel.hadir,
+        sakit: pel.sakit,
+        izin: pel.izin,
+        alpha: pel.alpha,
+        pending: pel.pending,
+        totalSesi: pel.totalSesi,
+        persentase: pel.persentase
+      }
+    })
+})
+
+const activeSummary = computed(() => {
+  if (!selectedDetailMapel.value || !detailData.value) {
+    return detailData.value?.summary || {
+      totalSesi: 0,
+      totalHadir: 0,
+      totalSakit: 0,
+      totalIzin: 0,
+      totalAlpha: 0,
+      totalPending: 0
+    }
+  }
+
+  const mapel = selectedDetailMapel.value
+  const sesiMapel = (detailData.value.sesi || []).filter(s => s.mapel === mapel)
+  const siswaList = filteredDetailSiswa.value
+
+  return {
+    totalSesi: sesiMapel.length,
+    totalHadir: siswaList.reduce((acc, s) => acc + s.hadir, 0),
+    totalSakit: siswaList.reduce((acc, s) => acc + s.sakit, 0),
+    totalIzin: siswaList.reduce((acc, s) => acc + s.izin, 0),
+    totalAlpha: siswaList.reduce((acc, s) => acc + s.alpha, 0),
+    totalPending: siswaList.reduce((acc, s) => acc + s.pending, 0)
+  }
+})
+
+const filteredDetailSesi = computed(() => {
+  const q = searchSesi.value.trim().toLowerCase()
+  const mapel = selectedDetailMapel.value
+  const list = detailData.value?.sesi || []
+
+  return list.filter(s => {
+    const matchMapel = !mapel || s.mapel === mapel
+    const matchSearch = !q || (
+      s.mapel.toLowerCase().includes(q) ||
+      s.guru.toLowerCase().includes(q) ||
+      s.ruangan.toLowerCase().includes(q) ||
+      s.tanggal.includes(q)
+    )
+    return matchMapel && matchSearch
+  })
+})
 
 const { data: semesterList } = useFetch<{ id: number; nama: string; kodeAngka: number | null; pakaiRomawi: boolean; isActive: boolean; tahunAjaran: { id: number; nama: string } }[]>('/api/admin/semester', { immediate: true })
 
@@ -103,7 +288,40 @@ async function resetFilter() {
   await refreshKelas()
 }
 
+const page = ref(1)
+const pageSize = 10
+
 const displayData = computed(() => (Array.isArray(data.value) ? data.value : []))
+
+const totalPages = computed(() => Math.max(1, Math.ceil(displayData.value.length / pageSize)))
+
+const pageNumbers = computed<(number | '...')[]>(() => {
+  const total = totalPages.value
+  const current = page.value
+  const set = new Set<number>([1, total, current - 1, current, current + 1])
+  const sorted = [...set].filter(n => n >= 1 && n <= total).sort((a, b) => a - b)
+  const result: (number | '...')[] = []
+  let prev = 0
+  for (const n of sorted) {
+    if (n - prev > 1) result.push('...')
+    result.push(n)
+    prev = n
+  }
+  return result
+})
+
+const visibleData = computed(() => {
+  const start = (page.value - 1) * pageSize
+  return displayData.value.slice(start, start + pageSize)
+})
+
+watch([appliedBulan, appliedSemester, appliedKelas], () => {
+  page.value = 1
+})
+
+watch(() => displayData.value.length, () => {
+  if (page.value > totalPages.value) page.value = totalPages.value
+})
 
 const bulanOptions = computed(() => {
   const options = []
@@ -135,7 +353,7 @@ const rataPersentase = computed(() =>
     <div class="flex flex-wrap items-end gap-3 mb-5">
       <!-- Filter: Semester -->
       <div class="flex flex-col gap-1 min-w-[180px]">
-        <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelSemester') }}</label>
+        <label class="text-xs text-gray-500">{{ t('admin.rekap.labelSemester') }}</label>
         <select v-model="selectedSemester"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="''">{{ t('admin.rekap.semuaSemester') }}</option>
@@ -145,7 +363,7 @@ const rataPersentase = computed(() =>
 
       <!-- Filter: Kelas -->
       <div class="flex flex-col gap-1 min-w-[160px]">
-        <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelKelas') }}</label>
+        <label class="text-xs text-gray-500">{{ t('admin.rekap.labelKelas') }}</label>
         <select v-model="selectedKelas"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="''">{{ t('admin.jadwal.semuaKelas') }}</option>
@@ -155,7 +373,7 @@ const rataPersentase = computed(() =>
 
       <!-- Filter: Periode Bulan -->
       <div class="flex flex-col gap-1 min-w-[180px]">
-        <label class="text-xs  text-gray-500">{{ t('admin.rekap.labelPeriode') }}</label>
+        <label class="text-xs text-gray-500">{{ t('admin.rekap.labelPeriode') }}</label>
         <select v-model="selectedBulan"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="">{{ t('admin.rekap.semuaPeriode') }}</option>
@@ -171,12 +389,12 @@ const rataPersentase = computed(() =>
 
       <!-- Tombol Reset -->
       <button @click="resetFilter()"
-        class="px-3 py-2 text-xs  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border admin-accent-border transition-colors">
+        class="px-3 py-2 text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border admin-accent-border transition-colors">
         {{ t('common.aturUlang') }}
       </button>
     </div>
 
-    <LoadingSkeleton v-if="pending" type="table" :rows="6" :columns="8" />
+    <LoadingSkeleton v-if="pending" type="table" :rows="6" :columns="9" />
 
     <template v-else>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3 mb-5">
@@ -194,31 +412,404 @@ const rataPersentase = computed(() =>
           <table class="w-full text-xs">
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
-                <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colKelas') }}</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colTotalMurid') }}</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colHadir') }}</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colPending') }}</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colSakit') }}</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colIzin') }}</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colAlpha') }}</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colPersentase') }}</th>
+                <th class="text-left px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colKelas') }}</th>
+                <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colTotalMurid') }}</th>
+                <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colHadir') }}</th>
+                <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colPending') }}</th>
+                <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colSakit') }}</th>
+                <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colIzin') }}</th>
+                <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colAlpha') }}</th>
+                <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colPersentase') }}</th>
+                <th class="text-center px-4 py-3 text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.rekap.colAksi') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y admin-accent-divide">
-              <tr v-for="item in displayData" :key="item.kelas" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
-                <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.kelas }}</td>
+              <tr v-for="item in visibleData" :key="item.kelas" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+                <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{{ item.kelas }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.totalSiswa }}</td>
-                <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 ">{{ item.hadir }}</td>
+                <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 font-semibold">{{ item.hadir }}</td>
                 <td class="px-4 py-3 text-center text-gray-500 dark:text-gray-400">{{ item.pending }}</td>
-                <td class="px-4 py-3 text-center text-amber-600 dark:text-amber-400">{{ item.sakit }}</td>
-                <td class="px-4 py-3 text-center text-blue-600 dark:text-blue-400">{{ item.izin }}</td>
-                <td class="px-4 py-3 text-center text-red-600 dark:text-red-400">{{ item.alpha }}</td>
-                <td class="px-4 py-3 text-center " :class="item.persentase >= 90 ? 'text-green-600 dark:text-green-400' : item.persentase >= 75 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'">{{ item.persentase }}%</td>
+                <td class="px-4 py-3 text-center text-amber-600 dark:text-amber-400 font-medium">{{ item.sakit }}</td>
+                <td class="px-4 py-3 text-center text-blue-600 dark:text-blue-400 font-medium">{{ item.izin }}</td>
+                <td class="px-4 py-3 text-center text-red-600 dark:text-red-400 font-medium">{{ item.alpha }}</td>
+                <td class="px-4 py-3 text-center font-bold" :class="item.persentase >= 90 ? 'text-green-600 dark:text-green-400' : item.persentase >= 75 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'">{{ item.persentase }}%</td>
+                <td class="px-4 py-3 text-center">
+                  <button
+                    @click="openDetailModal(item)"
+                    class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-md border border-blue-200 dark:border-blue-800 transition-colors"
+                    :title="t('admin.rekap.lihatDetail')"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    {{ t('admin.rekap.lihatDetail') }}
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="displayData.length === 0">
+                <td colspan="9" class="px-4 py-16 text-center text-gray-400 dark:text-gray-500">
+                  {{ t('admin.rekap.belumAdaData') }}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
+
+        <!-- Pagination Controls -->
+        <div
+          v-if="displayData.length > pageSize"
+          class="px-4 sm:px-6 py-3 border-t admin-accent-border flex items-center justify-between gap-3"
+        >
+          <p class="text-xs text-gray-400 dark:text-gray-500">
+            {{ t('common.menampilkan', {
+              from: ((page - 1) * pageSize) + 1,
+              to: Math.min(page * pageSize, displayData.length),
+              total: displayData.length,
+              unit: t('admin.kelas.unitKelas') || 'kelas'
+            }) }}
+          </p>
+          <div class="ml-auto flex items-center gap-2">
+            <button
+              @click="page--"
+              :disabled="page <= 1"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              {{ t('common.sebelumnya') }}
+            </button>
+            <div class="flex items-center gap-1">
+              <template v-for="(n, i) in pageNumbers" :key="i">
+                <button
+                  v-if="n !== '...'"
+                  @click="page = n"
+                  :disabled="n === page"
+                  :class="n === page
+                    ? 'w-7 h-7 rounded-md text-xs text-white bg-primary-600 ring-1 ring-primary-600 cursor-default'
+                    : 'w-7 h-7 rounded-md text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 transition-colors'"
+                >
+                  {{ n }}
+                </button>
+                <span v-else class="px-0.5 text-xs text-gray-400 dark:text-gray-500 select-none">&hellip;</span>
+              </template>
+            </div>
+            <button
+              @click="page++"
+              :disabled="page >= totalPages"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/40 ring-1 ring-primary-200 dark:ring-primary-800 hover:bg-primary-100 dark:hover:bg-primary-900/60 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {{ t('common.selanjutnya') }}
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </BaseCard>
     </template>
+
+    <!-- Modal Detail Rekap Kelas -->
+    <BaseModal
+      :show="!!detailKelas"
+      :title="t('admin.rekap.detailModalTitle') + (detailKelas ? ' — ' + detailKelas.nama : '')"
+      maxWidth="max-w-4xl"
+      @close="closeDetailModal()"
+    >
+      <div v-if="detailPending" class="py-12">
+        <LoadingSkeleton type="table" :rows="5" :columns="6" />
+      </div>
+
+      <div v-else-if="detailData" class="space-y-3.5">
+        <!-- Header Info Card -->
+        <div class="bg-gray-50 dark:bg-slate-700/40 rounded-xl border admin-accent-border overflow-hidden">
+          <div class="p-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-base flex-shrink-0">
+                {{ detailData.kelas.nama.substring(0, 3) }}
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ detailData.kelas.nama }}</h3>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">
+                    ({{ detailData.kelas.semester.tahunAjaran.nama }} - {{ semesterFullLabel(detailData.kelas.semester, t) }})
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {{ t('admin.kelas.colWali') }}: <span class="font-medium text-gray-700 dark:text-gray-200">{{ detailData.kelas.waliKelas?.nama || '-' }}</span>
+                  • <span class="font-medium text-gray-700 dark:text-gray-200">{{ detailData.kelas.totalMurid }} {{ t('admin.siswa.unitMurid') }}</span>
+                  • <span class="font-medium text-gray-700 dark:text-gray-200">{{ activeSummary.totalSesi }} {{ t('admin.rekap.totalSesi') }}</span>
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <NuxtLink
+                :to="`/admin/kelas/${detailData.kelas.id}`"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors shadow-sm"
+                target="_blank"
+              >
+                {{ t('admin.rekap.bukaHalamanKelas') }}
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </NuxtLink>
+            </div>
+          </div>
+
+          <!-- Pending Notification Strip (Khusus jika ada status pending) -->
+          <div
+            v-if="activeSummary.totalPending > 0"
+            class="px-4 py-2.5 bg-amber-50 dark:bg-amber-950/40 border-t border-amber-200/80 dark:border-amber-800/60 flex items-center justify-between gap-3 text-xs"
+          >
+            <div class="flex items-center gap-2.5 text-amber-900 dark:text-amber-200">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              </span>
+              <span class="font-medium">
+                {{ t('admin.rekap.pendingAlert', { count: activeSummary.totalPending }) }}
+              </span>
+            </div>
+            <button
+              @click="activeTab = 'murid'"
+              class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold text-amber-800 dark:text-amber-200 bg-amber-100 dark:bg-amber-900/50 hover:bg-amber-200 dark:hover:bg-amber-900/80 transition-colors shadow-xs"
+            >
+              {{ t('admin.rekap.pendingReviewAction') }}
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Indicator Keterangan Mapel yang Sedang Dilihat -->
+        <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-blue-50/70 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 text-xs">
+          <div class="flex items-center gap-2 text-blue-900 dark:text-blue-200">
+            <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span v-if="selectedDetailMapel">
+              {{ t('admin.rekap.sedangMelihatMapel') }} <strong class="font-bold text-blue-700 dark:text-blue-300">{{ selectedDetailMapel }}</strong>
+            </span>
+            <span v-else>
+              {{ t('admin.rekap.sedangMelihatSemua') }}
+            </span>
+          </div>
+
+          <button
+            v-if="selectedDetailMapel"
+            @click="selectedDetailMapel = ''"
+            class="text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+          >
+            Reset filter
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        <!-- 4 Kartu Status Utama dengan Aksen Warna Jelas -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          <div class="p-3 rounded-xl border border-green-200 dark:border-green-800/60 bg-green-50/70 dark:bg-green-950/20 text-center">
+            <p class="text-[11px] font-medium text-green-700 dark:text-green-300">{{ t('admin.rekap.statHadir') }}</p>
+            <p class="text-lg font-bold text-green-700 dark:text-green-300 mt-0.5">{{ activeSummary.totalHadir }}</p>
+          </div>
+          <div class="p-3 rounded-xl border border-amber-200 dark:border-amber-800/60 bg-amber-50/70 dark:bg-amber-950/20 text-center">
+            <p class="text-[11px] font-medium text-amber-700 dark:text-amber-300">{{ t('admin.rekap.statSakit') }}</p>
+            <p class="text-lg font-bold text-amber-700 dark:text-amber-300 mt-0.5">{{ activeSummary.totalSakit }}</p>
+          </div>
+          <div class="p-3 rounded-xl border border-blue-200 dark:border-blue-800/60 bg-blue-50/70 dark:bg-blue-950/20 text-center">
+            <p class="text-[11px] font-medium text-blue-700 dark:text-blue-300">{{ t('admin.rekap.statIzin') }}</p>
+            <p class="text-lg font-bold text-blue-700 dark:text-blue-300 mt-0.5">{{ activeSummary.totalIzin }}</p>
+          </div>
+          <div class="p-3 rounded-xl border border-red-200 dark:border-red-800/60 bg-red-50/70 dark:bg-red-950/20 text-center">
+            <p class="text-[11px] font-medium text-red-700 dark:text-red-300">{{ t('admin.rekap.statAlpha') }}</p>
+            <p class="text-lg font-bold text-red-700 dark:text-red-300 mt-0.5">{{ activeSummary.totalAlpha }}</p>
+          </div>
+        </div>
+
+        <!-- Tab Nav & Filter Search -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b admin-accent-border pb-2 pt-1">
+          <!-- Segmented Control Pill Container -->
+          <div class="p-1 bg-gray-100 dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 inline-flex items-center">
+            <button
+              @click="activeTab = 'murid'"
+              class="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-lg transition-all"
+              :class="activeTab === 'murid'
+                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 shadow-sm font-semibold'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'"
+            >
+              {{ t('admin.rekap.tabMurid') }}
+              <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="activeTab === 'murid' ? 'bg-gray-100 dark:bg-slate-600 text-gray-700 dark:text-gray-200' : 'bg-gray-200 dark:bg-slate-700 text-gray-500'">
+                {{ detailData.siswa.length }}
+              </span>
+            </button>
+            <button
+              @click="activeTab = 'sesi'"
+              class="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-lg transition-all"
+              :class="activeTab === 'sesi'
+                ? 'bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 shadow-sm font-semibold'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'"
+            >
+              {{ t('admin.rekap.tabSesi') }}
+              <span class="px-1.5 py-0.2 rounded-full text-[10px]" :class="activeTab === 'sesi' ? 'bg-gray-100 dark:bg-slate-600 text-gray-700 dark:text-gray-200' : 'bg-gray-200 dark:bg-slate-700 text-gray-500'">
+                {{ filteredDetailSesi.length }}
+              </span>
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Filter Dropdown Mapel with Modern Focus & Radius -->
+            <select
+              v-if="detailData.daftarMapel?.length"
+              v-model="selectedDetailMapel"
+              class="px-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-xl text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-shadow"
+            >
+              <option value="">{{ t('admin.rekap.semuaMapel') }}</option>
+              <option v-for="m in detailData.daftarMapel" :key="m" :value="m">{{ m }}</option>
+            </select>
+
+            <!-- Search with Magnifier Icon -->
+            <div class="relative w-full sm:w-56">
+              <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                v-if="activeTab === 'murid'"
+                v-model="searchMurid"
+                type="text"
+                :placeholder="t('admin.rekap.cariMurid')"
+                class="w-full pl-8 pr-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-xl text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+              />
+              <input
+                v-else
+                v-model="searchSesi"
+                type="text"
+                :placeholder="t('admin.rekap.cariSesi')"
+                class="w-full pl-8 pr-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-xl text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Content 1: Rekap per Murid -->
+        <div v-if="activeTab === 'murid'" class="overflow-x-auto scrollbar-thin border admin-accent-border rounded-xl max-h-96">
+          <table class="w-full text-xs">
+            <thead class="sticky top-0 bg-gray-50 dark:bg-slate-700 z-10">
+              <tr class="border-b admin-accent-border">
+                <th class="text-left px-3.5 py-2.5 text-gray-600 dark:text-gray-300 font-semibold w-10">No</th>
+                <th class="text-left px-3.5 py-2.5 text-gray-600 dark:text-gray-300 font-semibold">Nama Murid</th>
+                <th class="text-center px-3.5 py-2.5 text-green-600 dark:text-green-400 font-semibold">{{ t('admin.rekap.statHadir') }}</th>
+                <th class="text-center px-3.5 py-2.5 text-amber-600 dark:text-amber-400 font-semibold">{{ t('admin.rekap.statSakit') }}</th>
+                <th class="text-center px-3.5 py-2.5 text-blue-600 dark:text-blue-400 font-semibold">{{ t('admin.rekap.statIzin') }}</th>
+                <th class="text-center px-3.5 py-2.5 text-red-600 dark:text-red-400 font-semibold">{{ t('admin.rekap.statAlpha') }}</th>
+                <th class="text-center px-3.5 py-2.5 text-gray-500 dark:text-gray-400 font-semibold">{{ t('admin.rekap.statPending') }}</th>
+                <th class="text-left px-4 py-2.5 text-gray-600 dark:text-gray-300 font-semibold w-36">% Kehadiran</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y admin-accent-divide">
+              <tr v-for="(s, idx) in filteredDetailSiswa" :key="s.siswaId" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+                <td class="px-3.5 py-2.5 text-gray-400 dark:text-gray-500">{{ idx + 1 }}</td>
+                <td class="px-3.5 py-2.5 font-medium text-gray-900 dark:text-gray-100">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-[10px] flex-shrink-0">
+                      {{ s.nama.substring(0, 1) }}
+                    </div>
+                    <div>
+                      <span>{{ s.nama }}</span>
+                      <span class="block text-[10px] font-normal text-gray-400 dark:text-gray-500">{{ s.nisn }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-3.5 py-2.5 text-center text-green-600 dark:text-green-400 font-bold">{{ s.hadir }}</td>
+                <td class="px-3.5 py-2.5 text-center text-amber-600 dark:text-amber-400 font-medium">{{ s.sakit }}</td>
+                <td class="px-3.5 py-2.5 text-center text-blue-600 dark:text-blue-400 font-medium">{{ s.izin }}</td>
+                <td class="px-3.5 py-2.5 text-center text-red-600 dark:text-red-400 font-bold">{{ s.alpha }}</td>
+                <td class="px-3.5 py-2.5 text-center text-gray-500 dark:text-gray-400">{{ s.pending }}</td>
+                <td class="px-4 py-2.5">
+                  <div class="flex items-center gap-2.5">
+                    <!-- Progress Bar Tipis -->
+                    <div class="w-16 h-1.5 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden flex-shrink-0">
+                      <div
+                        class="h-full rounded-full transition-all duration-300"
+                        :class="s.persentase >= 80 ? 'bg-green-500' : s.persentase >= 50 ? 'bg-amber-500' : 'bg-red-500'"
+                        :style="{ width: `${Math.min(100, Math.max(0, s.persentase))}%` }"
+                      />
+                    </div>
+                    <span
+                      class="text-[11px] font-bold"
+                      :class="s.persentase >= 80 ? 'text-green-600 dark:text-green-400' : s.persentase >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'"
+                    >
+                      {{ s.persentase }}%
+                    </span>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="filteredDetailSiswa.length === 0">
+                <td colspan="8" class="px-3 py-8 text-center text-gray-400 dark:text-gray-500">
+                  {{ t('admin.rekap.emptyMurid') }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tab Content 2: Riwayat Sesi Pelajaran -->
+        <div v-else class="overflow-x-auto scrollbar-thin border admin-accent-border rounded-lg max-h-96">
+          <table class="w-full text-xs">
+            <thead class="sticky top-0 bg-gray-50 dark:bg-slate-700 z-10">
+              <tr class="border-b admin-accent-border">
+                <th class="text-left px-3 py-2.5 text-gray-600 dark:text-gray-300 font-semibold">Tanggal & Jam</th>
+                <th class="text-left px-3 py-2.5 text-gray-600 dark:text-gray-300 font-semibold">Mata Pelajaran</th>
+                <th class="text-left px-3 py-2.5 text-gray-600 dark:text-gray-300 font-semibold hidden sm:table-cell">Guru</th>
+                <th class="text-left px-3 py-2.5 text-gray-600 dark:text-gray-300 font-semibold hidden md:table-cell">Ruangan</th>
+                <th class="text-center px-3 py-2.5 text-gray-600 dark:text-gray-300 font-semibold">Kehadiran</th>
+                <th class="text-center px-3 py-2.5 text-gray-600 dark:text-gray-300 font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y admin-accent-divide">
+              <tr v-for="sesi in filteredDetailSesi" :key="sesi.id" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+                <td class="px-3 py-2.5 text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                  <span class="font-medium text-gray-900 dark:text-gray-100">{{ new Date(sesi.tanggal).toLocaleDateString('id-ID') }}</span>
+                  <span class="block text-[11px] text-gray-500 dark:text-gray-400">{{ sesi.jamMulai }} - {{ sesi.jamSelesai }}</span>
+                </td>
+                <td class="px-3 py-2.5">
+                  <span class="font-medium text-gray-900 dark:text-gray-100">{{ sesi.mapel }}</span>
+                  <span class="block text-[10px] text-gray-400 sm:hidden">{{ sesi.guru }}</span>
+                </td>
+                <td class="px-3 py-2.5 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{{ sesi.guru }}</td>
+                <td class="px-3 py-2.5 text-gray-600 dark:text-gray-300 hidden md:table-cell">{{ sesi.ruangan }}</td>
+                <td class="px-3 py-2.5 text-center">
+                  <span class="font-semibold text-green-600 dark:text-green-400">{{ sesi.hadir }}</span> / {{ sesi.totalSiswa }}
+                  <span class="text-[11px] font-bold block" :class="sesi.persentase >= 90 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'">
+                    ({{ sesi.persentase }}%)
+                  </span>
+                </td>
+                <td class="px-3 py-2.5 text-center">
+                  <BaseBadge :variant="sesi.status === 'AKTIF' ? 'green' : 'gray'" size="sm" :dot="sesi.status === 'AKTIF'">
+                    {{ formatStatusSesi(sesi.status) }}
+                  </BaseBadge>
+                </td>
+              </tr>
+              <tr v-if="filteredDetailSesi.length === 0">
+                <td colspan="6" class="px-3 py-8 text-center text-gray-400 dark:text-gray-500">
+                  {{ t('admin.rekap.emptySesi') }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <template #footer>
+        <button
+          @click="closeDetailModal()"
+          class="px-4 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border admin-accent-border transition-colors"
+        >
+          {{ t('common.tutup') }}
+        </button>
+      </template>
+    </BaseModal>
   </AppLayout>
 </template>
+

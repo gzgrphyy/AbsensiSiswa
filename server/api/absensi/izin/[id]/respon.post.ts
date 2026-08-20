@@ -48,9 +48,14 @@ export default defineEventHandler(async (event) => {
       data: { status, diresponOleh: user.id, diresponPada: new Date() }
     })
 
+    // Cari seluruh sesi di hari tersebut
     const sesiList = await tx.sesiAbsensi.findMany({
       where: { tanggal: izin.tanggal, jadwal: { kelasId: izin.siswa.kelasId } },
-      select: { id: true }
+      include: {
+        requests: {
+          where: { siswaId: izin.siswaId }
+        }
+      }
     })
 
     const updateData: {
@@ -66,6 +71,13 @@ export default defineEventHandler(async (event) => {
     if (izin.keterangan) updateData.keterangan = izin.keterangan
 
     for (const s of sesiList) {
+      const existingReq = s.requests[0]
+      // Jika sesi sudah SELESAI dan murid sudah tercatat HADIR oleh guru mapel tersebut,
+      // jangan timpa kehadiran murid di sesi itu.
+      if (s.status === 'SELESAI' && existingReq?.status === 'HADIR') {
+        continue
+      }
+
       await tx.absensiRequest.upsert({
         where: {
           sesiId_siswaId: { sesiId: s.id, siswaId: izin.siswaId }

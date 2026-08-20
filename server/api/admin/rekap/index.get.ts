@@ -51,7 +51,8 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  const kelasMap = new Map<string, {
+  const kelasMap = new Map<number, {
+    kelasId: number
     kelas: string
     totalSiswa: number
     hadir: number
@@ -63,10 +64,11 @@ export default defineEventHandler(async (event) => {
   }>()
 
   for (const s of sesi) {
-    const key = s.jadwal.kelas.nama
+    const key = s.jadwal.kelas.id
     if (!kelasMap.has(key)) {
       kelasMap.set(key, {
-        kelas: key,
+        kelasId: key,
+        kelas: s.jadwal.kelas.nama,
         totalSiswa: s.jadwal.kelas._count.siswa,
         hadir: 0,
         sakit: 0,
@@ -92,6 +94,7 @@ export default defineEventHandler(async (event) => {
       : 0
 
     return {
+      kelasId: k.kelasId,
       kelas: k.kelas,
       totalSiswa: k.totalSiswa,
       hadir: k.hadir,

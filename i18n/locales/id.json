@@ -29,7 +29,8 @@
     "jika": "Jika",
     "yaAktifkan": "Ya, Aktifkan",
     "yaHapus": "Ya, Hapus",
-    "muatLagi": "Muat Ulang"
+    "muatLagi": "Muat Ulang",
+    "tutup": "Tutup"
   },
   "role": {
     "admin": "Administrator",
@@ -222,7 +223,25 @@
       "colSakit": "Sakit",
       "colIzin": "Izin",
       "colAlpha": "Alpha",
-      "colPersentase": "% Kehadiran"
+      "colPersentase": "% Kehadiran",
+      "colAksi": "Aksi",
+      "lihatDetail": "Lihat Detail",
+      "detailModalTitle": "Detail Rekap Kelas",
+      "tabMurid": "Rincian Murid",
+      "tabSesi": "Riwayat Sesi",
+      "semuaMapel": "Semua Mata Pelajaran",
+      "filterMapel": "Filter Mapel",
+      "sedangMelihatMapel": "Menampilkan data untuk mata pelajaran:",
+      "sedangMelihatSemua": "Menampilkan akumulasi seluruh mata pelajaran",
+      "cariMurid": "Cari murid (nama/NISN)...",
+      "cariSesi": "Cari mapel/guru/ruangan...",
+      "bukaHalamanKelas": "Halaman Kelas",
+      "totalSesi": "Total Sesi",
+      "pendingReviewAction": "Review",
+      "pendingAlert": "{count} absensi menunggu konfirmasi guru di kelas ini",
+      "emptyMurid": "Tidak ada murid di kelas ini",
+      "emptySesi": "Belum ada sesi absensi pada periode ini",
+      "belumAdaData": "Belum ada data"
     },
     "rekapSesi": {
       "title": "Rekap per Sesi",
