@@ -520,6 +520,7 @@
       "colBelumAbsen": "Not Checked In",
       "colStatus": "Status",
       "unitRuangan": "rooms",
+      "searchPlaceholder": "Search room...",
       "empty": "No monitoring data yet",
       "status": {
         "AKTIF": "Active",

@@ -528,6 +528,7 @@
       "colBelumAbsen": "Belum Absen",
       "colStatus": "Status",
       "unitRuangan": "ruangan",
+      "searchPlaceholder": "Cari ruangan...",
       "empty": "Belum ada data pemantauan",
       "status": {
         "AKTIF": "Aktif",

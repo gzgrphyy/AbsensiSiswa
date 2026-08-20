@@ -3,7 +3,6 @@ const { t } = useI18n()
 
 interface MonitoringItem {
   ruangan: string
-  sesiAktif: number
   totalSiswa: number
   sudahAbsen: number
   belumAbsen: number
@@ -17,14 +16,25 @@ const { data, pending, refresh } = useFetch<MonitoringItem[]>('/api/admin/monito
 
 const displayData = computed(() => data.value || [])
 
+const searchQuery = ref('')
 const page = ref(1)
 const pageSize = 10
 
-const totalPages = computed(() => Math.max(1, Math.ceil(displayData.value.length / pageSize)))
+const filteredData = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return displayData.value
+  return displayData.value.filter((item) =>
+    item.ruangan.toLowerCase().includes(q)
+  )
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredData.value.length / pageSize)))
 const visibleData = computed(() => {
   const start = (page.value - 1) * pageSize
-  return displayData.value.slice(start, start + pageSize)
+  return filteredData.value.slice(start, start + pageSize)
 })
+
+watch(searchQuery, () => { page.value = 1 })
 
 const pageNumbers = computed < (number | '...')[] > (() => {
   const total = totalPages.value
@@ -51,7 +61,6 @@ function statusLabel(status: string) {
   return status
 }
 
-const totalAktif = computed(() => displayData.value.filter(i => i.status === 'AKTIF').reduce((a, b) => a + b.sesiAktif, 0))
 const totalSudahAbsen = computed(() => displayData.value.reduce((a, b) => a + b.sudahAbsen, 0))
 const totalBelumAbsen = computed(() => displayData.value.reduce((a, b) => a + b.belumAbsen, 0))
 
@@ -76,11 +85,21 @@ onMounted(() => {
       </template>
     </PageHeader>
 
-    <LoadingSkeleton v-if="pending" type="table" :rows="4" :columns="6" />
+    <LoadingSkeleton v-if="pending" type="table" :rows="4" :columns="5" />
 
     <template v-else>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-        <StatCard :label="t('admin.monitoring.statSesiAktif')" :value="totalAktif" variant="green" />
+      <!-- Search -->
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <div class="relative flex-1 max-w-xs">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input v-model="searchQuery" type="text" :placeholder="t('admin.monitoring.searchPlaceholder')"
+            class="w-full pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
         <StatCard :label="t('admin.monitoring.statSudahAbsen')" :value="totalSudahAbsen" variant="blue" />
         <StatCard :label="t('admin.monitoring.statBelumAbsen')" :value="totalBelumAbsen" variant="amber" />
       </div>
@@ -91,7 +110,6 @@ onMounted(() => {
             <thead>
               <tr class="bg-gray-50 dark:bg-slate-700/50 border-b admin-accent-border">
                 <th class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colRuangan') }}</th>
-                <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colSesiAktif') }}</th>
                 <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colTotalMurid') }}</th>
                 <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colSudahAbsen') }}</th>
                 <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{ t('admin.monitoring.colBelumAbsen') }}</th>
@@ -101,7 +119,6 @@ onMounted(() => {
             <tbody class="divide-y admin-accent-divide">
               <tr v-for="item in visibleData" :key="item.ruangan" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
                 <td class="px-4 py-3  text-gray-900 dark:text-gray-100">{{ item.ruangan }}</td>
-                <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.sesiAktif }}</td>
                 <td class="px-4 py-3 text-center text-gray-700 dark:text-gray-300">{{ item.totalSiswa }}</td>
                 <td class="px-4 py-3 text-center text-green-600 dark:text-green-400 ">{{ item.sudahAbsen }}</td>
                 <td class="px-4 py-3 text-center text-amber-600 dark:text-amber-400 ">{{ item.belumAbsen }}</td>
@@ -111,8 +128,8 @@ onMounted(() => {
                   </BaseBadge>
                 </td>
               </tr>
-              <tr v-if="displayData.length === 0">
-                <td colspan="6" class="px-4 py-16 text-center">
+              <tr v-if="filteredData.length === 0">
+                <td colspan="5" class="px-4 py-16 text-center">
                   <p class="text-gray-500 ">{{ t('admin.monitoring.empty') }}</p>
                 </td>
               </tr>

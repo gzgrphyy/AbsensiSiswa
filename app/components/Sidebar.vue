@@ -35,13 +35,7 @@ const adminMenus = computed<MenuItem[]>(() => [
     ]
   },
   { label: t('nav.pemantauanRuangan'), to: '/admin/monitoring', icon: 'monitor' },
-  {
-    label: t('nav.rekapAbsensi'), icon: 'rekap',
-    children: [
-      { label: t('nav.rekapPerKelas'), to: '/admin/rekap' },
-      { label: t('nav.rekapPerSesi'), to: '/admin/rekap/sesi' },
-    ]
-  },
+  { label: t('nav.rekapAbsensi'), to: '/admin/rekap', icon: 'rekap' },
   { label: t('nav.eksporLaporan'), to: '/admin/export', icon: 'export' },
   { label: t('nav.pengaturan'), to: '/admin/pengaturan', icon: 'settings' },
   { label: t('nav.profil'), to: '/admin/profil', icon: 'profile' },
