@@ -32,7 +32,7 @@ export default defineNuxtConfig({
     preference: 'system',
     fallback: 'light',
   },
-  css: ['~/assets/css/main.css', 'select2/dist/css/select2.min.css'],
+  css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
     session: {

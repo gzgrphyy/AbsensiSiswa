@@ -396,7 +396,7 @@ async function handleSave() {
                   </label>
                   <!-- Preview -->
                   <div class="flex flex-col items-center gap-3">
-                    <div class="w-16 h-16 rounded-lg border-2 border-dashed admin-accent-border flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
+                    <div class="w-24 h-24 rounded-lg border-2 border-dashed admin-accent-border flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-gray-700">
                       <img v-if="faviconPreview || formBranding.faviconPath"
                         :src="faviconPreview || formBranding.faviconPath"
                         class="w-full h-full object-contain p-1.5"

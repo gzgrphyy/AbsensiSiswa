@@ -27,9 +27,14 @@ const { data: pendampingList } = useFetch<{ id: number; nama: string }[]>('/api/
 const hariList = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU']
 const hariLabel = (h: string) => t('hari.' + h)
 
-const searchQuery = ref('')
-const filterKelasId = ref<number | undefined>(undefined)
-const filterJenjang = ref('')
+const draftSearch = ref('')
+const draftJenjang = ref('')
+const draftKelasId = ref<number | undefined>(undefined)
+
+const appliedSearch = ref('')
+const appliedJenjang = ref('')
+const appliedKelasId = ref<number | undefined>(undefined)
+
 const page = ref(1)
 const pageSize = 10
 
@@ -51,15 +56,15 @@ const jenjangList = computed(() => {
 })
 
 const filteredKelasList = computed(() => {
-  if (!filterJenjang.value) return kelasList.value || []
-  return (kelasList.value || []).filter(k => jenjangOf(k.nama) === filterJenjang.value)
+  if (!draftJenjang.value) return kelasList.value || []
+  return (kelasList.value || []).filter(k => jenjangOf(k.nama) === draftJenjang.value)
 })
 
 const filteredJadwal = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase()
+  const q = appliedSearch.value.trim().toLowerCase()
   return (jadwalList.value || []).filter((j) => {
-    const matchKelas = !filterKelasId.value || j.kelas.id === filterKelasId.value
-    const matchJenjang = !filterJenjang.value || jenjangOf(j.kelas?.nama || '') === filterJenjang.value
+    const matchKelas = !appliedKelasId.value || j.kelas.id === appliedKelasId.value
+    const matchJenjang = !appliedJenjang.value || jenjangOf(j.kelas?.nama || '') === appliedJenjang.value
     const matchMapel = !q || j.mapel.toLowerCase().includes(q)
     return matchKelas && matchJenjang && matchMapel
   })
@@ -87,8 +92,23 @@ const visibleData = computed(() => {
   return filteredJadwal.value.slice(start, start + pageSize)
 })
 
-watch([searchQuery, filterJenjang], () => { filterKelasId.value = undefined; page.value = 1 })
-watch(filterKelasId, () => { page.value = 1 })
+watch([appliedSearch, appliedJenjang, appliedKelasId], () => { page.value = 1 })
+watch(draftJenjang, () => { draftKelasId.value = undefined })
+
+function applyFilter() {
+  appliedSearch.value = draftSearch.value.trim()
+  appliedJenjang.value = draftJenjang.value
+  appliedKelasId.value = draftKelasId.value
+}
+
+function resetFilter() {
+  draftSearch.value = ''
+  draftJenjang.value = ''
+  draftKelasId.value = undefined
+  appliedSearch.value = ''
+  appliedJenjang.value = ''
+  appliedKelasId.value = undefined
+}
 
 const showModal = ref(false)
 const editing = ref<Jadwal | null>(null)
@@ -197,19 +217,27 @@ async function handleDelete() {
           <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input v-model="searchQuery" type="text" :placeholder="t('admin.jadwal.searchPlaceholder')"
+          <input v-model="draftSearch" type="text" :placeholder="t('admin.jadwal.searchPlaceholder')"
             class="w-40 sm:w-56 pl-9 pr-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400" />
         </div>
-        <select v-model="filterJenjang"
+        <select v-model="draftJenjang"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option value="">{{ t('admin.jadwal.semuaJenjang') }}</option>
           <option v-for="j in jenjangList" :key="j" :value="j">{{ j }}</option>
         </select>
-        <select v-model="filterKelasId"
+        <select v-model="draftKelasId"
           class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           <option :value="undefined">{{ t('admin.jadwal.semuaKelas') }}</option>
           <option v-for="k in filteredKelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
+        <button @click="applyFilter"
+          class="px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md border border-blue-600 transition-colors">
+          {{ t('common.terapkan') }}
+        </button>
+        <button @click="resetFilter"
+          class="px-3 py-2 text-xs  text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-md border admin-accent-border transition-colors">
+          {{ t('common.aturUlang') }}
+        </button>
       </div>
       <button @click="openCreate"
         class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs ">

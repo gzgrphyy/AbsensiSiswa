@@ -250,9 +250,6 @@
               <th
                 class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden sm:table-cell">
                 {{ t('admin.kelas.colWali') }}</th>
-              <th
-                class="text-left px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider hidden md:table-cell">
-                {{ t('admin.kelas.colTa') }}</th>
               <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
                 t('admin.kelas.colMurid') }}</th>
               <th class="text-center px-4 py-3  text-gray-600 dark:text-gray-300 text-xs tracking-wider">{{
@@ -278,8 +275,6 @@
                 </div>
                 <span v-else class="text-gray-600 dark:text-gray-300">-</span>
               </td>
-              <td class="px-4 py-3 text-gray-500 dark:text-gray-400 text-xs hidden md:table-cell">{{
-                item.semester.tahunAjaran.nama }} ({{ semesterFullLabel(item.semester, t) }})</td>
               <td class="px-4 py-3 text-center">
                 <span class="text-gray-700 dark:text-gray-200 ">{{ item._count.siswa }}</span>
               </td>
@@ -313,7 +308,7 @@
               </td>
             </tr>
             <tr v-if="filteredData.length === 0">
-              <td colspan="5" class="px-4 py-16 text-center">
+              <td colspan="4" class="px-4 py-16 text-center">
                 <svg class="w-10 h-10 text-gray-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor"
                   viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -364,9 +359,8 @@
 
 
         <BaseFormField :label="t('admin.kelas.labelWali')">
-          <Select2 v-model="form.waliKelasId" :options="guruOptions"
-            :settings="{ width: '100%', placeholder: t('common.tidakAda') }"
-            @change="onFormChange" />
+          <SearchableSelect v-model="form.waliKelasId" :options="guruOptions"
+            :placeholder="t('common.tidakAda')" @change="onFormChange" />
         </BaseFormField>
 
         <BaseFormField :label="t('admin.kelas.labelTa')" required>
@@ -411,9 +405,5 @@
     background-position: right 15px center !important;
     /* Mengatur posisi jarak ikon */
     background-size: 14px;
-  }
-
-  .select2-container.select2-container--open {
-    z-index: 9999 !important;
   }
 </style>
