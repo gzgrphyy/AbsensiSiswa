@@ -97,7 +97,6 @@ const searchSesi = ref('')
 const selectedDetailMapel = ref('')
 
 const detailQueryParams = computed(() => ({
-  ...(appliedBulan.value ? { bulan: appliedBulan.value } : {}),
   ...(appliedSemester.value ? { semesterId: appliedSemester.value } : {})
 }))
 
@@ -355,7 +354,7 @@ const rataPersentase = computed(() =>
       <div class="flex flex-col gap-1 min-w-[180px]">
         <label class="text-xs text-gray-500">{{ t('admin.rekap.labelSemester') }}</label>
         <select v-model="selectedSemester"
-          class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600">
           <option :value="''">{{ t('admin.rekap.semuaSemester') }}</option>
           <option v-for="s in semesterList" :key="s.id" :value="s.id">{{ s.tahunAjaran.nama }} ({{ semesterFullLabel(s, t) }})</option>
         </select>
@@ -365,7 +364,7 @@ const rataPersentase = computed(() =>
       <div class="flex flex-col gap-1 min-w-[160px]">
         <label class="text-xs text-gray-500">{{ t('admin.rekap.labelKelas') }}</label>
         <select v-model="selectedKelas"
-          class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600">
           <option :value="''">{{ t('admin.jadwal.semuaKelas') }}</option>
           <option v-for="k in kelasList" :key="k.id" :value="k.id">{{ k.nama }}</option>
         </select>
@@ -375,7 +374,7 @@ const rataPersentase = computed(() =>
       <div class="flex flex-col gap-1 min-w-[180px]">
         <label class="text-xs text-gray-500">{{ t('admin.rekap.labelPeriode') }}</label>
         <select v-model="selectedBulan"
-          class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          class="px-3 py-2 border admin-accent-border rounded-lg text-xs bg-white dark:bg-slate-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600">
           <option value="">{{ t('admin.rekap.semuaPeriode') }}</option>
           <option v-for="o in bulanOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
         </select>
@@ -521,7 +520,7 @@ const rataPersentase = computed(() =>
         <LoadingSkeleton type="table" :rows="5" :columns="6" />
       </div>
 
-      <div v-else-if="detailData" class="space-y-3.5">
+      <div v-else-if="detailData" class="space-y-4">
         <!-- Header Info Card -->
         <div class="bg-gray-50 dark:bg-slate-700/40 rounded-xl border admin-accent-border overflow-hidden">
           <div class="p-4 flex flex-wrap items-center justify-between gap-4">
@@ -582,56 +581,59 @@ const rataPersentase = computed(() =>
               </svg>
             </button>
           </div>
+
+          <!-- Filter Indicator (integrated into header card) -->
+          <div class="px-4 py-2 border-t border-gray-200/60 dark:border-slate-600/60 flex items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-2 text-blue-900 dark:text-blue-200">
+              <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span v-if="selectedDetailMapel">
+                {{ t('admin.rekap.sedangMelihatMapel') }} <strong class="font-bold text-blue-700 dark:text-blue-300">{{ selectedDetailMapel }}</strong>
+              </span>
+              <span v-else>
+                {{ t('admin.rekap.sedangMelihatSemua') }}
+              </span>
+            </div>
+            <button
+              v-if="selectedDetailMapel"
+              @click="selectedDetailMapel = ''"
+              class="text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+            >
+              Reset filter
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
         </div>
 
-        <!-- Indicator Keterangan Mapel yang Sedang Dilihat -->
-        <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-blue-50/70 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 text-xs">
-          <div class="flex items-center gap-2 text-blue-900 dark:text-blue-200">
-            <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span v-if="selectedDetailMapel">
-              {{ t('admin.rekap.sedangMelihatMapel') }} <strong class="font-bold text-blue-700 dark:text-blue-300">{{ selectedDetailMapel }}</strong>
-            </span>
-            <span v-else>
-              {{ t('admin.rekap.sedangMelihatSemua') }}
-            </span>
+        <!-- Ringkasan Status (inline, netral kecuali Alpha) -->
+        <div class="flex flex-wrap items-end gap-x-5 gap-y-2 px-1">
+          <div class="text-center">
+            <p class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('admin.rekap.statHadir') }}</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ activeSummary.totalHadir }}</p>
           </div>
-
-          <button
-            v-if="selectedDetailMapel"
-            @click="selectedDetailMapel = ''"
-            class="text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-          >
-            Reset filter
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-
-        <!-- 4 Kartu Status Utama dengan Aksen Warna Jelas -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-          <div class="p-3 rounded-xl border border-green-200 dark:border-green-800/60 bg-green-50/70 dark:bg-green-950/20 text-center">
-            <p class="text-[11px] font-medium text-green-700 dark:text-green-300">{{ t('admin.rekap.statHadir') }}</p>
-            <p class="text-lg font-bold text-green-700 dark:text-green-300 mt-0.5">{{ activeSummary.totalHadir }}</p>
+          <div class="text-center">
+            <p class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('admin.rekap.statSakit') }}</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ activeSummary.totalSakit }}</p>
           </div>
-          <div class="p-3 rounded-xl border border-amber-200 dark:border-amber-800/60 bg-amber-50/70 dark:bg-amber-950/20 text-center">
-            <p class="text-[11px] font-medium text-amber-700 dark:text-amber-300">{{ t('admin.rekap.statSakit') }}</p>
-            <p class="text-lg font-bold text-amber-700 dark:text-amber-300 mt-0.5">{{ activeSummary.totalSakit }}</p>
+          <div class="text-center">
+            <p class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('admin.rekap.statIzin') }}</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ activeSummary.totalIzin }}</p>
           </div>
-          <div class="p-3 rounded-xl border border-blue-200 dark:border-blue-800/60 bg-blue-50/70 dark:bg-blue-950/20 text-center">
-            <p class="text-[11px] font-medium text-blue-700 dark:text-blue-300">{{ t('admin.rekap.statIzin') }}</p>
-            <p class="text-lg font-bold text-blue-700 dark:text-blue-300 mt-0.5">{{ activeSummary.totalIzin }}</p>
+          <div class="text-center">
+            <p class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('admin.rekap.statAlpha') }}</p>
+            <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ activeSummary.totalAlpha }}</p>
           </div>
-          <div class="p-3 rounded-xl border border-red-200 dark:border-red-800/60 bg-red-50/70 dark:bg-red-950/20 text-center">
-            <p class="text-[11px] font-medium text-red-700 dark:text-red-300">{{ t('admin.rekap.statAlpha') }}</p>
-            <p class="text-lg font-bold text-red-700 dark:text-red-300 mt-0.5">{{ activeSummary.totalAlpha }}</p>
+          <div class="text-center">
+            <p class="text-[11px] text-gray-500 dark:text-gray-400">{{ t('admin.rekap.statPending') }}</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ activeSummary.totalPending }}</p>
           </div>
         </div>
 
         <!-- Tab Nav & Filter Search -->
         <div class="flex flex-wrap items-center justify-between gap-3 border-b admin-accent-border pb-2 pt-1">
           <!-- Segmented Control Pill Container -->
-          <div class="p-1 bg-gray-100 dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 inline-flex items-center">
+          <div class="p-1 bg-gray-100 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 inline-flex items-center">
             <button
               @click="activeTab = 'murid'"
               class="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-lg transition-all"
@@ -660,11 +662,11 @@ const rataPersentase = computed(() =>
 
           <div class="flex flex-wrap items-center gap-2">
             <!-- Filter Dropdown Mapel with Modern Focus & Radius -->
-            <select
-              v-if="detailData.daftarMapel?.length"
-              v-model="selectedDetailMapel"
-              class="px-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-xl text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm transition-shadow"
-            >
+             <select
+               v-if="detailData.daftarMapel?.length"
+               v-model="selectedDetailMapel"
+               class="px-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 shadow-sm transition-shadow"
+             >
               <option value="">{{ t('admin.rekap.semuaMapel') }}</option>
               <option v-for="m in detailData.daftarMapel" :key="m" :value="m">{{ m }}</option>
             </select>
@@ -674,75 +676,60 @@ const rataPersentase = computed(() =>
               <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              <input
-                v-if="activeTab === 'murid'"
-                v-model="searchMurid"
-                type="text"
-                :placeholder="t('admin.rekap.cariMurid')"
-                class="w-full pl-8 pr-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-xl text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-              />
-              <input
-                v-else
-                v-model="searchSesi"
-                type="text"
-                :placeholder="t('admin.rekap.cariSesi')"
-                class="w-full pl-8 pr-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-xl text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-              />
+               <input
+                 v-if="activeTab === 'murid'"
+                 v-model="searchMurid"
+                 type="text"
+                 :placeholder="t('admin.rekap.cariMurid')"
+                 class="w-full pl-8 pr-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 shadow-sm"
+               />
+               <input
+                 v-else
+                 v-model="searchSesi"
+                 type="text"
+                 :placeholder="t('admin.rekap.cariSesi')"
+                 class="w-full pl-8 pr-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 shadow-sm"
+               />
             </div>
           </div>
         </div>
 
         <!-- Tab Content 1: Rekap per Murid -->
-        <div v-if="activeTab === 'murid'" class="overflow-x-auto scrollbar-thin border admin-accent-border rounded-xl max-h-96">
+        <div v-if="activeTab === 'murid'" class="overflow-x-auto scrollbar-thin border admin-accent-border rounded-lg max-h-96">
           <table class="w-full text-xs">
             <thead class="sticky top-0 bg-gray-50 dark:bg-slate-700 z-10">
               <tr class="border-b admin-accent-border">
                 <th class="text-left px-3.5 py-2.5 text-gray-600 dark:text-gray-300 font-semibold w-10">No</th>
                 <th class="text-left px-3.5 py-2.5 text-gray-600 dark:text-gray-300 font-semibold">Nama Murid</th>
-                <th class="text-center px-3.5 py-2.5 text-green-600 dark:text-green-400 font-semibold">{{ t('admin.rekap.statHadir') }}</th>
-                <th class="text-center px-3.5 py-2.5 text-amber-600 dark:text-amber-400 font-semibold">{{ t('admin.rekap.statSakit') }}</th>
-                <th class="text-center px-3.5 py-2.5 text-blue-600 dark:text-blue-400 font-semibold">{{ t('admin.rekap.statIzin') }}</th>
-                <th class="text-center px-3.5 py-2.5 text-red-600 dark:text-red-400 font-semibold">{{ t('admin.rekap.statAlpha') }}</th>
+                <th class="text-center px-3.5 py-2.5 text-gray-600 dark:text-gray-300 font-semibold">{{ t('admin.rekap.statHadir') }}</th>
+                <th class="text-center px-3.5 py-2.5 text-gray-600 dark:text-gray-300 font-semibold">{{ t('admin.rekap.statSakit') }}</th>
+                <th class="text-center px-3.5 py-2.5 text-gray-600 dark:text-gray-300 font-semibold">{{ t('admin.rekap.statIzin') }}</th>
+                <th class="text-center px-3.5 py-2.5 text-gray-600 dark:text-gray-300 font-semibold">{{ t('admin.rekap.statAlpha') }}</th>
                 <th class="text-center px-3.5 py-2.5 text-gray-500 dark:text-gray-400 font-semibold">{{ t('admin.rekap.statPending') }}</th>
                 <th class="text-left px-4 py-2.5 text-gray-600 dark:text-gray-300 font-semibold w-36">% Kehadiran</th>
               </tr>
             </thead>
             <tbody class="divide-y admin-accent-divide">
-              <tr v-for="(s, idx) in filteredDetailSiswa" :key="s.siswaId" class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+              <tr v-for="(s, idx) in filteredDetailSiswa" :key="s.siswaId"
+                class="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors"
+                :class="s.alpha > 0 ? 'bg-red-50/40 dark:bg-red-950/15' : ''"
+              >
                 <td class="px-3.5 py-2.5 text-gray-400 dark:text-gray-500">{{ idx + 1 }}</td>
-                <td class="px-3.5 py-2.5 font-medium text-gray-900 dark:text-gray-100">
-                  <div class="flex items-center gap-2">
-                    <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold text-[10px] flex-shrink-0">
-                      {{ s.nama.substring(0, 1) }}
-                    </div>
-                    <div>
-                      <span>{{ s.nama }}</span>
-                      <span class="block text-[10px] font-normal text-gray-400 dark:text-gray-500">{{ s.nisn }}</span>
-                    </div>
-                  </div>
+                <td class="px-3.5 py-2.5">
+                  <span class="font-medium text-gray-900 dark:text-gray-100">{{ s.nama }}</span>
+                  <span class="block text-[10px] text-gray-400 dark:text-gray-500">{{ s.nisn }}</span>
                 </td>
-                <td class="px-3.5 py-2.5 text-center text-green-600 dark:text-green-400 font-bold">{{ s.hadir }}</td>
-                <td class="px-3.5 py-2.5 text-center text-amber-600 dark:text-amber-400 font-medium">{{ s.sakit }}</td>
-                <td class="px-3.5 py-2.5 text-center text-blue-600 dark:text-blue-400 font-medium">{{ s.izin }}</td>
-                <td class="px-3.5 py-2.5 text-center text-red-600 dark:text-red-400 font-bold">{{ s.alpha }}</td>
+                <td class="px-3.5 py-2.5 text-center text-gray-700 dark:text-gray-300">{{ s.hadir }}</td>
+                <td class="px-3.5 py-2.5 text-center text-gray-700 dark:text-gray-300">{{ s.sakit }}</td>
+                <td class="px-3.5 py-2.5 text-center text-gray-700 dark:text-gray-300">{{ s.izin }}</td>
+                <td class="px-3.5 py-2.5 text-center" :class="s.alpha > 0 ? 'text-red-600 dark:text-red-400 font-bold' : 'text-gray-700 dark:text-gray-300'">{{ s.alpha }}</td>
                 <td class="px-3.5 py-2.5 text-center text-gray-500 dark:text-gray-400">{{ s.pending }}</td>
                 <td class="px-4 py-2.5">
-                  <div class="flex items-center gap-2.5">
-                    <!-- Progress Bar Tipis -->
-                    <div class="w-16 h-1.5 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden flex-shrink-0">
-                      <div
-                        class="h-full rounded-full transition-all duration-300"
-                        :class="s.persentase >= 80 ? 'bg-green-500' : s.persentase >= 50 ? 'bg-amber-500' : 'bg-red-500'"
-                        :style="{ width: `${Math.min(100, Math.max(0, s.persentase))}%` }"
-                      />
-                    </div>
-                    <span
-                      class="text-[11px] font-bold"
-                      :class="s.persentase >= 80 ? 'text-green-600 dark:text-green-400' : s.persentase >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'"
-                    >
-                      {{ s.persentase }}%
-                    </span>
-                  </div>
+                  <span class="text-xs font-bold"
+                    :class="s.persentase >= 80 ? 'text-green-600 dark:text-green-400' : s.persentase >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'"
+                  >
+                    {{ s.persentase }}%
+                  </span>
                 </td>
               </tr>
               <tr v-if="filteredDetailSiswa.length === 0">

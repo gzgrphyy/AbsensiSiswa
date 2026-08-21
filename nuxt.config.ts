@@ -2,8 +2,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-
-
   modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n'],
 
   i18n: {
@@ -42,6 +40,13 @@ export default defineNuxtConfig({
   nitro: {
     experimental: {
       openAPI: false
+    }
+  },
+
+  // --- Tambahkan blok konfigurasi ini ---
+  vite: {
+    server: {
+      allowedHosts: true // Mengizinkan ngrok & host eksternal lainnya
     }
   }
 })

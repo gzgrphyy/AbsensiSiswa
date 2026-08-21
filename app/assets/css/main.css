@@ -41,6 +41,12 @@
 .dark .admin-accent-icon {
   color: rgb(var(--admin-accent-light));
 }
+.admin-accent-ring {
+  --tw-ring-color: rgb(var(--admin-accent));
+}
+.admin-accent-border-focus {
+  border-color: rgb(var(--admin-accent));
+}
 
 
 @layer base {
