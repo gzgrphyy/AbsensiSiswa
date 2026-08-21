@@ -335,9 +335,9 @@ body{background:#ffffff;color:#123B6D}
 .is-landscape .welcome{font-size:36px;line-height:1.1;text-align:left;letter-spacing:0.01em;white-space:nowrap}
 .badge{display:inline-flex;align-items:center;justify-content:center;min-width:84px;height:38px;padding:0 16px;border:1.5px solid #123B6D;border-radius:999px;background:#ffffff;font-weight:600;color:#123B6D;font-size:16pt;line-height:1;text-align:center}
 .is-landscape .badge{font-size:21px;height:38px;min-width:0;border-radius:10px;letter-spacing:0.06em}
-.qr-frame{position:relative;width:310px;height:310px;border:1.5px solid #123B6D;border-radius:16px;background:#ffffff;padding:0;display:flex;align-items:center;justify-content:center}
-.qr-frame .qr-box{width:100%;height:100%;padding:26px;border:none;border-radius:16px;display:flex;align-items:center;justify-content:center}
-.qr-box{background:#ffffff;border:1px solid #D9E0E8;border-radius:16px;padding:24px;display:flex;align-items:center;justify-content:center}
+.qr-frame{position:relative;width:280px;height:280px;border:1.5px solid #123B6D;border-radius:16px;background:#ffffff;padding:0;display:flex;align-items:center;justify-content:center}
+.qr-frame .qr-box{width:100%;height:100%;padding:16px;border:none;border-radius:16px;display:flex;align-items:center;justify-content:center}
+.qr-box{background:#ffffff;border:1px solid #D9E0E8;border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:center}
 .qr-box svg{width:100%;height:100%;display:block}
 .scan-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;width:162px;height:40px;background:#123B6D;color:#ffffff;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border-radius:999px;font-size:10.5pt;line-height:1}
 .scan-dot{width:5px;height:5px;border-radius:999px;background:#FFC400;flex-shrink:0}
@@ -650,10 +650,10 @@ ${footer}
 
       <!-- Modal QR Code -->
       <Transition name="modal">
-        <div v-if="showQR" class="fixed inset-0 z-50 flex items-center justify-center p-4" @click.self="showQR = null">
+        <div v-if="showQR" class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto" @click.self="showQR = null">
           <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="showQR = null"></div>
           <div
-            class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-4 border border-gray-300 dark:border-gray-600 text-center">
+            class="relative bg-white dark:bg-gray-800 rounded-lg w-full max-w-sm mx-auto p-3 border border-gray-300 dark:border-gray-600 text-center overflow-y-auto">
             <button @click="showQR = null"
               class="absolute top-3 right-3 p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -662,28 +662,30 @@ ${footer}
             </button>
 
             <h2 class="text-lg  text-gray-900 dark:text-gray-100 mb-1">{{ showQR.nama }}</h2>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">{{ t('admin.ruangan.qr.scan') }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ t('admin.ruangan.qr.scan') }}</p>
 
-            <div v-if="loadingQR" class="py-12 flex justify-center">
+            <div v-if="loadingQR" class="py-8 flex justify-center">
               <svg class="w-8 h-8 animate-spin text-blue-600" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
             </div>
-            <div v-else-if="qrSvg" class="flex justify-center mb-4" v-html="qrSvg"></div>
+            <div v-else-if="qrSvg" class="flex justify-center mb-3">
+              <div class="qr-preview" v-html="qrSvg" style="width: 200px; height: 200px; margin: 0 auto;"></div>
+            </div>
 
             <!-- Kode QR Text -->
-            <div v-if="!loadingQR && showQR" class="mb-4 text-left">
+            <div v-if="!loadingQR && showQR" class="mb-3 text-left">
               <div
-                class="bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600 p-3 space-y-2">
+                class="bg-gray-50 dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600 p-2.5 space-y-1.5">
                 <div>
                   <label class="text-xs  text-gray-500 dark:text-gray-400 tracking-wider">{{
                     t('admin.ruangan.qr.labelKode') }}</label>
                   <div class="flex items-center gap-2 mt-1">
                     <code
-                      class="flex-1 text-sm font-mono text-blue-700 dark:text-blue-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded px-2 py-1.5 truncate">{{ showQR.qrCode }}</code>
+                      class="flex-1 text-xs font-mono text-blue-700 dark:text-blue-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded px-2 py-1.5 truncate">{{ showQR.qrCode }}</code>
                     <button @click="copyToClipboard(showQR.qrCode, 'code')"
-                      class="flex-shrink-0 p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors"
+                      class="flex-shrink-0 p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors"
                       :title="copiedType === 'code' ? t('admin.ruangan.qr.tersalin') : t('admin.ruangan.qr.salinKode')">
                       <svg v-if="copiedType !== 'code'" class="w-4 h-4" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
@@ -700,9 +702,9 @@ ${footer}
                   <label class="text-xs  text-gray-500 tracking-wider">{{ t('admin.ruangan.qr.labelUrl') }}</label>
                   <div class="flex items-center gap-2 mt-1">
                     <code
-                      class="flex-1 text-xs font-mono text-gray-600 dark:text-gray-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded px-2 py-1.5 truncate">{{ scanUrl }}</code>
+                      class="flex-1 text-[0.85em] font-mono text-gray-600 dark:text-gray-300 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded px-2 py-1.5 truncate">{{ scanUrl }}</code>
                     <button @click="copyToClipboard(scanUrl, 'url')"
-                      class="flex-shrink-0 p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors"
+                      class="flex-shrink-0 p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors"
                       :title="copiedType === 'url' ? t('admin.ruangan.qr.tersalin') : t('admin.ruangan.qr.salinUrl')">
                       <svg v-if="copiedType !== 'url'" class="w-4 h-4" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
@@ -719,7 +721,7 @@ ${footer}
               </div>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-3">
               <label class="block text-left text-xs text-gray-500 dark:text-gray-400 tracking-wider mb-1.5">{{
                 t('admin.ruangan.qr.pilihUkuran') }}</label>
               <div class="flex rounded-lg border border-gray-200 dark:border-slate-600 overflow-hidden">
@@ -736,7 +738,7 @@ ${footer}
 
             <div class="flex gap-2 justify-center">
               <button @click="printQR"
-                class="px-4 py-2 text-sm  text-white bg-blue-600 rounded-md hover:bg-blue-700 inline-flex items-center gap-1.5">
+                class="px-4 py-2 text-xs  text-white bg-blue-600 rounded-md hover:bg-blue-700 inline-flex items-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -822,5 +824,21 @@ ${footer}
   .fade-enter-from,
   .fade-leave-to {
     opacity: 0;
+  }
+
+  .qr-preview {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qr-preview svg {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain;
   }
 </style>
