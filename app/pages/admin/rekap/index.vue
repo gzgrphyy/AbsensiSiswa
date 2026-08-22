@@ -95,9 +95,11 @@ const activeTab = ref<'murid' | 'sesi'>('murid')
 const searchMurid = ref('')
 const searchSesi = ref('')
 const selectedDetailMapel = ref('')
+const selectedDetailTanggal = ref('')
 
 const detailQueryParams = computed(() => ({
-  ...(appliedSemester.value ? { semesterId: appliedSemester.value } : {})
+  ...(appliedSemester.value ? { semesterId: appliedSemester.value } : {}),
+  ...(selectedDetailTanggal.value ? { tanggal: selectedDetailTanggal.value } : {})
 }))
 
 const { data: detailData, pending: detailPending, refresh: refreshDetail } = useFetch<DetailKelasResponse>(
@@ -121,8 +123,13 @@ function openDetailModal(item: RekapItem) {
   searchMurid.value = ''
   searchSesi.value = ''
   selectedDetailMapel.value = ''
+  selectedDetailTanggal.value = ''
   refreshDetail()
 }
+
+watch(selectedDetailTanggal, () => {
+  if (detailKelas.value) refreshDetail()
+})
 
 function closeDetailModal() {
   detailKelas.value = null
@@ -524,10 +531,7 @@ const rataPersentase = computed(() =>
         <!-- Header Info Card -->
         <div class="bg-gray-50 dark:bg-slate-700/40 rounded-xl border admin-accent-border overflow-hidden">
           <div class="p-4 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-base flex-shrink-0">
-                {{ detailData.kelas.nama.substring(0, 3) }}
-              </div>
+            <div>
               <div>
                 <div class="flex items-center gap-2">
                   <h3 class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ detailData.kelas.nama }}</h3>
@@ -547,12 +551,8 @@ const rataPersentase = computed(() =>
               <NuxtLink
                 :to="`/admin/kelas/${detailData.kelas.id}`"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors shadow-sm"
-                target="_blank"
               >
                 {{ t('admin.rekap.bukaHalamanKelas') }}
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
               </NuxtLink>
             </div>
           </div>
@@ -588,16 +588,22 @@ const rataPersentase = computed(() =>
               <svg class="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span v-if="selectedDetailMapel">
+              <span v-if="selectedDetailMapel && selectedDetailTanggal">
+                {{ t('admin.rekap.sedangMelihatMapel') }} <strong class="font-bold text-blue-700 dark:text-blue-300">{{ selectedDetailMapel }}</strong> pada <strong class="font-bold text-blue-700 dark:text-blue-300">{{ new Date(selectedDetailTanggal + 'T00:00:00').toLocaleDateString('id-ID') }}</strong>
+              </span>
+              <span v-else-if="selectedDetailMapel">
                 {{ t('admin.rekap.sedangMelihatMapel') }} <strong class="font-bold text-blue-700 dark:text-blue-300">{{ selectedDetailMapel }}</strong>
+              </span>
+              <span v-else-if="selectedDetailTanggal">
+                Sedang melihat tanggal <strong class="font-bold text-blue-700 dark:text-blue-300">{{ new Date(selectedDetailTanggal + 'T00:00:00').toLocaleDateString('id-ID') }}</strong>
               </span>
               <span v-else>
                 {{ t('admin.rekap.sedangMelihatSemua') }}
               </span>
             </div>
             <button
-              v-if="selectedDetailMapel"
-              @click="selectedDetailMapel = ''"
+              v-if="selectedDetailMapel || selectedDetailTanggal"
+              @click="selectedDetailMapel = ''; selectedDetailTanggal = ''"
               class="text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
             >
               Reset filter
@@ -670,6 +676,13 @@ const rataPersentase = computed(() =>
               <option value="">{{ t('admin.rekap.semuaMapel') }}</option>
               <option v-for="m in detailData.daftarMapel" :key="m" :value="m">{{ m }}</option>
             </select>
+
+            <!-- Filter Tanggal -->
+            <input
+              v-model="selectedDetailTanggal"
+              type="date"
+              class="px-3 py-1.5 border border-gray-200 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 shadow-sm transition-shadow"
+            />
 
             <!-- Search with Magnifier Icon -->
             <div class="relative w-full sm:w-56">

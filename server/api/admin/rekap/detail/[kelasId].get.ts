@@ -2,7 +2,8 @@ import { z } from 'zod'
 
 const querySchema = z.object({
   bulan: z.string().optional(),
-  semesterId: z.coerce.number().int().positive().optional()
+  semesterId: z.coerce.number().int().positive().optional(),
+  tanggal: z.string().optional()
 })
 
 export default defineEventHandler(async (event) => {
@@ -60,6 +61,7 @@ export default defineEventHandler(async (event) => {
   const sesiList = await prisma.sesiAbsensi.findMany({
     where: {
       ...(filterTanggal && { tanggal: filterTanggal }),
+      ...(query.tanggal && { tanggal: query.tanggal }),
       jadwal: jadwalFilter
     },
     orderBy: [{ tanggal: 'desc' }, { jadwal: { jamMulai: 'asc' } }],

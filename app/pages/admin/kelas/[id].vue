@@ -83,11 +83,6 @@ watch(searchSiswa, () => { page.value = 1 })
       <!-- Info Bar -->
       <div class="bg-white dark:bg-gray-800 rounded-lg border admin-accent-border p-5 mb-4">
         <div class="flex items-center gap-3 mb-4">
-          <div class="p-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex-shrink-0">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13v-1m4 1v-3m4 3V8M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-            </svg>
-          </div>
           <div class="min-w-0 flex-1">
             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ t('admin.kelas.labelNama') }}</p>
             <p class="text-lg font-bold text-gray-900 dark:text-gray-100 truncate">{{ kelas.nama }}</p>

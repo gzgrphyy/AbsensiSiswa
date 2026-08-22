@@ -4,6 +4,11 @@ export default defineNuxtConfig({
 
   modules: ['nuxt-auth-utils', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/i18n'],
 
+  devServer: {
+    host: '0.0.0.0',
+    port: 3000
+  },
+
   i18n: {
     defaultLocale: 'id',
     fallbackLocale: 'id',
