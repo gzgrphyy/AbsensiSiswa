@@ -43,5 +43,26 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return result
+  const totalSesiAktif = result.reduce((sum, r) => sum + r.sesiAktif, 0)
+
+  const totalMuridAktif = result.reduce((sum, r) => {
+    if (r.sesiAktif === 0) return sum
+    return sum + r.totalSiswa
+  }, 0)
+
+  const totalSudahAbsenAktif = result.reduce((sum, r) => {
+    if (r.sesiAktif === 0) return sum
+    return sum + r.sudahAbsen
+  }, 0)
+
+  const partisipasiPersen = totalMuridAktif > 0 ? Math.round(totalSudahAbsenAktif / totalMuridAktif * 100) : 0
+
+  return {
+    rooms: result,
+    totalRuangan: ruangan.length,
+    totalSesiAktif,
+    totalMuridAktif,
+    totalSudahAbsenAktif,
+    partisipasiPersen
+  }
 })

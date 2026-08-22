@@ -30,7 +30,8 @@
     "yaAktifkan": "Ya, Aktifkan",
     "yaHapus": "Ya, Hapus",
     "muatLagi": "Muat Ulang",
-    "tutup": "Tutup"
+    "tutup": "Tutup",
+    "dari": "dari"
   },
   "role": {
     "admin": "Administrator",
@@ -537,6 +538,8 @@
       "desc": "Pantau sesi absensi secara langsung",
       "langsung": "Langsung",
       "hariIni": "Hari ini",
+      "statRuanganAktif": "Ruangan Aktif",
+      "statPartisipasiHariIni": "Partisipasi Hari Ini",
       "statSesiAktif": "Sesi Aktif",
       "statSudahAbsen": "Sudah Absen",
       "statBelumAbsen": "Belum Absen",

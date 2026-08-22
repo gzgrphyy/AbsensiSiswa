@@ -1,6 +1,15 @@
 <script setup lang="ts">
 const { t } = useI18n()
 
+interface MonitoringResponse {
+  rooms: MonitoringItem[]
+  totalRuangan: number
+  totalSesiAktif: number
+  totalMuridAktif: number
+  totalSudahAbsenAktif: number
+  partisipasiPersen: number
+}
+
 interface MonitoringItem {
   ruangan: string
   totalSiswa: number
@@ -9,12 +18,16 @@ interface MonitoringItem {
   status: string
 }
 
-const { data, pending, refresh } = useFetch<MonitoringItem[]>('/api/admin/monitoring', {
+const { data, pending, refresh } = useFetch<MonitoringResponse>('/api/admin/monitoring', {
   immediate: true,
-  transform: (res: any) => Array.isArray(res) ? res : []
+  transform: (res: any) => Array.isArray(res?.rooms) ? res : { rooms: [] }
 })
 
-const displayData = computed(() => data.value || [])
+const displayData = computed(() => data.value?.rooms || [])
+
+const totalRuangan = computed(() => data.value?.totalRuangan ?? 0)
+const totalSesiAktif = computed(() => data.value?.totalSesiAktif ?? 0)
+const partisipasiPersen = computed(() => data.value?.partisipasiPersen ?? 0)
 
 const searchQuery = ref('')
 const page = ref(1)
@@ -61,9 +74,6 @@ function statusLabel(status: string) {
   return status
 }
 
-const totalSudahAbsen = computed(() => displayData.value.reduce((a, b) => a + b.sudahAbsen, 0))
-const totalBelumAbsen = computed(() => displayData.value.reduce((a, b) => a + b.belumAbsen, 0))
-
 // Auto-refresh every 15 seconds for real-time monitoring
 onMounted(() => {
   const interval = setInterval(() => refresh(), 15000)
@@ -88,9 +98,33 @@ onMounted(() => {
     <LoadingSkeleton v-if="pending" type="table" :rows="4" :columns="5" />
 
     <template v-else>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-        <StatCard :label="t('admin.monitoring.statSudahAbsen')" :value="totalSudahAbsen" variant="blue" />
-        <StatCard :label="t('admin.monitoring.statBelumAbsen')" :value="totalBelumAbsen" variant="amber" />
+      <div class="grid grid-cols-1 sm:grid-cols-[1.3fr_1fr] gap-4 mb-5">
+        <div class="rounded-lg bg-[rgb(var(--surface-1))] dark:bg-slate-800 p-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+              <p class="text-[12px] text-gray-500 dark:text-gray-400 tracking-wider">{{ t('admin.monitoring.statRuanganAktif') }}</p>
+            </div>
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5" />
+              <circle cx="12" cy="12" r="2" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1" />
+            </svg>
+          </div>
+          <p class="text-2xl text-gray-900 dark:text-gray-100 mt-2">
+            {{ totalSesiAktif }} <span class="text-sm text-gray-400">{{ t('common.dari') }} {{ totalRuangan }}</span>
+          </p>
+        </div>
+
+        <div class="rounded-lg bg-[rgb(var(--surface-1))] dark:bg-slate-800 p-4">
+          <p class="text-[12px] text-gray-500 dark:text-gray-400 tracking-wider">{{ t('admin.monitoring.statPartisipasiHariIni') }}</p>
+          <p class="text-2xl mt-2" style="color: rgb(var(--text-accent))">{{ partisipasiPersen }}%</p>
+          <div class="mt-3 h-[6px] rounded-full bg-gray-200 dark:bg-slate-700 overflow-hidden">
+            <div class="h-full rounded-full transition-all duration-500" :style="{ width: partisipasiPersen + '%', backgroundColor: 'rgb(var(--fill-accent))' }"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Search -->

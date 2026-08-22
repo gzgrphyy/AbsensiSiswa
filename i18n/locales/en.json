@@ -30,7 +30,8 @@
     "yaAktifkan": "Yes, Activate",
     "yaHapus": "Yes, Delete",
     "muatLagi": "Reload",
-    "tutup": "Close"
+    "tutup": "Close",
+    "dari": "of"
   },
   "role": {
     "admin": "Administrator",
@@ -529,6 +530,8 @@
       "desc": "Monitor attendance sessions in real time",
       "langsung": "Live",
       "hariIni": "Today",
+      "statRuanganAktif": "Active Rooms",
+      "statPartisipasiHariIni": "Today's Participation",
       "statSesiAktif": "Active Sessions",
       "statSudahAbsen": "Checked In",
       "statBelumAbsen": "Not Checked In",
